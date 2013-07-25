@@ -43,13 +43,6 @@ public interface ICache {
 	public long getMisses();
 
 	/**
-	 * Get cache's capacity (the max number of entries)
-	 * 
-	 * @return
-	 */
-	public long getCapacity();
-
-	/**
 	 * Gets number of seconds before entries to be expired since the last access
 	 * 
 	 * @return

@@ -7,6 +7,7 @@ import java.util.Set;
 import my.library.cache.AbstractCache;
 import my.library.cache.CacheConstant;
 import my.library.cache.ICache;
+import my.library.cache.config.RedisCacheConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -29,18 +30,15 @@ public class RedisCache extends AbstractCache implements ICache {
 	private String nameSpace;
 	private JedisPool jedisPool;
 
-	public RedisCache() {
-		super();
-	}
-
-	public RedisCache(String name) {
+	public RedisCache(String name, RedisCacheConfig config) {
 		super(name);
-	}
-
-	public RedisCache(String name, String host, int port) {
-		super(name);
-		this.host = host;
-		this.port = port;
+		if (config != null) {
+			this.host = config.getHost();
+			this.port = config.getPort();
+			this.maxActive = config.getMaxActive();
+			this.testOnReturn = config.isTestOnReturn();
+			this.expireAfterWrite = config.getExpireAfterWrite();
+		}
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public class RedisCache extends AbstractCache implements ICache {
 		// Maximum active connections to Redis instance
 		int maxActive = this.maxActive > 0 ? this.maxActive
 				: CacheConstant.DEFAULT_REDIS_MAX_ACTIVE;
-		setMaxActive(maxActive);
+		this.maxActive = maxActive;
 		jedisConfig.setMaxActive(maxActive);
 
 		// Tests whether connection is dead when returning a connection to the
@@ -109,22 +107,6 @@ public class RedisCache extends AbstractCache implements ICache {
 	@Override
 	protected Object internalGet(String key) {
 		return cache.get(nameSpace + key);
-	}
-
-	public void setMaxActive(int maxActive) {
-		this.maxActive = maxActive;
-	}
-
-	public void setTestOnReturn(boolean testOnReturn) {
-		this.testOnReturn = testOnReturn;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
 	}
 
 }
