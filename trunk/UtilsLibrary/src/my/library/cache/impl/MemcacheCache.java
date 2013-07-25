@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import my.library.cache.AbstractCache;
-import my.library.cache.CacheConstant;
 import my.library.cache.ICache;
 import my.library.cache.config.MemcacheConfig;
 import net.spy.memcached.CacheMap;
@@ -42,11 +41,12 @@ public class MemcacheCache extends AbstractCache implements ICache {
 
 		String name = getName();
 		long expireAfterWrite = getExpireAfterWrite();
-		expireAfterWrite = expireAfterWrite > 0 ? expireAfterWrite
-				: CacheConstant.DEFAULT_EXPIRE_AFTER_WRITE;
-		this.expireAfterWrite = expireAfterWrite;
 		int expireTime = (int) expireAfterWrite;
-		cache = new CacheMap(memcache, expireTime, name + ":");
+		if (expireTime <= 0) {
+			cache = new CacheMap(memcache, name + ":");
+		} else {
+			cache = new CacheMap(memcache, expireTime, name + ":");
+		}
 	}
 
 	public MemcachedClient getMemcacheClient() {
@@ -82,7 +82,9 @@ public class MemcacheCache extends AbstractCache implements ICache {
 
 	@Override
 	public void clear() {
-		cache.clear();
+		for (String key : cache.keySet()) {
+			cache.remove(key);
+		}
 	}
 
 	@Override
