@@ -7,6 +7,7 @@ import java.util.List;
 import my.library.cache.AbstractCache;
 import my.library.cache.CacheConstant;
 import my.library.cache.ICache;
+import my.library.cache.config.MemcacheConfig;
 import net.spy.memcached.CacheMap;
 import net.spy.memcached.MemcachedClient;
 
@@ -22,18 +23,13 @@ public class MemcacheCache extends AbstractCache implements ICache {
 	private int port;
 	private CacheMap cache;
 
-	public MemcacheCache() {
-		super();
-	}
-
-	public MemcacheCache(String name) {
+	public MemcacheCache(String name, MemcacheConfig config) {
 		super(name);
-	}
-
-	public MemcacheCache(String name, String host, int port) {
-		super(name);
-		this.host = host;
-		this.port = port;
+		if (config != null) {
+			this.host = config.getHost();
+			this.port = config.getPort();
+			this.expireAfterWrite = config.getExpireAfterWrite();
+		}
 	}
 
 	@Override
@@ -43,12 +39,12 @@ public class MemcacheCache extends AbstractCache implements ICache {
 		if (memcache == null) {
 			return;
 		}
-		
+
 		String name = getName();
 		long expireAfterWrite = getExpireAfterWrite();
 		expireAfterWrite = expireAfterWrite > 0 ? expireAfterWrite
 				: CacheConstant.DEFAULT_EXPIRE_AFTER_WRITE;
-		setExpireAfterWrite(expireAfterWrite);
+		this.expireAfterWrite = expireAfterWrite;
 		int expireTime = (int) expireAfterWrite;
 		cache = new CacheMap(memcache, expireTime, name + ":");
 	}
@@ -114,16 +110,8 @@ public class MemcacheCache extends AbstractCache implements ICache {
 		return host;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
-	}
-
 	public int getPort() {
 		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
 	}
 
 }

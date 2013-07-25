@@ -2,12 +2,16 @@ package my.library.cache;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * 
+ * @author ngoctdn
+ *
+ */
 public abstract class AbstractCache implements ICache {
 
-	private String name;
-	private long capacity;
-	private long expireAfterWrite;
-	private long expireAfterAccess;
+	protected String name;
+	protected long expireAfterWrite;
+	protected long expireAfterAccess;
 	private AtomicLong hits = new AtomicLong(), misses = new AtomicLong();
 
 	public AbstractCache() {
@@ -17,21 +21,16 @@ public abstract class AbstractCache implements ICache {
 		this.name = name;
 	}
 
-	public AbstractCache(String name, long capacity) {
-		this.name = name;
-		this.capacity = capacity;
+	@Override
+	public void init() {
+		// EMPTY
 	}
 
-    @Override
-    public void init() {
-        // EMPTY
-    }
+	@Override
+	public void destroy() {
+		// EMPTY
+	}
 
-    @Override
-    public void destroy() {
-        // EMPTY
-    }
-	
 	@Override
 	public String getName() {
 		return name;
@@ -42,30 +41,13 @@ public abstract class AbstractCache implements ICache {
 	}
 
 	@Override
-	public long getCapacity() {
-		return capacity;
-	}
-
-	public void setCapacity(long capacity) {
-		this.capacity = capacity;
-	}
-
-	@Override
 	public long getExpireAfterWrite() {
 		return expireAfterWrite;
-	}
-
-	public void setExpireAfterWrite(long expireAfterWrite) {
-		this.expireAfterWrite = expireAfterWrite;
 	}
 
 	@Override
 	public long getExpireAfterAccess() {
 		return expireAfterAccess;
-	}
-
-	public void setExpireAfterAccess(long expireAfterAccess) {
-		this.expireAfterAccess = expireAfterAccess;
 	}
 
 	@Override
@@ -96,6 +78,6 @@ public abstract class AbstractCache implements ICache {
 		}
 		return value;
 	}
-	
+
 	protected abstract Object internalGet(String key);
 }

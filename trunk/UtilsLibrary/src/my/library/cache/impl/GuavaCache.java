@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import my.library.cache.AbstractCache;
 import my.library.cache.CacheConstant;
 import my.library.cache.ICache;
+import my.library.cache.config.GuavaCacheConfig;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -20,6 +21,7 @@ import com.google.common.cache.CacheBuilder;
  */
 public class GuavaCache extends AbstractCache implements ICache {
 	private Cache<String, Object> cache;
+	private long capacity;
 
 	public GuavaCache() {
 	}
@@ -28,8 +30,13 @@ public class GuavaCache extends AbstractCache implements ICache {
 		super(name);
 	}
 
-	public GuavaCache(String name, long capacity) {
-		super(name, capacity);
+	public GuavaCache(String name, GuavaCacheConfig config) {
+		super(name);
+		if (config != null) {
+			this.capacity = config.getCapacity();
+			this.expireAfterAccess = config.getExpireAfterAccess();
+			this.expireAfterWrite = config.getExipreAfterWrite();
+		}
 	}
 
 	@Override
@@ -42,7 +49,7 @@ public class GuavaCache extends AbstractCache implements ICache {
 		long capacity = getCapacity();
 		capacity = capacity > 0 ? capacity
 				: CacheConstant.DEFAULT_CACHE_CAPACITY;
-		setCapacity(capacity);
+		this.capacity = capacity;
 		cacheBuider.maximumSize(capacity);
 
 		long expireAfterAccess = getExpireAfterAccess();
@@ -55,7 +62,7 @@ public class GuavaCache extends AbstractCache implements ICache {
 		} else {
 			cacheBuider.expireAfterWrite(
 					CacheConstant.DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.SECONDS);
-			setExpireAfterWrite(CacheConstant.DEFAULT_EXPIRE_AFTER_WRITE);
+			this.expireAfterWrite = CacheConstant.DEFAULT_EXPIRE_AFTER_WRITE;
 		}
 		cache = cacheBuider.build();
 	}
@@ -112,6 +119,10 @@ public class GuavaCache extends AbstractCache implements ICache {
 	@Override
 	protected Object internalGet(String key) {
 		return cache.getIfPresent(key);
+	}
+
+	public long getCapacity() {
+		return capacity;
 	}
 
 }
