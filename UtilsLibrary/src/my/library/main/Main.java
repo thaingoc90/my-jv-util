@@ -10,9 +10,38 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.List;
 
+import my.library.cache.ICache;
+import my.library.cache.ICacheManager;
+import my.library.cache.config.GuavaCacheConfig;
+import my.library.cache.config.MemcacheConfig;
+import my.library.cache.impl.DefaultCacheManager;
+
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		ICacheManager cacheManger = new DefaultCacheManager();
+		cacheManger.init();
+		MemcacheConfig cacheConfig = new MemcacheConfig();
+		cacheConfig.setHost("127.0.0.1");
+		cacheConfig.setPort(11211);
+		ICache memcache = cacheManger.createCache("Test_cache", cacheConfig);
+		memcache.set("abc", 3);
+		
+		ICache memcache2 = cacheManger.createCache("Test_cache2", cacheConfig);
+		memcache2.set("ef", 5);
+		memcache2.clear();
+		System.out.println(memcache.get("abc"));
+		System.out.println(memcache2.get("ef"));
+		
+		GuavaCacheConfig guavaConfig = new GuavaCacheConfig();
+		ICache guavaCache = cacheManger.createCache("Guava_Cache", guavaConfig);
+//		guavaCache.set("abc", 3);
+//		System.out.println(guavaCache.get("abc"));
+		
+		System.out.println("---end----");
+		cacheManger.removeCache("Test_cache");
+		cacheManger.removeCache("Test_cache2");
+		cacheManger.removeCache("Guava_Cache");
 	}
 
 	public void printUrlDecode() throws Exception {
