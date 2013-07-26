@@ -100,8 +100,12 @@ public class RedisCache extends AbstractCache implements ICache {
 
 	@Override
 	public List<String> searchKey(String pattern) {
-		Set<String> listKeys = cache.keys(pattern);
-		return new LinkedList<String>(listKeys);
+		Set<String> listKeys = cache.keys(nameSpace + pattern);
+		List<String> result = new LinkedList<String>();
+		for (String key : listKeys) {
+			result.add(key.substring(nameSpace.length()));
+		}
+		return result;
 	}
 
 	@Override

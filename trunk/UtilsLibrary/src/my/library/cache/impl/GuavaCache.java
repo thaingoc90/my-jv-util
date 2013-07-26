@@ -22,6 +22,7 @@ import com.google.common.cache.CacheBuilder;
 public class GuavaCache extends AbstractCache implements ICache {
 	private Cache<String, Object> cache;
 	private long capacity;
+	private String nameSpace;
 
 	public GuavaCache() {
 	}
@@ -42,6 +43,7 @@ public class GuavaCache extends AbstractCache implements ICache {
 	@Override
 	public void init() {
 		super.init();
+		nameSpace = getName() + ":";
 		CacheBuilder<Object, Object> cacheBuider = CacheBuilder.newBuilder();
 		int numProcessores = Runtime.getRuntime().availableProcessors();
 		cacheBuider.concurrencyLevel(numProcessores);
@@ -85,32 +87,34 @@ public class GuavaCache extends AbstractCache implements ICache {
 
 	@Override
 	public void set(String key, Object value) {
-		cache.put(key, value);
+		cache.put(nameSpace + key, value);
 	}
 
 	@Override
 	public void delete(String key) {
-		cache.invalidate(key);
+		cache.invalidate(nameSpace + key);
 
 	}
 
 	@Override
 	public void clear() {
-		cache.invalidateAll();
+		Set<String> keys = cache.asMap().keySet();
+		cache.invalidateAll(keys);
 	}
 
 	@Override
 	public boolean exists(String key) {
-		return cache.getIfPresent(key) != null;
+		return cache.getIfPresent(nameSpace + key) != null;
 	}
 
 	@Override
 	public List<String> searchKey(String pattern) {
+		pattern = pattern.replaceAll("%", ".*");
 		List<String> result = new LinkedList<String>();
 		Set<String> keys = cache.asMap().keySet();
 		for (String key : keys) {
-			if (key.matches(pattern)) {
-				result.add(key);
+			if (key.matches(nameSpace + pattern)) {
+				result.add(key.substring(nameSpace.length()));
 			}
 		}
 		return result;
@@ -118,7 +122,7 @@ public class GuavaCache extends AbstractCache implements ICache {
 
 	@Override
 	protected Object internalGet(String key) {
-		return cache.getIfPresent(key);
+		return cache.getIfPresent(nameSpace + key);
 	}
 
 	public long getCapacity() {
