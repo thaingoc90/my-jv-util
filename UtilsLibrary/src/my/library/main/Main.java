@@ -14,6 +14,7 @@ import my.library.cache.ICache;
 import my.library.cache.ICacheManager;
 import my.library.cache.config.GuavaCacheConfig;
 import my.library.cache.config.MemcacheConfig;
+import my.library.cache.config.RedisCacheConfig;
 import my.library.cache.impl.DefaultCacheManager;
 
 public class Main {
@@ -21,27 +22,51 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		ICacheManager cacheManger = new DefaultCacheManager();
 		cacheManger.init();
-		MemcacheConfig cacheConfig = new MemcacheConfig();
-		cacheConfig.setHost("127.0.0.1");
-		cacheConfig.setPort(11211);
-		ICache memcache = cacheManger.createCache("Test_cache", cacheConfig);
-		memcache.set("abc", 3);
-		
-		ICache memcache2 = cacheManger.createCache("Test_cache2", cacheConfig);
-		memcache2.set("ef", 5);
-		memcache2.clear();
-		System.out.println(memcache.get("abc"));
-		System.out.println(memcache2.get("ef"));
-		
+//		MemcacheConfig cacheConfig = new MemcacheConfig();
+//		cacheConfig.setHost("127.0.0.1");
+//		cacheConfig.setPort(11211);
+//		ICache memcache = cacheManger.createCache("Test_cache", cacheConfig);
+//		memcache.set("abc", 3);
+//		memcache.set("dec", 5);
+//		
+//		ICache memcache2 = cacheManger.createCache("Test_cache2", cacheConfig);
+//		memcache2.set("ef", 5);
+//		memcache2.clear();
+//		System.out.println(memcache.get("abc"));
+//		System.out.println(memcache2.get("ef"));
+//		
 		GuavaCacheConfig guavaConfig = new GuavaCacheConfig();
 		ICache guavaCache = cacheManger.createCache("Guava_Cache", guavaConfig);
-//		guavaCache.set("abc", 3);
-//		System.out.println(guavaCache.get("abc"));
+		guavaCache.set("abc", 3);
+		guavaCache.set("ebc", 4);
+		System.out.println(guavaCache.searchKey("%bc"));
+		
+		ICache guavaCache2 = cacheManger.createCache("Guava_Cache2", guavaConfig);
+		guavaCache2.set("abc", 3);
+		guavaCache.clear();
+		System.out.println(guavaCache.get("abc"));
+		System.out.println(guavaCache2.get("abc"));
+		
+//		RedisCacheConfig redisConfig = new RedisCacheConfig();
+//		redisConfig.setHost("127.0.0.1");
+//		redisConfig.setPort(6379);
+//		redisConfig.setMaxActive(100);
+//		redisConfig.setTestOnReturn(true);
+//		ICache redisCache = cacheManger.createCache("RedisCache", redisConfig);
+//		redisCache.set("123",  123);
+//		System.out.println(redisCache.get("123"));
+//		
+//		ICache redisCache2 = cacheManger.createCache("RedisCache2", redisConfig);
+//		redisCache2.set("123", 344);
+//		redisCache2.set("423", 345);
+//		System.out.println(redisCache2.searchKey("*23"));
 		
 		System.out.println("---end----");
+		cacheManger.removeCache("RedisCache");
+		cacheManger.removeCache("RedisCache2");
 		cacheManger.removeCache("Test_cache");
-		cacheManger.removeCache("Test_cache2");
 		cacheManger.removeCache("Guava_Cache");
+		cacheManger.destroy();
 	}
 
 	public void printUrlDecode() throws Exception {

@@ -21,6 +21,7 @@ public class MemcacheCache extends AbstractCache implements ICache {
 	private String host;
 	private int port;
 	private CacheMap cache;
+	private MemcachedClient memcacheClient;
 
 	public MemcacheCache(String name, MemcacheConfig config) {
 		super(name);
@@ -50,13 +51,15 @@ public class MemcacheCache extends AbstractCache implements ICache {
 	}
 
 	public MemcachedClient getMemcacheClient() {
-		MemcachedClient memcache = null;
-		try {
-			memcache = new MemcachedClient(new InetSocketAddress(host, port));
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (memcacheClient == null) {
+			try {
+				memcacheClient = new MemcachedClient(new InetSocketAddress(
+						host, port));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		return memcache;
+		return memcacheClient;
 	}
 
 	@Override
@@ -66,7 +69,8 @@ public class MemcacheCache extends AbstractCache implements ICache {
 
 	@Override
 	public long getSize() {
-		return cache.size();
+		// NOT SUPPORT YET
+		return 0;
 	}
 
 	@Override
@@ -82,9 +86,7 @@ public class MemcacheCache extends AbstractCache implements ICache {
 
 	@Override
 	public void clear() {
-		for (String key : cache.keySet()) {
-			cache.remove(key);
-		}
+		// NOT SUPPORT YET
 	}
 
 	@Override
@@ -95,11 +97,7 @@ public class MemcacheCache extends AbstractCache implements ICache {
 	@Override
 	public List<String> searchKey(String pattern) {
 		List<String> result = new LinkedList<String>();
-		for (String key : cache.keySet()) {
-			if (key.matches(pattern)) {
-				result.add(key);
-			}
-		}
+		// NOT SUPPORT YET
 		return result;
 	}
 
