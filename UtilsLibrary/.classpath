@@ -31,6 +31,9 @@
 	<classpathentry kind="lib" path="lib/gdata-youtube-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/guava-14.0.1.jar" sourcepath="sourcejar/guava-14.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/spymemcached-2.9.1.jar" sourcepath="sourcejar/spymemcached-2.9.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar" sourcepath="sourcejar/slf4j-api-1.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="lib/gdata-core-1.0.jar" sourcepath="C:/Users/ngoctdn/Desktop/gdata-src.java-1.47.1/gdata/java"/>
 </classpath>
