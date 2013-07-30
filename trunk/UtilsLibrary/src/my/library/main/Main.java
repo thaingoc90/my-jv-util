@@ -1,6 +1,5 @@
 package my.library.main;
 
-import java.io.File;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -11,11 +10,6 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.List;
 
-import org.apache.log4j.MDC;
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import my.library.cache.ICache;
 import my.library.cache.ICacheManager;
 import my.library.cache.config.GuavaCacheConfig;
@@ -25,17 +19,7 @@ import my.library.cache.impl.DefaultCacheManager;
 
 public class Main {
 
-	static Logger log = LoggerFactory.getLogger(Main.class);
-	static {
-		MDC.put("userName", "ngoc-thai");
-	}
-
 	public static void main(String[] args) throws Exception {
-		String log4jconfig = System.getProperty("user.dir") + File.separator
-				+ "config" + File.separator + "log4j.properties";
-		PropertyConfigurator.configure(log4jconfig);
-		log.error("ds");
-		log.warn("Abvc");
 	}
 
 	public static void initCache() {
