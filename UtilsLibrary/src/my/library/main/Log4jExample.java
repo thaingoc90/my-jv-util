@@ -17,7 +17,7 @@ public class Log4jExample {
 		String log4jconfig = System.getProperty("user.dir") + File.separator
 				+ "src" + File.separator + "config" + File.separator + "log4j.properties";
 		PropertyConfigurator.configure(log4jconfig);
-		log.error("ds");
 		log.warn("Abvc");
+		log.error("ds");
 	}
 }
