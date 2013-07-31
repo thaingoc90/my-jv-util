@@ -30,7 +30,6 @@
 	<classpathentry kind="lib" path="lib/spymemcached-2.9.1.jar" sourcepath="sourcejar/spymemcached-2.9.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar" sourcepath="sourcejar/slf4j-api-1.7.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.5.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib/spring/spring-aop-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring/spring-aspects-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring/spring-beans-3.2.2.RELEASE.jar"/>
@@ -39,6 +38,7 @@
 	<classpathentry kind="lib" path="lib/spring/spring-core-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring/spring-expression-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring/antlr-runtime-3.5.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="lib/gdata-core-1.0.jar" sourcepath="C:/Users/ngoctdn/Desktop/gdata-src.java-1.47.1/gdata/java"/>
 </classpath>
