@@ -1,10 +1,13 @@
-package my.ngoc;
+package ind.web.nhp.controller;
 
 import java.io.IOException;
-import javax.servlet.http.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
-public class NgocHomePageServlet extends HttpServlet {
+public class HomeController extends BaseController {
+
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		resp.setContentType("text/plain");

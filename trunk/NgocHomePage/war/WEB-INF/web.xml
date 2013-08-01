@@ -6,7 +6,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<servlet>
 		<servlet-name>NgocHomePage</servlet-name>
-		<servlet-class>my.ngoc.NgocHomePageServlet</servlet-class>
+		<servlet-class>ind.web.nhp.controller.HomeController</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>NgocHomePage</servlet-name>
