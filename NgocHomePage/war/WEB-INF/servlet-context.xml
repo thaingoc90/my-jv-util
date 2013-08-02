@@ -15,10 +15,22 @@
     <context:component-scan base-package="ind.web.nhp" />
     <mvc:annotation-driven />
 
+	<!-- freemarker config -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+      	<property name="templateLoaderPath" value="/WEB-INF/ftl/"/>
+    </bean>
+    
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+	      <property name="cache" value="true"/>
+	      <property name="prefix" value="page_"/>
+	      <property name="suffix" value=".ftl"/>
+    </bean>
+
+	<!-- 
     <bean id="viewResolver"
         class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/" />
         <property name="suffix" value=".jsp" />
-    </bean>
+    </bean> -->
 
 </beans>
