@@ -19,5 +19,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-tx-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-web-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-webmvc-3.2.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/freemarker.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-context-support-3.2.2.RELEASE.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
