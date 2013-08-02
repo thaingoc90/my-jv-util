@@ -1,4 +1,4 @@
-package ind.web.nhp;
+package ind.web.nhp.base;
 
 public class Constants {
 
