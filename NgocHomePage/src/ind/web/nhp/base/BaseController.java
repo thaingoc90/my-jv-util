@@ -1,4 +1,4 @@
-package ind.web.nhp.controller;
+package ind.web.nhp.base;
 
 public abstract class BaseController {
 
