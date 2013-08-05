@@ -20,6 +20,9 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 
 public class BaseJdbcDao extends CacheDao {
+
+	public static final String EXC_NOT_CONNECT_DB = "Can not make connection to database!";
+
 	private DataSource ds;
 	public static String PATTERN_PARAM = "\\@\\{([^\\}]+)\\}";
 	public static String PATTERN_TABLE = "\\@\\{_([^\\}]+)\\}";
@@ -36,6 +39,15 @@ public class BaseJdbcDao extends CacheDao {
 		ds = null;
 	}
 
+	/**
+	 * Builds a DataSource.
+	 * 
+	 * @param driver
+	 * @param connUrl
+	 * @param username
+	 * @param password
+	 * @return
+	 */
 	public DataSource buildDataSource(String driver, String connUrl,
 			String username, String password) {
 		BasicDataSource bds = new BasicDataSource();
@@ -46,11 +58,24 @@ public class BaseJdbcDao extends CacheDao {
 		return bds;
 	}
 
+	/**
+	 * Obtain a database connection from the JDBC datasource.
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
 	public Connection getConnection() throws SQLException {
 		Connection conn = ds.getConnection();
 		return conn;
 	}
 
+	/**
+	 * Releases an opening database connection.
+	 * 
+	 * @param conn
+	 * @param stm
+	 * @param rs
+	 */
 	public void closeResources(Connection conn, Statement stm, ResultSet rs) {
 		if (rs != null) {
 			try {
@@ -78,6 +103,15 @@ public class BaseJdbcDao extends CacheDao {
 		}
 	}
 
+	/**
+	 * Builds a PreparedStatement.
+	 * 
+	 * @param conn
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	@SuppressWarnings("unchecked")
 	public PreparedStatement preparedStatement(Connection conn, String sql,
 			Object params) throws SQLException {
@@ -91,6 +125,15 @@ public class BaseJdbcDao extends CacheDao {
 		return null;
 	}
 
+	/**
+	 * * Builds a PreparedStatement which params is a map.
+	 * 
+	 * @param conn
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public PreparedStatement buildStatement(Connection conn, String sql,
 			Map<String, Object> params) throws SQLException {
 		String cleanSql = RegexUtils.replaceRegexToValue(sql, PATTERN_TABLE,
@@ -107,6 +150,15 @@ public class BaseJdbcDao extends CacheDao {
 		return buildStatement(conn, cleanSql, listValues.toArray());
 	}
 
+	/**
+	 * Builds a PreparedStatement which params is an array.
+	 * 
+	 * @param conn
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public PreparedStatement buildStatement(Connection conn, String sql,
 			Object[] params) throws SQLException {
 		String cleanSql = sql.replaceAll(PATTERN_PARAM, "?");
@@ -138,6 +190,16 @@ public class BaseJdbcDao extends CacheDao {
 		return stmt;
 	}
 
+	/**
+	 * 
+	 * Builds a list of PreparedStatements from multi sqlCommands
+	 * 
+	 * @param conn
+	 * @param sqlCommands
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public List<PreparedStatement> getListStatements(Connection conn,
 			String[] sqlCommands, Object params) throws SQLException {
 		List<PreparedStatement> listStates = new ArrayList<PreparedStatement>();
@@ -149,11 +211,19 @@ public class BaseJdbcDao extends CacheDao {
 		return listStates;
 	}
 
+	/**
+	 * Executes a non-SELECT query and returns the number of affected rows.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public long executeNonSelect(String sqlCommand, Object params)
 			throws SQLException {
 		Connection conn = getConnection();
 		if (conn == null) {
-			throw new RuntimeException("Can not make connection to database!");
+			throw new RuntimeException(EXC_NOT_CONNECT_DB);
 		}
 		PreparedStatement stmt = null;
 		try {
@@ -165,65 +235,168 @@ public class BaseJdbcDao extends CacheDao {
 		}
 	}
 
+	/**
+	 * Executes a COUNT query and returns the result. Don't use cache.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public long executeCount(String sqlCommand, Object params)
 			throws SQLException {
-		Connection conn = getConnection();
-		if (conn == null) {
-			throw new RuntimeException("Can not make connection to database!");
-		}
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		long result = 0;
-		try {
-			stmt = preparedStatement(conn, sqlCommand, params);
-			rs = stmt.executeQuery();
-			if (rs.next()) {
-				result = rs.getLong(1);
-			}
-			return result;
-		} finally {
-			closeResources(conn, stmt, rs);
-		}
+		return executeCount(sqlCommand, params, (String) null);
 	}
 
+	/**
+	 * Executes a COUNT query and returns the result.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @param cacheKey
+	 * @return
+	 * @throws SQLException
+	 */
+	public long executeCount(String sqlCommand, Object params, String cacheKey)
+			throws SQLException {
+		Long result = null;
+		if (!StringUtils.isBlank(cacheKey) && cacheEnabled()) {
+			Object temp = getFromCache(cacheKey);
+			if (temp instanceof Long) {
+				result = (Long) temp;
+			} else if (temp instanceof Number) {
+				result = ((Number) temp).longValue();
+			} else {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			Connection conn = getConnection();
+			if (conn == null) {
+				throw new RuntimeException(EXC_NOT_CONNECT_DB);
+			}
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				stmt = preparedStatement(conn, sqlCommand, params);
+				rs = stmt.executeQuery();
+				if (rs.next()) {
+					result = rs.getLong(1);
+				}
+			} finally {
+				closeResources(conn, stmt, rs);
+			}
+		}
+
+		if (!StringUtils.isBlank(cacheKey) && cacheEnabled() && result != null) {
+			putToCache(cacheKey, result);
+		}
+		return result;
+
+	}
+
+	/**
+	 * Executes a SELECT query and returns the result as an array of records,
+	 * each record is a Map<String, Object>. Don't use cache.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public List<Map<String, Object>> executeSelect(String sqlCommand,
 			Object params) throws SQLException {
 		return executeSelect(sqlCommand, params, (String) null);
 	}
 
+	/**
+	 * Executes a SELECT query and returns the result as an array of records,
+	 * each record is a Map<String, Object>.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> executeSelect(String sqlCommand,
 			Object params, String cacheKey) throws SQLException {
-		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-		Connection conn = getConnection();
-		if (conn == null) {
-			throw new RuntimeException("Can not make connection to database!");
-		}
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			stmt = preparedStatement(conn, sqlCommand, params);
-			rs = stmt.executeQuery();
-			ResultSetMetaData rsMetaData = rs != null ? rs.getMetaData() : null;
-			while (rs.next()) {
-				Map<String, Object> obj = new HashMap<String, Object>();
-				for (int i = 1, n = rsMetaData.getColumnCount(); i <= n; i++) {
-					String colName = rsMetaData.getColumnName(i);
-					Object value = rs.getObject(colName);
-					obj.put(colName, value);
+		List<Map<String, Object>> result = null;
+		// GET FROM CACHE
+		if (!StringUtils.isBlank(cacheKey) && cacheEnabled()) {
+			Object temp = getFromCache(cacheKey);
+			if (temp != null) {
+				try {
+					result = (List<Map<String, Object>>) temp;
+				} catch (ClassCastException e) {
+					result = null;
 				}
-				result.add(obj);
 			}
-			return result;
-		} finally {
-			closeResources(conn, stmt, rs);
 		}
+
+		if (result == null) {
+			result = new ArrayList<Map<String, Object>>();
+			Connection conn = getConnection();
+			if (conn == null) {
+				throw new RuntimeException(EXC_NOT_CONNECT_DB);
+			}
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				stmt = preparedStatement(conn, sqlCommand, params);
+				rs = stmt.executeQuery();
+				ResultSetMetaData rsMetaData = rs != null ? rs.getMetaData()
+						: null;
+				while (rs.next()) {
+					Map<String, Object> obj = new HashMap<String, Object>();
+					for (int i = 1, n = rsMetaData.getColumnCount(); i <= n; i++) {
+						String colName = rsMetaData.getColumnName(i);
+						Object value = rs.getObject(colName);
+						obj.put(colName, value);
+					}
+					result.add(obj);
+				}
+			} finally {
+				closeResources(conn, stmt, rs);
+			}
+		}
+
+		// PUT TO CACHE
+		if (!StringUtils.isBlank(cacheKey) && cacheEnabled() && result != null
+				&& result.size() > 0) {
+			putToCache(cacheKey, result);
+		}
+
+		return result;
 	}
 
+	/**
+	 * Executes a SELECT query and returns the result as an array of result,
+	 * each result is an instance of type {@link BaseBo}. Don't use cache.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @param clazz
+	 * @return
+	 * @throws SQLException
+	 */
 	public <T extends BaseBo> T[] executeSelect(String sqlCommand,
 			Object params, Class<T> clazz) throws SQLException {
 		return executeSelect(sqlCommand, params, clazz, (String) null);
 	}
 
+	/**
+	 * Executes a SELECT query and returns the result as an array of result,
+	 * each result is an instance of type {@link BaseBo}.
+	 * 
+	 * @param sqlCmd
+	 * @param params
+	 * @param clazz
+	 * @param cacheKey
+	 * @return
+	 * @throws SQLException
+	 */
 	@SuppressWarnings("unchecked")
 	protected <T extends BaseBo> T[] executeSelect(String sqlCmd,
 			Object params, Class<T> clazz, String cacheKey) throws SQLException {
@@ -247,12 +420,19 @@ public class BaseJdbcDao extends CacheDao {
 		return result.toArray((T[]) Array.newInstance(clazz, 0));
 	}
 
+	/**
+	 * Executes multi queries. Nothing returns.
+	 * 
+	 * @param sqlCommand
+	 * @param params
+	 * @throws SQLException
+	 */
 	public void executeMultiCommands(String[] sqlCommand, Object params)
 			throws SQLException {
 		Boolean autoCommitOldValue = true;
 		Connection conn = getConnection();
 		if (conn == null) {
-			throw new RuntimeException("Can not make connection to database!");
+			throw new RuntimeException(EXC_NOT_CONNECT_DB);
 		}
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
