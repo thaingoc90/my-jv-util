@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.springframework.security.crypto.codec.Hex;
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * Base class for digest password encoders.
@@ -14,7 +14,6 @@ import org.springframework.security.crypto.codec.Hex;
  * >Message Digest Algorithms</a>
  * </p>
  * 
- * @author NBThanh <btnguyen2k@gmail.com>
  */
 public class MessageDigestPasswordEncoder extends BasePasswordEncoder {
 
@@ -91,7 +90,7 @@ public class MessageDigestPasswordEncoder extends BasePasswordEncoder {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("UTF-8 not supported!");
 		}
-		return new String(Hex.encode(digest).toString().toLowerCase());
+		return new String(Hex.encodeHexString(digest).toLowerCase());
 	}
 
 	/**
