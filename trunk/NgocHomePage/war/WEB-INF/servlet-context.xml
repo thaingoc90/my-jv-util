@@ -14,6 +14,8 @@
        
     <context:component-scan base-package="ind.web.nhp" />
     <mvc:annotation-driven />
+    
+    <mvc:resources mapping="/static/**" location="/WEB-INF/resource/" cache-period="0"/>
 
 	<!-- freemarker config -->
 	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
