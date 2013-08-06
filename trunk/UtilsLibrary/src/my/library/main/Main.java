@@ -17,9 +17,14 @@ import my.library.cache.config.MemcacheConfig;
 import my.library.cache.config.RedisCacheConfig;
 import my.library.cache.impl.DefaultCacheManager;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		Document doc = Jsoup.connect("http://360game.vn/hinh-anh").get();
+		System.out.println(doc.getElementsByTag("img"));
 	}
 
 	public static void initCache() {
