@@ -9,17 +9,17 @@ import java.util.Map;
 
 public class UserBo extends BaseBo implements IUser {
 
-	public static final String COL_ID = "id";
-	public static final String COL_EMAIL = "email";
-	public static final String COL_LOGIN_NAME = "loginName";
-	public static final String COL_DISPLAY_NAME = "displayName";
-	public static final String COL_PASSWORD = "password";
-	public static final String COL_LOCKED = "locked";
-	public static final String COL_BIRTHDAY = "birthday";
-	public static final String COL_CREATED_DATE = "createdDate";
-	public static final String COL_TIME_LOGIN = "timeLogin";
-	public static final String COL_LAST_LOGIN = "lastLogin";
-	public static final String COL_TOKEN = "token";
+	public static final String COL_ID = "uId";
+	public static final String COL_EMAIL = "uEmail";
+	public static final String COL_LOGIN_NAME = "uLoginName";
+	public static final String COL_DISPLAY_NAME = "uDisplayName";
+	public static final String COL_PASSWORD = "uPassword";
+	public static final String COL_LOCKED = "uDisabled";
+	public static final String COL_BIRTHDAY = "uBirthday";
+	public static final String COL_CREATED_DATE = "uCreatedDate";
+	public static final String COL_TIME_LOGIN = "uTimeLogin";
+	public static final String COL_LAST_LOGIN = "uLastLogin";
+	public static final String COL_TOKEN = "uToken";
 	public static final String COL_GROUP_ID = "groupId";
 
 	private int id, groupId;
