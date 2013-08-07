@@ -7,8 +7,8 @@
 	<entry key="_col.userId.where">uid=@{uId}</entry>
 	<entry key="_col.userLoginName.where">ulogin_name=@{uLoginName}</entry>
 	<entry key="_col.userEmail.where">uemail=@{uEmail}</entry>
-	<entry key="_cols.user.select"><![CDATA[uid AS uId, uemail AS uEmail, ulogin_name AS uLoginName, udisplay_name AS uDisplayName, ubirthday AS uBirthday, upassword AS uPassword, gid AS groupId, uis_disabled AS uDisabled, utime_login AS uTimeLogin, ulast_login AS uLastLogin, uforget_token AS uToken]]></entry>
-	<entry key="_cols.user.insert"><![CDATA[(uid, uemail, ulogin_name, udisplay_name, ubirthday, upassword, gid, uis_disabled, utime_login, ulast_login, uforget_token) VALUES (@{uId}, @{uEmail}, @{uLoginName}, @{uDisplayName}, @{uBirthday}, @{uPassword}, @{groupId}, @{uDisabled}, NOW(), NOW(), '')]]></entry>
+	<entry key="_cols.user.select"><![CDATA[uid AS uId, uemail AS uEmail, ulogin_name AS uLoginName, udisplay_name AS uDisplayName, ubirthday AS uBirthday, upassword AS uPassword, gid AS groupId, uis_disabled AS uDisabled, utime_login AS uTimeLogin, ulast_login AS uLastLogin, uforget_token AS uToken, ucreated_date AS uCreatedDate]]></entry>
+	<entry key="_cols.user.insert"><![CDATA[(uid, uemail, ulogin_name, udisplay_name, ubirthday, upassword, gid, uis_disabled, ucreated_date, utime_login, ulast_login, uforget_token) VALUES (@{uId}, @{uEmail}, @{uLoginName}, @{uDisplayName}, @{uBirthday}, @{uPassword}, @{groupId}, @{uDisabled}, NOW(), NOW(), NOW(), '')]]></entry>
 	<entry key="_cols.user.update"><![CDATA[udisplay_name=@{uDisplayName}, ubirthday=@{uBirthday}, upassword=@{uPassword}, gid=@{groupId}, uis_disabled=@{uDisabled}, utime_login=@{uTimeLogin}, ulast_login=@{uLastLogin}, uforget_token=@{uToken}]]></entry>
 
 
