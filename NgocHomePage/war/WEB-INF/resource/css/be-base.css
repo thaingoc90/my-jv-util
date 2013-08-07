@@ -1,2 +1,78 @@
-.navbar i{margin-right: 2px;}
-.wrapper {height: 100%;margin-top: 50px;}
+html,body {
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+}
+
+a,a:visited {
+	text-decoration: none;
+	outline-style: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.navbar i {
+	margin-right: 2px;
+}
+
+#content {
+	margin-top: 50px;
+}
+
+.body-content {
+	width: 70%;
+	margin: 20px auto;
+	position: relative;
+}
+
+.ta-cen {
+	text-align: center !important;
+}
+
+.require {
+	color: red;
+	font-size: 18px
+}
+
+.title-large {
+	font-size: 28px;
+	margin: 10px 0;
+	font-family: inherit;
+	font-weight: bold;
+	line-height: 40px;
+	color: inherit;
+	text-rendering: optimizelegibility;
+}
+
+.title-medium {
+	font-size: 20px;
+	margin: 10px 0;
+	font-family: inherit;
+	font-weight: bold;
+	line-height: 24px;
+	color: inherit;
+	text-rendering: optimizelegibility;
+}
+
+.create-btn {
+	position: absolute;
+	right: 0;
+	top: 0;
+	margin-top: 10px;
+}
+
+#createModal {
+	width: 460px;
+}
+
+#createModal .control-label {
+	width: 130px;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+#createModal .controls {
+	margin-left: 145px;
+}

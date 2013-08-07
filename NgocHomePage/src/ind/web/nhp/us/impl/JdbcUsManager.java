@@ -44,8 +44,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(UserBo.COL_ID, id);
 		try {
-			IUser[] users = executeSelect(sqlKey, params, UserBo.class,
-					cacheKey);
+			IUser[] users = executeSelect(sqlKey, params, UserBo.class, cacheKey);
 			return users != null && users.length > 0 ? users[0] : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -74,8 +73,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(UserBo.COL_EMAIL, email);
 		try {
-			IUser[] users = executeSelect(sqlKey, params, UserBo.class,
-					cacheKey);
+			IUser[] users = executeSelect(sqlKey, params, UserBo.class, cacheKey);
 			return users != null && users.length > 0 ? users[0] : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -164,8 +162,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		String cacheKey = cacheKeyAllUsers();
 		Map<String, Object> params = new HashMap<String, Object>();
 		try {
-			IUser[] users = executeSelect(sqlKey, params, UserBo.class,
-					cacheKey);
+			IUser[] users = executeSelect(sqlKey, params, UserBo.class, cacheKey);
 			return users != null && users.length > 0 ? users : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -258,8 +255,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		String cacheKey = cacheKeyAllGroups();
 		Map<String, Object> params = new HashMap<String, Object>();
 		try {
-			IGroup[] groups = executeSelect(sqlKey, params, GroupBo.class,
-					cacheKey);
+			IGroup[] groups = executeSelect(sqlKey, params, GroupBo.class, cacheKey);
 			return (groups != null && groups.length > 0) ? groups : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -277,8 +273,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(GroupBo.COL_ID, id);
 		try {
-			IGroup[] groups = executeSelect(sqlKey, params, GroupBo.class,
-					cacheKey);
+			IGroup[] groups = executeSelect(sqlKey, params, GroupBo.class, cacheKey);
 			return groups != null && groups.length > 0 ? groups[0] : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -353,10 +348,8 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(PermissionBo.COL_ID, pid);
 		try {
-			IPermission[] permissions = executeSelect(sqlKey, params,
-					PermissionBo.class, cacheKey);
-			return (permissions != null && permissions.length > 0) ? permissions[0]
-					: null;
+			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class, cacheKey);
+			return (permissions != null && permissions.length > 0) ? permissions[0] : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();
@@ -368,10 +361,8 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		final String sqlKey = "sql.getAllPermissions";
 		Map<String, Object> params = new HashMap<String, Object>();
 		try {
-			IPermission[] permissions = executeSelect(sqlKey, params,
-					PermissionBo.class);
-			return (permissions == null || permissions.length == 0) ? null
-					: permissions;
+			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class);
+			return (permissions == null || permissions.length == 0) ? null : permissions;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();
@@ -423,8 +414,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		}
 	}
 
-	private static Map<String, Object> _buildParamPermission(
-			IPermission permission) {
+	private static Map<String, Object> _buildParamPermission(IPermission permission) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(PermissionBo.COL_ID, permission.getId());
 		params.put(PermissionBo.COL_DESCRIPTION, permission.getDesc());
@@ -451,10 +441,8 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(GroupBo.COL_ID, group.getId());
 		try {
-			IPermission[] permissions = executeSelect(sqlKey, params,
-					PermissionBo.class, cacheKey);
-			return (permissions == null || permissions.length == 0) ? null
-					: permissions;
+			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class, cacheKey);
+			return (permissions == null || permissions.length == 0) ? null : permissions;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();
@@ -468,10 +456,8 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(GroupBo.COL_ID, groupId);
 		try {
-			IPermission[] permissions = executeSelect(sqlKey, params,
-					PermissionBo.class, cacheKey);
-			return (permissions == null || permissions.length == 0) ? null
-					: permissions;
+			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class, cacheKey);
+			return (permissions == null || permissions.length == 0) ? null : permissions;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();
@@ -495,8 +481,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 	}
 
 	@Override
-	public void addMultiPermisionsForGroup(IGroup group,
-			IPermission[] permissions) {
+	public void addMultiPermisionsForGroup(IGroup group, IPermission[] permissions) {
 		for (IPermission permission : permissions) {
 			addPermisionForGroup(group, permission);
 		}

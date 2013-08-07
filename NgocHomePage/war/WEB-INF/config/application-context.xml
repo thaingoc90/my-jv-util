@@ -9,4 +9,6 @@
 		init-method="init">
 		<property name="configLocation" value="/WEB-INF/languages/locale-config.properties" />
 	</bean>
+
+	<bean id="_applicationContextUtils" class="ind.web.nhp.utils.SpringUtils"></bean>
 </beans>

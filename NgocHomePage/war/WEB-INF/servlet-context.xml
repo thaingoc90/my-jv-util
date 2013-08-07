@@ -15,6 +15,7 @@
 	<context:component-scan base-package="ind.web.nhp" />
 	<mvc:annotation-driven />
 	<context:annotation-config />
+	<mvc:annotation-driven ignoreDefaultModelOnRedirect="false" />
 
 	<mvc:resources mapping="/static/**" location="/WEB-INF/resource/"
 		cache-period="0" />
