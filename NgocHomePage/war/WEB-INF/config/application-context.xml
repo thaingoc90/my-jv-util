@@ -4,4 +4,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
+
+	<bean id="_languageLoader" class="ind.web.nhp.base.LanguageLoader"
+		init-method="init">
+		<property name="configLocation" value="/WEB-INF/languages/locale-config.properties" />
+	</bean>
 </beans>

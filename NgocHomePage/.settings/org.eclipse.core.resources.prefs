@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
+encoding//war/WEB-INF/ftl/page_be_home.ftl=UTF-8
+encoding//war/WEB-INF/ftl/page_home.ftl=UTF-8
 encoding//war/WEB-INF/jsp/404.jsp=UTF-8
