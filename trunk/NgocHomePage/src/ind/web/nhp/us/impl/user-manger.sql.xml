@@ -30,82 +30,82 @@
 	
 
 	<entry key="sql.getUserById"><![CDATA[
-    	{"sql":"SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}"}
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
     ]]></entry>
 	<entry key="sql.getUserByLoginName"><![CDATA[
-    	{"sql":"SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userLoginName.where}"}
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userLoginName.where}
     ]]></entry>
 	<entry key="sql.getUserByEmail"><![CDATA[
-    	{"sql":"SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userEmail.where}"}
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userEmail.where}
     ]]></entry>
 	<entry key="sql.updateUser"><![CDATA[
-    	{"sql":"UPDATE ${_tbl.user} SET ${_cols.user.update} WHERE ${_col.userId.where}"} 
+    	UPDATE ${_tbl.user} SET ${_cols.user.update} WHERE ${_col.userId.where} 
     ]]></entry>
 	<entry key="sql.updatePasswordUser"><![CDATA[
-    	{"sql":"UPDATE ${_tbl.user} SET ${_col.userPassword.where} WHERE ${_col.userId.where}"} 
+    	UPDATE ${_tbl.user} SET ${_col.userPassword.where} WHERE ${_col.userId.where} 
     ]]></entry>
 	<entry key="sql.updateLastLoginUser"><![CDATA[
-    	{"sql":"UPDATE ${_tbl.user} SET ${_col.userLastLogin.where} WHERE ${_col.userId.where}"} 
+    	UPDATE ${_tbl.user} SET ${_col.userLastLogin.where} WHERE ${_col.userId.where} 
     ]]></entry>
 	<entry key="sql.getAllUsers"><![CDATA[
-    	{"sql":"SELECT ${_cols.user.select} FROM ${_tbl.user} ORDER BY uid"}
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} ORDER BY uid
     ]]></entry>
     <entry key="sql.getUserById"><![CDATA[
-    	{"sql":"SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}"}
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
     ]]></entry>
     <entry key="sql.createUser"><![CDATA[
-    	{"sql":"INSERT INTO ${_tbl.user} ${_cols.user.insert}"} 
+    	INSERT INTO ${_tbl.user} ${_cols.user.insert} 
     ]]></entry>
     <entry key="sql.deleteUser"><![CDATA[
-    	{"sql":"DELETE FROM ${_tbl.user} WHERE ${_col.userId.where}"} 
+    	DELETE FROM ${_tbl.user} WHERE ${_col.userId.where} 
     ]]></entry>
     
     
     <entry key="sql.getAllGroups"><![CDATA[
- 		{"sql":"SELECT ${_cols.group.select} FROM ${_tbl.group} ORDER BY gid"} 
+ 		SELECT ${_cols.group.select} FROM ${_tbl.group} ORDER BY gid 
     ]]></entry>
     <entry key="sql.createGroup"><![CDATA[
-    	{"sql":"INSERT INTO ${_tbl.group} ${_cols.group.insert}"}
+    	INSERT INTO ${_tbl.group} ${_cols.group.insert}
     ]]></entry>
 	<entry key="sql.deleteGroup"><![CDATA[
-    	{"sql":"DELETE FROM ${_tbl.group} WHERE ${_col.groupId.where}"} 
+    	DELETE FROM ${_tbl.group} WHERE ${_col.groupId.where} 
     ]]></entry>
 	<entry key="sql.getGroupById"><![CDATA[
-    	{"sql":"SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupId.where}"} 
+    	SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupId.where} 
     ]]></entry>
 	<entry key="sql.getGroupByName"><![CDATA[
-    	{"sql":"SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupName.where}"}
+    	SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupName.where}
     ]]></entry>
 	<entry key="sql.updateGroup"><![CDATA[
-    	{"sql":"UPDATE ${_tbl.group} SET ${_cols.group.update} WHERE ${_col.groupId.where}"} 
+    	UPDATE ${_tbl.group} SET ${_cols.group.update} WHERE ${_col.groupId.where} 
     ]]></entry>
 
 
 	<entry key="sql.getPermission"><![CDATA[
-    	{"sql":"SELECT ${_cols.permission.select} FROM ${_tbl.permission} WHERE ${_col.permissionId.where}"}
+    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
     ]]></entry>
 	<entry key="sql.getAllPermissions"><![CDATA[
-    	{"sql":"SELECT ${_cols.permission.select} FROM ${_tbl.permission} ORDER BY id"}
+    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} ORDER BY id
     ]]></entry>
 	<entry key="sql.deletePermission"><![CDATA[
-    	{"sql":"DELETE FROM ${_tbl.permission} WHERE ${_col.permissionId.where}"}
+    	DELETE FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
     ]]></entry>
 	<entry key="sql.updatePermission"><![CDATA[
-    	{"sql":"UPDATE ${_tbl.permission} SET ${_cols.permission.update} WHERE ${_col.permissionId.where}"}
+    	UPDATE ${_tbl.permission} SET ${_cols.permission.update} WHERE ${_col.permissionId.where}
     ]]></entry>
 	<entry key="sql.addPermission"><![CDATA[
-    	{"sql":"INSERT INTO ${_tbl.permission} (${_cols.permission.insert})"}
+    	INSERT INTO ${_tbl.permission} (${_cols.permission.insert})
     ]]></entry>
 	
 
 	<entry key="sql.getAllPermissionsOfGroup"><![CDATA[
-    	{"sql":"SELECT P.id AS perId, P.pdesc AS perDesc, P.parent_id AS parentId FROM ${_tbl.group_permission} GP JOIN ${_tbl.permission} P ON (GP.pid = P.id AND GP.gid = @{groupId})"}
+    	SELECT P.id AS perId, P.pdesc AS perDesc, P.parent_id AS parentId FROM ${_tbl.group_permission} GP JOIN ${_tbl.permission} P ON (GP.pid = P.id AND GP.gid = @{groupId})
     ]]></entry>
     <entry key="sql.deletePermisionsOfGroup"><![CDATA[
-    	{"sql":"DELETE FROM ${_tbl.group_permission} WHERE gid=@{groupId}"}
+    	DELETE FROM ${_tbl.group_permission} WHERE gid=@{groupId}
     ]]></entry>
     <entry key="sql.addPermisionForGroup"><![CDATA[
-    	{"sql":"INSERT INTO ${_tbl.group_permission} (gid, pid) VALUES (@{groupId}, @{perId})"}
+    	INSERT INTO ${_tbl.group_permission} (gid, pid) VALUES (@{groupId}, @{perId})
     ]]></entry>
 
 </properties>
