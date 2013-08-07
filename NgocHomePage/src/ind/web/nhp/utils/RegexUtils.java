@@ -8,6 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexUtils {
+
+	public static String regexReplacementEscape(String str) {
+		String result = regexReplacement(str, "\\\\", "\\\\\\\\");
+		result = regexReplacement(str, "\\$", "\\\\\\$");
+		return result;
+	}
+
 	/**
 	 * Escapes a regular expression replacement string.
 	 * 
@@ -15,8 +22,8 @@ public class RegexUtils {
 	 *            String
 	 * @return String
 	 */
-	public static String regexpReplacementEscape(String str, String regex, String replacement) {
-		return regexpReplacementEscape(str, regex, replacement, false);
+	public static String regexReplacement(String str, String regex, String replacement) {
+		return regexReplacement(str, regex, replacement, false);
 	}
 
 	/**
@@ -28,8 +35,8 @@ public class RegexUtils {
 	 *            boolean indicates that returned value can be null or not
 	 * @return String
 	 */
-	public static String regexpReplacementEscape(String str, String regex, String replacement,
-			boolean preserveNull) {
+	public static String regexReplacement(String str, String regex, String replacement,
+	        boolean preserveNull) {
 		return str != null ? str.replaceAll(regex, replacement) : (preserveNull ? null : "");
 	}
 
@@ -56,7 +63,7 @@ public class RegexUtils {
 	 * @return
 	 */
 	public static String replaceRegexToValue(String src, String patternFormat,
-			Map<String, Object> params) throws IllegalArgumentException {
+	        Map<String, Object> params) throws IllegalArgumentException {
 		Pattern pattern = Pattern.compile(patternFormat);
 		Matcher matcher = pattern.matcher(src);
 		while (matcher.find()) {
@@ -84,7 +91,7 @@ public class RegexUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, C> T formatObjectWithMethod(T value, String formatMethodName,
-			Class<C> classNameContainsMethod) {
+	        Class<C> classNameContainsMethod) {
 		try {
 			Method method = classNameContainsMethod.getMethod(formatMethodName, value.getClass());
 			if (method != null) {
@@ -113,7 +120,7 @@ public class RegexUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void formatValueOfMap(Map<String, ?> results, String key,
-			String formatMethodName, Class<T> classNameContainsMethod) {
+	        String formatMethodName, Class<T> classNameContainsMethod) {
 		if (results == null) {
 			return;
 		}
@@ -136,7 +143,7 @@ public class RegexUtils {
 	 * @return
 	 */
 	public static <T, C> void formatValueOfArray(T[] results, String formatMethodName,
-			Class<C> classNameContainsMethod) {
+	        Class<C> classNameContainsMethod) {
 		if (results == null) {
 			return;
 		}

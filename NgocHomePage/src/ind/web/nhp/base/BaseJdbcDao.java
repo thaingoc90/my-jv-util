@@ -1,7 +1,10 @@
 package ind.web.nhp.base;
 
+import ind.web.nhp.utils.PropsUtils;
 import ind.web.nhp.utils.RegexUtils;
+import ind.web.nhp.utils.SqlProperties;
 
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,26 +16,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.MapMaker;
 
 public class BaseJdbcDao extends CacheDao {
 
 	public static final String EXC_NOT_CONNECT_DB = "Can not make connection to database!";
+	private final static int NUM_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
+	private Logger LOGGER = LoggerFactory.getLogger(BaseJdbcDao.class);
 	private DataSource ds;
 	public static String PATTERN_PARAM = "\\@\\{([^\\}]+)\\}";
 	public static String PATTERN_TABLE = "\\@\\{_([^\\}]+)\\}";
 	private String driver, connUrl, username, password;
+	private String sqlPropsLocation;
+	private Properties sqlProps = new SqlProperties();
+	private ConcurrentMap<String, String> cacheSqlProps = new MapMaker().concurrencyLevel(
+	        NUM_PROCESSORS).makeMap();
 
 	public void init() {
 		super.init();
 		if (ds == null) {
 			ds = buildDataSource(driver, connUrl, username, password);
 		}
+		loadSqlProps();
 	}
 
 	public void destroy() {
@@ -48,14 +64,72 @@ public class BaseJdbcDao extends CacheDao {
 	 * @param password
 	 * @return
 	 */
-	public DataSource buildDataSource(String driver, String connUrl,
-			String username, String password) {
+	public DataSource buildDataSource(String driver, String connUrl, String username,
+	        String password) {
 		BasicDataSource bds = new BasicDataSource();
 		bds.setDriverClassName(driver);
 		bds.setUrl(connUrl);
 		bds.setUsername(username);
 		bds.setPassword(password);
 		return bds;
+	}
+
+	/**
+	 * Loads SQL properties.
+	 */
+	protected void loadSqlProps() {
+		this.sqlProps.clear();
+		this.cacheSqlProps.clear();
+
+		String sqlLocation = getSqlPropsLocation();
+		if (sqlLocation != null) {
+			InputStream is = getClass().getResourceAsStream(sqlLocation);
+			Properties props = PropsUtils.loadProperties(is, sqlLocation.endsWith(".xml"));
+			if (props != null) {
+				this.sqlProps.putAll(props);
+			} else {
+				String msg = "Can not load SQL properties from [" + sqlLocation + "]!";
+				LOGGER.warn(msg);
+			}
+		} else {
+			String msg = "Location of sql is invalid!";
+			LOGGER.warn(msg);
+		}
+	}
+
+	protected String getSqlProps(String name) {
+		String result = cacheSqlProps.get(name);
+		if (result == null) {
+			result = sqlProps.getProperty(name);
+			if (!StringUtils.isBlank(result)) {
+				try {
+					cacheSqlProps.put(name, result);
+				} catch (Exception e) {
+					LOGGER.warn(e.getMessage(), e);
+					result = null;
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Obtains and builds the sql
+	 * 
+	 * @param sqkKey
+	 * @return
+	 */
+	protected String buildSqlProps(final Object sqlKey) {
+		final String finalKey = (sqlKey instanceof Object[]) ? ((Object[]) sqlKey)[0].toString()
+		        : sqlKey.toString();
+		String sql = getSqlProps(finalKey);
+		if (sql != null && sqlKey instanceof Object[]) {
+			Object[] temp = (Object[]) sqlKey;
+			for (int i = 1; i < temp.length; i++) {
+				sql = sql.replaceAll("\\{" + i + "\\}", temp[i] != null ? temp[i].toString() : "");
+			}
+		}
+		return sql;
 	}
 
 	/**
@@ -113,8 +187,8 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("unchecked")
-	public PreparedStatement preparedStatement(Connection conn, String sql,
-			Object params) throws SQLException {
+	public PreparedStatement preparedStatement(Connection conn, String sql, Object params)
+	        throws SQLException {
 		if (params == null) {
 			return buildStatement(conn, sql, (Object[]) params);
 		} else if (params instanceof Object[]) {
@@ -134,10 +208,9 @@ public class BaseJdbcDao extends CacheDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public PreparedStatement buildStatement(Connection conn, String sql,
-			Map<String, Object> params) throws SQLException {
-		String cleanSql = RegexUtils.replaceRegexToValue(sql, PATTERN_TABLE,
-				params);
+	public PreparedStatement buildStatement(Connection conn, String sql, Map<String, Object> params)
+	        throws SQLException {
+		String cleanSql = RegexUtils.replaceRegexToValue(sql, PATTERN_TABLE, params);
 		String[] listParams = RegexUtils.extractParams(cleanSql, PATTERN_PARAM);
 		List<Object> listValues = new ArrayList<Object>();
 		for (String param : listParams) {
@@ -159,8 +232,8 @@ public class BaseJdbcDao extends CacheDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public PreparedStatement buildStatement(Connection conn, String sql,
-			Object[] params) throws SQLException {
+	public PreparedStatement buildStatement(Connection conn, String sql, Object[] params)
+	        throws SQLException {
 		String cleanSql = sql.replaceAll(PATTERN_PARAM, "?");
 		PreparedStatement stmt = conn.prepareStatement(cleanSql);
 		int numNeedParam = StringUtils.countMatches(cleanSql, "?");
@@ -200,12 +273,11 @@ public class BaseJdbcDao extends CacheDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<PreparedStatement> getListStatements(Connection conn,
-			String[] sqlCommands, Object params) throws SQLException {
+	public List<PreparedStatement> getListStatements(Connection conn, String[] sqlCommands,
+	        Object params) throws SQLException {
 		List<PreparedStatement> listStates = new ArrayList<PreparedStatement>();
 		for (String command : sqlCommands) {
-			PreparedStatement preState = preparedStatement(conn, command,
-					params);
+			PreparedStatement preState = preparedStatement(conn, command, params);
 			listStates.add(preState);
 		}
 		return listStates;
@@ -214,20 +286,23 @@ public class BaseJdbcDao extends CacheDao {
 	/**
 	 * Executes a non-SELECT query and returns the number of affected rows.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @return
 	 * @throws SQLException
 	 */
-	public long executeNonSelect(String sqlCommand, Object params)
-			throws SQLException {
+	public long executeNonSelect(String sqlKey, Object params) throws SQLException {
 		Connection conn = getConnection();
 		if (conn == null) {
 			throw new RuntimeException(EXC_NOT_CONNECT_DB);
 		}
 		PreparedStatement stmt = null;
 		try {
-			stmt = preparedStatement(conn, sqlCommand, params);
+			String sql = buildSqlProps(sqlKey);
+			if (sql == null) {
+				throw new SQLException("Can not retrieve SQL [" + sqlKey + "]!");
+			}
+			stmt = preparedStatement(conn, sql, params);
 			long result = stmt.executeUpdate();
 			return result;
 		} finally {
@@ -238,27 +313,25 @@ public class BaseJdbcDao extends CacheDao {
 	/**
 	 * Executes a COUNT query and returns the result. Don't use cache.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @return
 	 * @throws SQLException
 	 */
-	public long executeCount(String sqlCommand, Object params)
-			throws SQLException {
-		return executeCount(sqlCommand, params, (String) null);
+	public long executeCount(String sqlKey, Object params) throws SQLException {
+		return executeCount(sqlKey, params, (String) null);
 	}
 
 	/**
 	 * Executes a COUNT query and returns the result.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @param cacheKey
 	 * @return
 	 * @throws SQLException
 	 */
-	public long executeCount(String sqlCommand, Object params, String cacheKey)
-			throws SQLException {
+	public long executeCount(String sqlKey, Object params, String cacheKey) throws SQLException {
 		Long result = null;
 		if (!StringUtils.isBlank(cacheKey) && cacheEnabled()) {
 			Object temp = getFromCache(cacheKey);
@@ -279,7 +352,11 @@ public class BaseJdbcDao extends CacheDao {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				stmt = preparedStatement(conn, sqlCommand, params);
+				String sql = buildSqlProps(sqlKey);
+				if (sql == null) {
+					throw new SQLException("Can not retrieve SQL [" + sqlKey + "]!");
+				}
+				stmt = preparedStatement(conn, sql, params);
 				rs = stmt.executeQuery();
 				if (rs.next()) {
 					result = rs.getLong(1);
@@ -297,31 +374,31 @@ public class BaseJdbcDao extends CacheDao {
 	}
 
 	/**
-	 * Executes a SELECT query and returns the result as an array of records,
-	 * each record is a Map<String, Object>. Don't use cache.
+	 * Executes a SELECT query and returns the result as an array of records, each record is a
+	 * Map<String, Object>. Don't use cache.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<Map<String, Object>> executeSelect(String sqlCommand,
-			Object params) throws SQLException {
-		return executeSelect(sqlCommand, params, (String) null);
+	public List<Map<String, Object>> executeSelect(String sqlKey, Object params)
+	        throws SQLException {
+		return executeSelect(sqlKey, params, (String) null);
 	}
 
 	/**
-	 * Executes a SELECT query and returns the result as an array of records,
-	 * each record is a Map<String, Object>.
+	 * Executes a SELECT query and returns the result as an array of records, each record is a
+	 * Map<String, Object>.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @return
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Map<String, Object>> executeSelect(String sqlCommand,
-			Object params, String cacheKey) throws SQLException {
+	public List<Map<String, Object>> executeSelect(String sqlKey, Object params, String cacheKey)
+	        throws SQLException {
 		List<Map<String, Object>> result = null;
 		// GET FROM CACHE
 		if (!StringUtils.isBlank(cacheKey) && cacheEnabled()) {
@@ -344,10 +421,13 @@ public class BaseJdbcDao extends CacheDao {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				stmt = preparedStatement(conn, sqlCommand, params);
+				String sql = buildSqlProps(sqlKey);
+				if (sql == null) {
+					throw new SQLException("Can not retrieve SQL [" + sqlKey + "]!");
+				}
+				stmt = preparedStatement(conn, sql, params);
 				rs = stmt.executeQuery();
-				ResultSetMetaData rsMetaData = rs != null ? rs.getMetaData()
-						: null;
+				ResultSetMetaData rsMetaData = rs != null ? rs.getMetaData() : null;
 				while (rs.next()) {
 					Map<String, Object> obj = new HashMap<String, Object>();
 					for (int i = 1, n = rsMetaData.getColumnCount(); i <= n; i++) {
@@ -363,8 +443,7 @@ public class BaseJdbcDao extends CacheDao {
 		}
 
 		// PUT TO CACHE
-		if (!StringUtils.isBlank(cacheKey) && cacheEnabled() && result != null
-				&& result.size() > 0) {
+		if (!StringUtils.isBlank(cacheKey) && cacheEnabled() && result != null && result.size() > 0) {
 			putToCache(cacheKey, result);
 		}
 
@@ -372,25 +451,25 @@ public class BaseJdbcDao extends CacheDao {
 	}
 
 	/**
-	 * Executes a SELECT query and returns the result as an array of result,
-	 * each result is an instance of type {@link BaseBo}. Don't use cache.
+	 * Executes a SELECT query and returns the result as an array of result, each result is an
+	 * instance of type {@link BaseBo}. Don't use cache.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @param clazz
 	 * @return
 	 * @throws SQLException
 	 */
-	public <T extends BaseBo> T[] executeSelect(String sqlCommand,
-			Object params, Class<T> clazz) throws SQLException {
-		return executeSelect(sqlCommand, params, clazz, (String) null);
+	public <T extends BaseBo> T[] executeSelect(String sqlKey, Object params, Class<T> clazz)
+	        throws SQLException {
+		return executeSelect(sqlKey, params, clazz, (String) null);
 	}
 
 	/**
-	 * Executes a SELECT query and returns the result as an array of result,
-	 * each result is an instance of type {@link BaseBo}.
+	 * Executes a SELECT query and returns the result as an array of result, each result is an
+	 * instance of type {@link BaseBo}.
 	 * 
-	 * @param sqlCmd
+	 * @param sqlKey
 	 * @param params
 	 * @param clazz
 	 * @param cacheKey
@@ -398,10 +477,9 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends BaseBo> T[] executeSelect(String sqlCmd,
-			Object params, Class<T> clazz, String cacheKey) throws SQLException {
-		List<Map<String, Object>> dbResult = executeSelect(sqlCmd, params,
-				cacheKey);
+	protected <T extends BaseBo> T[] executeSelect(String sqlKey, Object params, Class<T> clazz,
+	        String cacheKey) throws SQLException {
+		List<Map<String, Object>> dbResult = executeSelect(sqlKey, params, cacheKey);
 		if (dbResult == null || dbResult.size() <= 0) {
 			return null;
 		}
@@ -423,13 +501,20 @@ public class BaseJdbcDao extends CacheDao {
 	/**
 	 * Executes multi queries. Nothing returns.
 	 * 
-	 * @param sqlCommand
+	 * @param sqlKey
 	 * @param params
 	 * @throws SQLException
 	 */
-	public void executeMultiCommands(String[] sqlCommand, Object params)
-			throws SQLException {
+	public void executeMultiCommands(String[] sqlKey, Object params) throws SQLException {
 		Boolean autoCommitOldValue = true;
+		String[] sql = new String[sqlKey.length];
+		for (int i = 0; i < sqlKey.length; i++) {
+			String sqlCommand = buildSqlProps(sqlKey[i]);
+			if (sqlCommand == null) {
+				throw new SQLException("Can not retrieve SQL [" + sqlKey[i] + "]!");
+			}
+			sql[i] = sqlCommand;
+		}
 		Connection conn = getConnection();
 		if (conn == null) {
 			throw new RuntimeException(EXC_NOT_CONNECT_DB);
@@ -439,8 +524,7 @@ public class BaseJdbcDao extends CacheDao {
 		try {
 			autoCommitOldValue = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			List<PreparedStatement> statements = getListStatements(conn,
-					sqlCommand, params);
+			List<PreparedStatement> statements = getListStatements(conn, sql, params);
 			for (PreparedStatement ps : statements) {
 				ps.execute();
 			}
@@ -484,6 +568,14 @@ public class BaseJdbcDao extends CacheDao {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getSqlPropsLocation() {
+		return sqlPropsLocation;
+	}
+
+	public void setSqlPropsLocation(String sqlPropsLocation) {
+		this.sqlPropsLocation = sqlPropsLocation;
 	}
 
 }
