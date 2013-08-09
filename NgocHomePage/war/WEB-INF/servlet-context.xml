@@ -15,7 +15,7 @@
 	<context:component-scan base-package="ind.web.nhp" />
 	<mvc:annotation-driven />
 	<context:annotation-config />
-	<mvc:annotation-driven ignoreDefaultModelOnRedirect="false" />
+	<mvc:annotation-driven ignoreDefaultModelOnRedirect="true" />
 
 	<mvc:resources mapping="/static/**" location="/WEB-INF/resource/"
 		cache-period="0" />
@@ -32,6 +32,9 @@
 	
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="exposeRequestAttributes" value="false" />
+		<property name="exposeSessionAttributes" value="false" />
+		<property name="exposeSpringMacroHelpers" value="false" />
 		<property name="cache" value="true" />
 		<property name="prefix" value="page_" />
 		<property name="suffix" value=".ftl" />

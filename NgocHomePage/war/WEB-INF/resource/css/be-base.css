@@ -19,6 +19,7 @@ a:hover {
 
 #content {
 	margin-top: 50px;
+	height: 100%;
 }
 
 .body-content {
@@ -67,6 +68,17 @@ a:hover {
 	line-height: 30px;
 	font-weight: bold;
 	margin-left: 0px;
+}
+
+#login-form {
+	margin: auto;
+	margin-top: 80px;
+	width: 300px;
+	padding: 10px 0 10px 40px;
+	background-color: #fff;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
 /* ---------MODAL -------------*/
