@@ -7,7 +7,6 @@ import ind.web.nhp.form.UserBEForm;
 import ind.web.nhp.form.UserBEFormValidator;
 import ind.web.nhp.model.ErrorModel;
 import ind.web.nhp.us.IGroup;
-import ind.web.nhp.us.IUsManager;
 import ind.web.nhp.us.IUser;
 import ind.web.nhp.us.impl.UserBo;
 import ind.web.nhp.utils.Utils;
@@ -30,9 +29,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UsersController extends BaseBackendController {
 	private static final String VIEW_NAME = "be_users";
 	private static final String ERROR_PARAM = "errObj";
-
-	@Autowired
-	private IUsManager usManager;
 
 	@Autowired
 	private ISaltGenerator saltGenerator;
@@ -92,10 +88,8 @@ public class UsersController extends BaseBackendController {
 
 		if (result.hasErrors()) {
 			errMsg = this.lang.getMessage("error.field.required");
-			;
 		} else if (!Utils.isValidEmail(email)) {
 			errMsg = this.lang.getMessage("error.field.email.invalid");
-			;
 		} else if (usManager.getUserByEmail(email) != null) {
 			errMsg = this.lang.getMessage("error.user.email.existed");
 		} else if (usManager.getUser(loginName) != null) {
