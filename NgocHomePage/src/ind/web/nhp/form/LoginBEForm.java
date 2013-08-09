@@ -3,6 +3,7 @@ package ind.web.nhp.form;
 public class LoginBEForm {
 
 	private String email, password;
+	private int remember;
 
 	public String getEmail() {
 		return email;
@@ -18,6 +19,14 @@ public class LoginBEForm {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public int getRemember() {
+		return remember;
+	}
+
+	public void setRemember(int remember) {
+		this.remember = remember;
 	}
 
 }

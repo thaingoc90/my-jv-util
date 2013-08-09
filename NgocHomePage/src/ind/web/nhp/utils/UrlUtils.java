@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.ServletContextAware;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.web.context.ServletContextAware;
  * @author ngoctdn
  * 
  */
+@Component
 public class UrlUtils implements ServletContextAware {
 
 	public final static int DEFAULT_HTTP_PORT = 80;

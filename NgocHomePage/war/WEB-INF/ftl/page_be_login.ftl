@@ -6,7 +6,7 @@
 </style>
 
 <section id="login-form">
-	<form class="" action="/admin/login" id="frmLogin" method="post" >
+	<form class="" action="${urlAction}" id="frmLogin" method="post" >
 		<fieldset>
 			<div class="title-large">Sign In</div>
 			<#include "inc_error_zone.ftl" />
@@ -20,7 +20,7 @@
 				<input type="password" id="inputPassword" name="password" required placeholder="Password">
 			</div>
 			<label class="checkbox">
-		    	<input type="checkbox"> Remember me
+		    	<input type="checkbox" name="remember" value=1> Remember me
 		    	| <a href="${baseUrl}forgotpassword">Forgot password?</a>
 		    </label>
 		    <div style="margin-top: 10px;">

@@ -13,7 +13,9 @@ import ind.web.nhp.us.IUser;
 import ind.web.nhp.utils.UrlUtils;
 import ind.web.nhp.utils.Utils;
 
-public abstract class BaseBackendController extends BaseController {
+public class BaseBackendController extends BaseController {
+
+	private boolean loginAuthentication = true;
 
 	@Autowired
 	protected IUsManager usManager;
@@ -36,5 +38,13 @@ public abstract class BaseBackendController extends BaseController {
 			}
 		}
 		return user;
+	}
+
+	public boolean isLoginAuthentication() {
+		return loginAuthentication;
+	}
+
+	public void setLoginAuthentication(boolean loginAuthentication) {
+		this.loginAuthentication = loginAuthentication;
 	}
 }

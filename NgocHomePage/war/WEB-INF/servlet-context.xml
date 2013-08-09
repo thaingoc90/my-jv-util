@@ -22,6 +22,11 @@
 
 	<mvc:interceptors>
 		<ref bean="localeChangeInterceptor" />
+		<mvc:interceptor>
+			<mvc:mapping path="/admin" />
+			<mvc:mapping path="/admin/*"/>
+			<bean class="ind.web.nhp.interceptor.LoginAuthentication"/>
+		</mvc:interceptor>
 	</mvc:interceptors>
 
 	<!-- freemarker config -->
