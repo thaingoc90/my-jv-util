@@ -1,16 +1,16 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="navbar-inner">
            <div class="container">
-             	<a class="brand" href="#">NHP</a>
+             	<a class="brand" href="${baseUrl}">NHP</a>
              	<div class="nav-collapse collapse navbar-inverse-collapse">
                    <ul class="nav">
-                 		<li class="active"><a href="#"><i class="icon-home icon-white"></i> Dashboard</a></li>
+                 		<li class="active"><a href="${baseUrl}dashboard"><i class="icon-home icon-white"></i> Dashboard</a></li>
                  		<li class="dropdown">
                        	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-group icon-white"></i> Manage <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                           	<li><a href="${baseUrl}groups">Groups</a></li>
                           	<li><a href="${baseUrl}users">Users</a></li>
-                          	<li><a href="#">Permissions</a></li>
+                          	<li><a href="${baseUrl}permissions">Permissions</a></li>
                         </ul>
                      	</li>
                      	<li class="dropdown">
