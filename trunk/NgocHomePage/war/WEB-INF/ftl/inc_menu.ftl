@@ -4,7 +4,7 @@
              	<a class="brand" href="${baseUrl}">NHP</a>
              	<div class="nav-collapse collapse navbar-inverse-collapse">
                    <ul class="nav">
-                 		<li class="active"><a href="${baseUrl}dashboard"><i class="icon-home icon-white"></i> Dashboard</a></li>
+                 		<li><a href="${baseUrl}dashboard"><i class="icon-home icon-white"></i> Dashboard</a></li>
                  		<li class="dropdown">
                        	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-group icon-white"></i> Manage <b class="caret"></b></a>
                         <ul class="dropdown-menu">
