@@ -3,19 +3,8 @@
 
 <div class="body-content">
 	<header class="title-large">List Users </header>
-	<div>
-		<#if msgError??>
-			<span class="dialog error">
-				${msgError}
-			</span>	
-		</#if>
-		<#if msgSuccess??>
-			<span class="dialog success">
-				${msgSuccess}
-			</span>	
-		</#if>
-	</div>
-	
+	<#include "inc_error_zone.ftl" />	
+
 	<button class="btn btn-info create-btn" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create User</button>
 	<#if USERS??>
 	<table class="table table-hover">
@@ -26,23 +15,22 @@
 			<th width="150">Display Name</th>
 			<th width="60" class="ta-cen">Status</th>
 			<th width="120">Group</th>
-			<th width="80"></th>
+			<th width="60"></th>
 		</tr>
 		<#list USERS as user>
-			<tr>
+			<tr <#if user.getId() == 1>class="info"</#if>>
 				<td>${user_index + 1}</td>
 				<td><span class="user-email">${user.getEmail()}</span></td>
-				<td><span class="user-name">${user.getLoginName()}</span></td>
-				<td><span class="user-name">${user.getDisplayName()!""}</span></td>
+				<td><span class="user-login-name">${user.getLoginName()}</span></td>
+				<td><span class="user-display-name">${user.getDisplayName()!""}</span></td>
 				<td class="ta-cen"><#if !user.isLocked()><i class="icon-ok"></i></#if></td>
-				<td><span class="user-group" style="display: none">${user.getGroupId()?c}</span>${GROUP_MAPPING[user.getGroupId()?string]!"No Group"}</td>
+				<td><span class="user-group hide">${user.getGroupId()?c}</span>${GROUP_MAPPING[user.getGroupId()?string]!"No Group"}</td>
 				<td>
-					<#-- <#if user.getId() != 1> -->
-						<a href="javascript:;" id="id${user_index}" class="modal-edit-open" rel="${user.getId()}" title="Edit"><i class="icon-pencil"></i></a>
+					<#if user.getId() != 1>
+						<a href="#editModal" class="modal-edit-user" data-toggle="modal" data-id="${user.getId()}" title="Edit"><i class="icon-pencil"></i></a>
 						<a href="${baseUrl}users/lock/${user.getId()}" <#if user.isLocked()>title="Unlock"> <i class="icon-unlock"></i><#else>title="Lock"> <i class="icon-lock"></i></#if></a>
-						<a href="javascript:;" class="modal-change-open" rel="${user.getId()}" title="Reset password"><i class="icon-repeat"> </i></a>
 						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}users/delete/${user.getId()}" title="Delete"><i class="icon-trash"> </i></a>
-					<#-- </#if> -->
+					</#if>
 				</td>
 			</tr>
 		</#list>
@@ -50,29 +38,29 @@
 	</#if>
 </div>
 
-<div id="createModal" class="modal hide fade" >
+<div id="createModal" class="modal hide fade modal-form" >
 	<form action="${baseUrl}users/add" method="post" class="form-horizontal">
 		<div class="modal-header">
-	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Create User</div>
 	  	</div>
 		<div class="modal-body">
 			<div class="control-group">
 		    	<label class="control-label" for="inputEmail">Email <span class="require">*</span></label>
 		    	<div class="controls">
-		      		<input type="text" id="inputEmail" name="email" required placeholder="Email">
+		      		<input type="email" id="inputEmail" name="email" required placeholder="Email">
 		    	</div>
 		  	</div>
 			<div class="control-group">
-				<label class="control-label" for="inputName">Login Name <span class="require">*</span></label>
+				<label class="control-label" for="inputLoginName">Login Name <span class="require">*</span></label>
 			    <div class="controls">
-			      <input type="text" id="inputName" name="loginName" required placeholder="Login name">
+			      <input type="text" id="inputLoginName" name="loginName" required placeholder="Login name">
 			    </div>
 		  	</div>
 		  	<div class="control-group">
-				<label class="control-label" for="displayName">Display Name</label>
+				<label class="control-label" for="inputDisplayName">Display Name</label>
 			    <div class="controls">
-			      <input type="text" id="displayName" name="displayName" placeholder="Login name">
+			      <input type="text" id="inputDisplayName" name="displayName" placeholder="Login name">
 			    </div>
 		  	</div>
 		  	<div class="control-group">
@@ -82,18 +70,69 @@
 		    	</div>
 		  	</div>
 		  	<div class="control-group">
-			    	<label class="control-label">Group <span class="require">*</span></label>
-			    	<div class="controls">
-			      		<select  id="inputGroup" name="groupId">
-			      			<#list GROUPS as group>
-							  	<option value="${group.getId()}">${group.getName()}</option>
-						  	</#list>
-						</select>
-			    	</div>
-			  	</div>
+		    	<label class="control-label">Group <span class="require">*</span></label>
+		    	<div class="controls">
+		      		<select  id="inputGroup" name="groupId">
+		      			<#list GROUPS as group>
+						  	<option value="${group.getId()}">${group.getName()}</option>
+					  	</#list>
+					</select>
+		    	</div>
+		  	</div>
 		</div>
 		<div class="modal-footer">
 			<button type="submit" class="btn btn-success">Create</button>
+	   		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	 	</div>
+ 	</form>
+</div>
+
+<div id="editModal" class="modal hide fade modal-form" >
+	<form action="${baseUrl}users/edit" method="post" class="form-horizontal">
+		<div class="modal-header">
+	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    		<div class="title-medium">Edit User</div>
+	  	</div>
+		<div class="modal-body">
+			<input type="hidden" id="inputId" name="id" required>
+			<div class="control-group">
+		    	<label class="control-label">Email</label>
+		    	<div class="controls">
+		      		<span id="inputEmail" class="text-info span-in-control"></span>
+		    	</div>
+		  	</div>
+			<div class="control-group">
+				<label class="control-label">Login Name</label>
+			    <div class="controls">
+			     	<span id="inputLoginName" class="text-info span-in-control"></span>
+			    </div>
+		  	</div>
+		  	<div class="control-group">
+		    	<label class="control-label" for="inputPassword">New Password</label>
+		    	<div class="controls">
+		      		<input type="password" id="inputPassword" name="password">
+		      		<div><small>Input if want to change password</small></div>
+		    	</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class="control-label" for="inputDisplayName">Display Name</label>
+			    <div class="controls">
+			      	<input type="text" id="inputDisplayName" name="displayName" value="" placeholder="Login name">
+			    </div>
+		  	</div>
+		  	<div class="control-group">
+		    	<label class="control-label">Group </label>
+		    	<div class="controls">
+		      		<select  id="inputGroup" name="groupId">
+		      			<#list GROUPS as group>
+						  	<option value="${group.getId()}">${group.getName()}</option>
+					  	</#list>
+					</select>
+		    	</div>
+		  	</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success">Save</button>
 	   		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
 	 	</div>
  	</form>

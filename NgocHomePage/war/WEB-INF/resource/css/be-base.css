@@ -63,16 +63,24 @@ a:hover {
 	margin-top: 10px;
 }
 
-#createModal {
+.span-in-control {
+	line-height: 30px;
+	font-weight: bold;
+	margin-left: 0px;
+}
+
+/* ---------MODAL -------------*/
+.modal-form {
 	width: 460px;
 }
 
-#createModal .control-label {
+.modal-form .control-label {
 	width: 130px;
 	font-weight: bold;
 	font-size: 13px;
 }
 
-#createModal .controls {
+.modal-form .controls {
 	margin-left: 145px;
 }
+/* ------- END MODAL ---------- */

@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="${staticResourceRoot}bootstrap2.3.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="${staticResourceRoot}font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" type="text/css" href="${staticResourceRoot}css/be-base.css"/>
+    <link rel="stylesheet" type="text/css" href="${staticResourceRoot}css/dialogbox.css"/>
+    
     <#list customCssList as customCss>
 		<link rel="stylesheet" type="text/css" href="${staticResourceRoot}${customCss}.css"/>
 	</#list>

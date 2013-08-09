@@ -1,5 +1,7 @@
 package ind.web.nhp.base;
 
+import ind.web.nhp.model.ErrorModel;
+
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public abstract class BaseController {
 
 	private static Language defaultLang = new Language();
+	protected Language lang;
 
 	@Autowired
 	protected LanguageLoader languageManager;
@@ -17,7 +20,8 @@ public abstract class BaseController {
 	@ModelAttribute("lang")
 	public Language getLanguage(Locale locale) {
 		Language lang = languageManager.getLanguage(getLocale(locale));
-		return lang != null ? lang : defaultLang;
+		this.lang = lang != null ? lang : defaultLang;
+		return this.lang;
 	}
 
 	@ModelAttribute("staticResourceRoot")
@@ -30,4 +34,7 @@ public abstract class BaseController {
 		return locale.getLanguage();
 	}
 
+	protected ErrorModel buildErrorObject(int errCode, String errMsg, String msgSuccess) {
+		return new ErrorModel(errCode, errMsg, msgSuccess);
+	}
 }
