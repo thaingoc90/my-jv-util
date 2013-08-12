@@ -47,6 +47,9 @@ CREATE TABLE nhp_permission (
 	FOREIGN KEY (parent_id) REFERENCES nhp_permission(id) ON DELETE CASCADE,
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+INSERT INTO nhp_permission (id, pdesc) VALUES ('ADMIN', 'See menu-admin');
+INSERT INTO nhp_permission (id, pdesc) VALUES ('ADMIN_USER', 'All privileges on menu-group');
+INSERT INTO nhp_permission (id, pdesc) VALUES ('ADMIN_GROUP', 'All privileges on menu-user');
 
 -- Table for relation between permission and group
 CREATE TABLE nhp_group_permission (

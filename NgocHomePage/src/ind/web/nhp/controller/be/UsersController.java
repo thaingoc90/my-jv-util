@@ -1,5 +1,6 @@
 package ind.web.nhp.controller.be;
 
+import ind.web.nhp.base.Constants;
 import ind.web.nhp.base.ErrorConstants;
 import ind.web.nhp.encrypt.IPasswordEncoder;
 import ind.web.nhp.encrypt.ISaltGenerator;
@@ -28,7 +29,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class UsersController extends BaseBackendController {
 	private static final String VIEW_NAME = "be_users";
-	private static final String ERROR_PARAM = "errObj";
 
 	@Autowired
 	private ISaltGenerator saltGenerator;
@@ -47,7 +47,7 @@ public class UsersController extends BaseBackendController {
 	 * @return
 	 */
 	@RequestMapping(value = { "/admin/users", "/admin/users/*" })
-	public String get(@ModelAttribute(ERROR_PARAM) ErrorModel errorObj, Model model) {
+	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IUser[] listUsers = usManager.getAllUsers();
 		IGroup[] listGroups = usManager.getAllGroups();
 		Map<String, String> groupMapping = new HashMap<String, String>();
@@ -109,7 +109,7 @@ public class UsersController extends BaseBackendController {
 			usManager.createUser(user);
 		}
 
-		redirectAttributes.addFlashAttribute(ERROR_PARAM,
+		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
 		return "redirect:/admin/users";
 	}
@@ -146,7 +146,7 @@ public class UsersController extends BaseBackendController {
 			usManager.updateUser(user);
 		}
 
-		redirectAttributes.addFlashAttribute(ERROR_PARAM,
+		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
 		return "redirect:/admin/users";
 	}
@@ -173,7 +173,7 @@ public class UsersController extends BaseBackendController {
 			usManager.deleteUser(user);
 		}
 
-		redirectAttributes.addFlashAttribute(ERROR_PARAM,
+		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
 		return "redirect:/admin/users";
 	}
@@ -204,7 +204,7 @@ public class UsersController extends BaseBackendController {
 			succMsg = this.lang.getMessage(succMsg);
 		}
 
-		redirectAttributes.addFlashAttribute(ERROR_PARAM,
+		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.LOCK_ERROR, errMsg, succMsg));
 		return "redirect:/admin/users";
 	}
