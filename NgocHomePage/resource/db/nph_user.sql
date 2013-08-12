@@ -33,7 +33,7 @@ CREATE TABLE nhp_user (
 	utime_login				DATETIME,
 	ulast_login				DATETIME,
 	uforget_token 			VARCHAR(64),
-	FOREIGN KEY gid(gid) REFERENCES nhp_group(gid) ON DELETE SET NULL,
+	FOREIGN KEY gid(gid) REFERENCES nhp_group(gid) ON DELETE CASCADE,
     PRIMARY KEY (uid)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- Default User Account: admin/password
