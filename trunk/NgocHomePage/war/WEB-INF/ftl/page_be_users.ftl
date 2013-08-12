@@ -29,7 +29,7 @@
 					<#if user.getId() != 1>
 						<a href="#editModal" class="modal-edit-user" data-toggle="modal" data-id="${user.getId()}" title="Edit"><i class="icon-pencil"></i></a>
 						<a href="${baseUrl}users/lock/${user.getId()}" <#if user.isLocked()>title="Unlock"> <i class="icon-unlock"></i><#else>title="Lock"> <i class="icon-lock"></i></#if></a>
-						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}users/delete/${user.getId()}" title="Delete"><i class="icon-trash"> </i></a>
+						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}users/delete/${user.getId()}" title="Delete"><i class="icon-trash"></i></a>
 					</#if>
 				</td>
 			</tr>

@@ -16,15 +16,15 @@
 	<entry key="_col.groupId.where">gid=@{groupId}</entry>
 	<entry key="_col.groupName.where">gname=@{groupName}</entry>
 	<entry key="_cols.group.select"><![CDATA[gid AS groupId, gname AS groupName, gdesc AS groupDesc, gis_system AS groupIsSystem]]></entry>
-	<entry key="_cols.group.insert"><![CDATA[(gid, gis_system, gname, gdesc) VALUES (@{groupId}, @{groupName}, @{groupDesc}, @{groupIsSystem})]]></entry>
-	<entry key="_cols.group.update"><![CDATA[gname=${groupName}, gdesc=${groupDesc}, gis_system=${groupIsSystem}]]></entry>
+	<entry key="_cols.group.insert"><![CDATA[(gid, gname, gdesc, gis_system) VALUES (@{groupId}, @{groupName}, @{groupDesc}, @{groupIsSystem})]]></entry>
+	<entry key="_cols.group.update"><![CDATA[gname=@{groupName}, gdesc=@{groupDesc}, gis_system=@{groupIsSystem}]]></entry>
 	
 	
 	<entry key="_tbl.permission">nhp_permission</entry>
 	<entry key="_col.permissionId.where">id=@{perId}</entry>
 	<entry key="_cols.permission.select"><![CDATA[id AS perId, pdesc AS perDesc, parent_id AS parentId]]></entry>
 	<entry key="_cols.permission.insert"><![CDATA[(id, pdesc, parent_id) VALUES (@{perId}, @{perDesc}, @{parentId})]]></entry>
-	<entry key="_cols.permission.select"><![CDATA[pdesc=@{perDesc}, parent_id=@{parentId}]]></entry>
+	<entry key="_cols.permission.update"><![CDATA[pdesc=@{perDesc}, parent_id=@{parentId}]]></entry>
 	
 	<entry key="_tbl.group_permission">nhp_group_permission</entry>
 	
