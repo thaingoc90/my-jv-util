@@ -94,7 +94,7 @@
     	UPDATE ${_tbl.permission} SET ${_cols.permission.update} WHERE ${_col.permissionId.where}
     ]]></entry>
 	<entry key="sql.addPermission"><![CDATA[
-    	INSERT INTO ${_tbl.permission} (${_cols.permission.insert})
+    	INSERT INTO ${_tbl.permission} ${_cols.permission.insert}
     ]]></entry>
 	
 

@@ -1,5 +1,5 @@
 <#import "inc_layout.ftl" as layout />
-<@layout.masterTemplate title="Dashboard">
+<@layout.masterTemplate title="Manage Users">
 
 <div class="body-content">
 	<header class="title-large">List Users </header>

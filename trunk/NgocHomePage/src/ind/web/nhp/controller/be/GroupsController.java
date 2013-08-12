@@ -167,7 +167,7 @@ public class GroupsController extends BaseBackendController {
 		for (int i = 0; permissionIds != null && i < permissionIds.length; i++) {
 			IPermission permission = usManager.getPermission(permissionIds[i]);
 			if (permission == null) {
-				errMsg = this.lang.getMessage("error.permission.notExisted");
+				errMsg = this.lang.getMessage("error.permission.notExist");
 				break;
 			}
 			listPerms.add(permission);
