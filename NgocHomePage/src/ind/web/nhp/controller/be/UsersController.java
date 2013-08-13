@@ -15,6 +15,8 @@ import ind.web.nhp.utils.Utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,7 +49,8 @@ public class UsersController extends BaseBackendController {
 	 * @return
 	 */
 	@RequestMapping(value = { "/admin/users", "/admin/users/*" })
-	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
+	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj,
+	        HttpServletRequest request, Model model) {
 		IUser[] listUsers = usManager.getAllUsers();
 		IGroup[] listGroups = usManager.getAllGroups();
 		Map<String, String> groupMapping = new HashMap<String, String>();
@@ -60,6 +63,14 @@ public class UsersController extends BaseBackendController {
 		} else if (errorObj.getErrorCode() != 0) {
 			model.addAttribute(ErrorConstants.MODEL_SUCCESS, errorObj.getMsgSuccess());
 		}
+
+		// PAGINATION
+		// int page = Utils.toInt(request.getParameter("p"), 1);
+		// int pageSize = Constants.DEFAULT_PAGESIZE;
+		// int numUsers = listUsers.length;
+		// String urlFormat = "abc?p={PAGE}";
+		// PaginationModel pagniation = new PaginationModel(urlFormat, numUsers, pageSize, page);
+		// model.addAttribute("pagination", pagniation);
 
 		model.addAttribute("USERS", listUsers);
 		model.addAttribute("GROUPS", listGroups);

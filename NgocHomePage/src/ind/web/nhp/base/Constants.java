@@ -8,4 +8,5 @@ public class Constants {
 	public static final String NHP_USER_ID = "NHP_USER_ID";
 
 	public static final String ERROR_PARAM = "errObj";
+	public static final int DEFAULT_PAGESIZE = 10;
 }
