@@ -35,6 +35,8 @@
 			</tr>
 		</#list>
 	</table>
+	
+	<#include "inc_pagination.ftl" />
 	</#if>
 </div>
 
