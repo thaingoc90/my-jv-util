@@ -1,17 +1,21 @@
 package ind.web.nhp.controller.be;
 
+import ind.web.nhp.base.BaseController;
+import ind.web.nhp.base.Constants;
+import ind.web.nhp.us.IMenu;
+import ind.web.nhp.us.IUsManager;
+import ind.web.nhp.us.IUser;
+import ind.web.nhp.utils.UrlUtils;
+import ind.web.nhp.utils.Utils;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
-
-import ind.web.nhp.base.BaseController;
-import ind.web.nhp.base.Constants;
-import ind.web.nhp.us.IUsManager;
-import ind.web.nhp.us.IUser;
-import ind.web.nhp.utils.UrlUtils;
-import ind.web.nhp.utils.Utils;
 
 public class BaseBackendController extends BaseController {
 
@@ -25,6 +29,15 @@ public class BaseBackendController extends BaseController {
 		String url = UrlUtils.getBaseUrl(request);
 		url += "/" + Constants.MODULE_ADMIN + "/";
 		return url;
+	}
+
+	@ModelAttribute("mainMenu")
+	public List<IMenu> modelMenu(HttpServletRequest request) {
+		if (usManager == null) {
+			return new LinkedList<IMenu>();
+		}
+		List<String> listPermIds = new LinkedList<String>();
+		return BuildMenu.buildMainMenu(listPermIds);
 	}
 
 	public IUser getCurrentUser(HttpServletRequest request) {

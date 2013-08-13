@@ -48,7 +48,7 @@ public class UsersController extends BaseBackendController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = { "/admin/users", "/admin/users/*" })
+	@RequestMapping(value = { "/admin/manage/users", "/admin/manage/users/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj,
 	        HttpServletRequest request, Model model) {
 		IUser[] listUsers = usManager.getAllUsers();
@@ -86,7 +86,7 @@ public class UsersController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/users/add", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/users/add", method = RequestMethod.POST)
 	public String addUser(@ModelAttribute UserBEForm form, BindingResult result,
 	        RedirectAttributes redirectAttributes) {
 		String email = form.getEmail();
@@ -122,7 +122,7 @@ public class UsersController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/users";
+		return "redirect:/admin/manage/users";
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class UsersController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/users/edit", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/users/edit", method = RequestMethod.POST)
 	public String editUser(@ModelAttribute UserBEForm form, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.user.edit.success");
 		String errMsg = null;
@@ -159,7 +159,7 @@ public class UsersController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
-		return "redirect:/admin/users";
+		return "redirect:/admin/manage/users";
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class UsersController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/users/delete/{userId}")
+	@RequestMapping(value = "/admin/manage/users/delete/{userId}")
 	public String deleteUser(@PathVariable int userId, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.user.delete.success");
 		String errMsg = null;
@@ -186,7 +186,7 @@ public class UsersController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/users";
+		return "redirect:/admin/manage/users";
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class UsersController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/users/lock/{userId}")
+	@RequestMapping(value = "/admin/manage/users/lock/{userId}")
 	public String lockUser(@PathVariable int userId, RedirectAttributes redirectAttributes) {
 		String errMsg = null;
 		String succMsg = "";
@@ -217,6 +217,6 @@ public class UsersController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.LOCK_ERROR, errMsg, succMsg));
-		return "redirect:/admin/users";
+		return "redirect:/admin/manage/users";
 	}
 }

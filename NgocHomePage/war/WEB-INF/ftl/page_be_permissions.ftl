@@ -24,7 +24,7 @@
 			<td><span class="perm-parent-id"><#if perm.getPid()??>${perm.getPid()}</#if></span></td>
 			<td>
 				<a href="#editModal" class="modal-edit-permission" data-toggle="modal" data-id="${perm.getId()}" title="Edit"><i class="icon-pencil"></i></a>
-				<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}permissions/delete/${perm.getId()}" title="Delete"><i class="icon-trash"></i></a>
+				<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}manage/permissions/delete/${perm.getId()}" title="Delete"><i class="icon-trash"></i></a>
 			</td>
 		</tr>
 		</#list>
@@ -33,7 +33,7 @@
 </div>
 
 <div id="createModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}permissions/add" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/permissions/add" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Create Permission</div>
@@ -71,7 +71,7 @@
 </div>
 
 <div id="editModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}permissions/edit" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/permissions/edit" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Edit Permission</div>

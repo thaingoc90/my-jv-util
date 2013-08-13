@@ -28,8 +28,8 @@
 				<td>
 					<#if user.getId() != 1>
 						<a href="#editModal" class="modal-edit-user" data-toggle="modal" data-id="${user.getId()}" title="Edit"><i class="icon-pencil"></i></a>
-						<a href="${baseUrl}users/lock/${user.getId()}" <#if user.isLocked()>title="Unlock"> <i class="icon-unlock"></i><#else>title="Lock"> <i class="icon-lock"></i></#if></a>
-						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}users/delete/${user.getId()}" title="Delete"><i class="icon-trash"></i></a>
+						<a href="${baseUrl}manage/users/lock/${user.getId()}" <#if user.isLocked()>title="Unlock"> <i class="icon-unlock"></i><#else>title="Lock"> <i class="icon-lock"></i></#if></a>
+						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}manage/users/delete/${user.getId()}" title="Delete"><i class="icon-trash"></i></a>
 					</#if>
 				</td>
 			</tr>
@@ -41,7 +41,7 @@
 </div>
 
 <div id="createModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}users/add" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/users/add" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Create User</div>
@@ -90,7 +90,7 @@
 </div>
 
 <div id="editModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}users/edit" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/users/edit" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Edit User</div>

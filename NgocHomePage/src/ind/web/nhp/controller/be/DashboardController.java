@@ -11,7 +11,7 @@ public class DashboardController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_home";
 
-	@RequestMapping(value = {"/admin", "/admin/*"})
+	@RequestMapping(value = {"/admin", "/admin/**"})
 	public String get(HttpServletRequest req, HttpServletResponse resp) {
 		return VIEW_NAME;
 	}
