@@ -8,6 +8,8 @@ import ind.web.nhp.us.IUser;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -362,11 +364,31 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		Map<String, Object> params = new HashMap<String, Object>();
 		try {
 			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class);
-			return (permissions == null || permissions.length == 0) ? null : permissions;
+			if (permissions == null || permissions.length == 0) {
+				return null;
+			}
+			return orderPermission(permissions);
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();
 		}
+	}
+
+	private IPermission[] orderPermission(IPermission[] orgPerms) {
+		List<IPermission> result = new LinkedList<IPermission>();
+		for (IPermission perm : orgPerms) {
+			if (perm.getPid() != null) {
+				break;
+			}
+			result.add(perm);
+			String permId = perm.getId();
+			for (IPermission subPerm : orgPerms) {
+				if (permId.equals(subPerm.getPid())) {
+					result.add(subPerm);
+				}
+			}
+		}
+		return result.toArray(new IPermission[0]);
 	}
 
 	@Override
@@ -436,6 +458,9 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 
 	@Override
 	public IPermission[] getAllPermisionsOfGroup(IGroup group) {
+		if (group.isSystem()) {
+			return getAllPermissions();
+		}
 		final String sqlKey = "sql.getAllPermissionsOfGroup";
 		String cacheKey = cacheKeyAllPermissionsOfGroup(group.getId());
 		Map<String, Object> params = new HashMap<String, Object>();

@@ -11,15 +11,15 @@
 	<table class="table table-hover">
 		<tr>
 			<th width="20">STT</th>
-			<th width="200">Id</th>
+			<th width="220">Id</th>
 			<th>Description</th>
-			<th width="200">Parent Id</th>
+			<th width="180">Parent Id</th>
 			<th width="60"></th>
 		</tr>
 		<#list PERMISSIONS as perm>
 		<tr>
 			<td>${perm_index + 1}</td>
-			<td><span class="perm-id">${perm.getId()}</span></td>
+			<td><span class="perm-id <#if perm.getPid()??>pad-lef-20</#if>">${perm.getId()}</span></td>
 			<td><span class="perm-desc">${perm.getDesc()}</span></td>
 			<td><span class="perm-parent-id"><#if perm.getPid()??>${perm.getPid()}</#if></span></td>
 			<td>
@@ -65,6 +65,45 @@
 		</div>
 		<div class="modal-footer">
 			<button type="submit" class="btn btn-success">Create</button>
+	   		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	 	</div>
+ 	</form>
+</div>
+
+<div id="editModal" class="modal hide fade modal-form" >
+	<form action="${baseUrl}permissions/edit" method="post" class="form-horizontal">
+		<div class="modal-header">
+	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    		<div class="title-medium">Edit Permission</div>
+	  	</div>
+		<div class="modal-body">
+			<div class="control-group">
+				<label class="control-label" for="inputId">Id</label>
+			    <div class="controls">
+			      	<input type="hidden" id="inputId" name="id" disable placeholder="Id">
+			      	<span class="span-in-control" id="labelId">Id</span>
+			    </div>
+		  	</div>
+		  	<div class="control-group">
+		    	<label class="control-label" for="inputDesc">Description</label>
+		    	<div class="controls">
+		      		<input type="text" id="inputDesc" name="desc" placeholder="Description">
+		    	</div>
+		  	</div>
+		  	<div class="control-group">
+		    	<label class="control-label">Parent Id</label>
+		    	<div class="controls">
+		      		<select id="inputPid" name="pid">
+		      			<option value="0">--Select parent--</option>
+		      			<#list PERMISSIONS as perm>
+						  	<option value="${perm.getId()}">${perm.getId()}</option>
+					  	</#list>
+					</select>
+		    	</div>
+		  	</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success">Save</button>
 	   		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
 	 	</div>
  	</form>

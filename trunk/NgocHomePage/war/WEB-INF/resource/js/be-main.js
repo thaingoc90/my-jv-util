@@ -61,3 +61,17 @@ $(document).on('click', '.modal-permission-mapping', function() {
 	
 	$('#permMappingModel #inputPermission').val(listPermId);
 });
+
+$(document).on('click', '.modal-edit-permission', function() {
+	var grandFather = $(this).parent().parent();
+	var id = grandFather.find(".perm-id").html();
+	var desc = grandFather.find(".perm-desc").html();
+	var parentId = grandFather.find(".perm-parent-id").html();
+	
+	$('#editModal #inputId').attr('value', id);
+	$('#editModal #labelId').html(id);
+	$('#editModal #inputDesc').attr('value', desc);
+	if (!isEmpty(parentId)) {
+		$("#editModal #inputPid").val(parentId);
+	}
+});

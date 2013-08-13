@@ -62,6 +62,33 @@ public class PermissionsController extends BaseBackendController {
 		return "redirect:/admin/permissions";
 	}
 
+	@RequestMapping(value = "/admin/permissions/edit", method = RequestMethod.POST)
+	public String editPerm(@ModelAttribute PermissionBEForm form,
+	        RedirectAttributes redirectAttributes) {
+		String succMsg = this.lang.getMessage("msg.permission.edit.success");
+		String errMsg = null;
+
+		String id = form.getId();
+		PermissionBo perm = (PermissionBo) usManager.getPermission(id);
+		if (perm == null) {
+			errMsg = this.lang.getMessage("error.permission.notExist");
+		}
+
+		if (errMsg == null) {
+			perm.setDesc(form.getDesc());
+			if (!"0".equals(form.getPid())) {
+				perm.setPid(form.getPid());
+			} else {
+				perm.setPid(null);
+			}
+			usManager.updatePermission(perm);
+		}
+
+		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
+		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
+		return "redirect:/admin/permissions";
+	}
+
 	/**
 	 * 
 	 * @param permId

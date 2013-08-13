@@ -85,7 +85,7 @@
     	SELECT ${_cols.permission.select} FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
     ]]></entry>
 	<entry key="sql.getAllPermissions"><![CDATA[
-    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} ORDER BY id
+    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} ORDER BY parent_id, id
     ]]></entry>
 	<entry key="sql.deletePermission"><![CDATA[
     	DELETE FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
