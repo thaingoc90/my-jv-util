@@ -60,3 +60,33 @@ CREATE TABLE nhp_group_permission (
 	FOREIGN KEY gid(gid) REFERENCES nhp_group(gid) ON DELETE CASCADE,
 	FOREIGN KEY pid(pid) REFERENCES nhp_permission(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+-- Table menu
+CREATE TABLE nhp_menu (
+	mid					INT(8)					NOT NULL AUTO_INCREMENT,
+	mname				VARCHAR(64)				NOT NULL DEFAULT "",
+	murl				VARCHAR(128)			NOT NULL DEFAULT "",
+	mposition			INT(8)					NOT NULL DEFAULT 0,	
+	mparent_id			INT(8),
+	mpermission			VARCHAR(64),
+	PRIMARY KEY (mid),
+	INDEX (mposition),
+	INDEX (mparent_id),
+	FOREIGN KEY mpermission(mpermission) REFERENCES nhp_permission(id) ON DELETE SET NULL,
+	FOREIGN KEY mparent_id(mparent_id) REFERENCES nhp_menu(mid) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+INSERT INTO nhp_menu (mname, murl, mposition, mparent_id) VALUES
+	('Manage', '', 1, NULL),
+	('Setting', '', 2, NULL),
+	('Groups', 'manage/groups', 1, 1),
+	('Users', 'manage/users', 2, 1),
+	('Permissions', 'manage/permissions', 3, 1),
+	('Accounts', 'setting/account', 1, 2),
+	('Mail', 'setting/mail', 2, 2);
+	
+CREATE TABLE nhp_config (
+ 	c_key            VARCHAR(32)         	NOT NULL,
+    c_value          TEXT,
+    PRIMARY KEY (c_key)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
