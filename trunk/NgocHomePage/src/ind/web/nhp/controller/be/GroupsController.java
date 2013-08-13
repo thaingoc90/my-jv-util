@@ -29,7 +29,7 @@ public class GroupsController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_groups";
 
-	@RequestMapping(value = { "/admin/groups", "/admin/groups/*" })
+	@RequestMapping(value = { "/admin/manage/groups", "/admin/manage/groups/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IGroup[] listGroups = usManager.getAllGroups();
 		IPermission[] permisions = usManager.getAllPermissions();
@@ -62,7 +62,7 @@ public class GroupsController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/groups/add", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/groups/add", method = RequestMethod.POST)
 	public String addGroup(@ModelAttribute GroupBEForm form, RedirectAttributes redirectAttributes) {
 		String name = form.getName();
 		String succMsg = this.lang.getMessage("msg.group.create.success");
@@ -84,7 +84,7 @@ public class GroupsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/groups";
+		return "redirect:/admin/manage/groups";
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class GroupsController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/groups/edit", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/groups/edit", method = RequestMethod.POST)
 	public String editGroup(@ModelAttribute GroupBEForm form, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.group.edit.success");
 		String errMsg = null;
@@ -119,7 +119,7 @@ public class GroupsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
-		return "redirect:/admin/groups";
+		return "redirect:/admin/manage/groups";
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class GroupsController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/groups/delete/{groupId}")
+	@RequestMapping(value = "/admin/manage/groups/delete/{groupId}")
 	public String deleteGroup(@PathVariable int groupId, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.group.delete.success");
 		String errMsg = null;
@@ -146,10 +146,10 @@ public class GroupsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/groups";
+		return "redirect:/admin/manage/groups";
 	}
 
-	@RequestMapping(value = "/admin/groups/permission", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/groups/permission", method = RequestMethod.POST)
 	public String editPermission(@ModelAttribute GroupBEForm form,
 	        RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.group.edit.success");
@@ -179,6 +179,6 @@ public class GroupsController extends BaseBackendController {
 		}
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
-		return "redirect:/admin/groups";
+		return "redirect:/admin/manage/groups";
 	}
 }

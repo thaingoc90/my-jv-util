@@ -5,21 +5,20 @@
              	<div class="nav-collapse collapse navbar-inverse-collapse">
                    <ul class="nav">
                  		<li><a href="${baseUrl}dashboard"><i class="icon-home icon-white"></i> Dashboard</a></li>
-                 		<li class="dropdown">
-                       	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-group icon-white"></i> Manage <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                          	<li><a href="${baseUrl}groups">Groups</a></li>
-                          	<li><a href="${baseUrl}users">Users</a></li>
-                          	<li><a href="${baseUrl}permissions">Permissions</a></li>
-                        </ul>
-                     	</li>
-                     	<li class="dropdown">
-                       	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-gear icon-white"></i> Setting <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                          	<li><a href="#">Account</a></li>
-                          	<li><a href="#">Primacy</a></li>
-                        </ul>
-                     	</li>
+                     	<#list mainMenu as menuItem>
+                     	<#if menuItem.getChilds()??>
+                     		<li class="dropdown">
+	                     		<a href="#" class="dropdown-toggle" data-toggle="dropdown">${menuItem.getName()} <b class="caret"></b></a>
+	                     		<ul class="dropdown-menu">
+	                     			<#list menuItem.getChilds() as subMenu>
+	                     				<li><a href="${baseUrl}${subMenu.getUrl()}">${subMenu.getName()}</a></li>
+	                     			</#list>
+	                     		</ul>
+	                     	</li>
+                     	<#else>
+                     		<li><a href="${baseUrl}${menuItem.getUrl()}">${menuItem.getName()}</a></li>
+                     	</#if>
+                     	</#list>
                    </ul>
                    <ul class="nav pull-right">
                    	<li class="divider-vertical"></li>

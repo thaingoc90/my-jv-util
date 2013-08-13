@@ -21,7 +21,7 @@ public class PermissionsController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_permissions";
 
-	@RequestMapping(value = { "/admin/permissions", "/admin/permissions/*" })
+	@RequestMapping(value = { "/admin/manage/permissions", "/admin/manage/permissions/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IPermission[] permisions = usManager.getAllPermissions();
 		model.addAttribute("PERMISSIONS", permisions);
@@ -34,7 +34,7 @@ public class PermissionsController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/permissions/add", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/permissions/add", method = RequestMethod.POST)
 	public String addPerm(@ModelAttribute PermissionBEForm form,
 	        RedirectAttributes redirectAttributes) {
 		String id = form.getId();
@@ -59,10 +59,10 @@ public class PermissionsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/permissions";
+		return "redirect:/admin/manage/permissions";
 	}
 
-	@RequestMapping(value = "/admin/permissions/edit", method = RequestMethod.POST)
+	@RequestMapping(value = "/admin/manage/permissions/edit", method = RequestMethod.POST)
 	public String editPerm(@ModelAttribute PermissionBEForm form,
 	        RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.permission.edit.success");
@@ -86,7 +86,7 @@ public class PermissionsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
-		return "redirect:/admin/permissions";
+		return "redirect:/admin/manage/permissions";
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class PermissionsController extends BaseBackendController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequestMapping(value = "/admin/permissions/delete/{permId}")
+	@RequestMapping(value = "/admin/manage/permissions/delete/{permId}")
 	public String deletePerm(@PathVariable String permId, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.permission.delete.success");
 		String errMsg = null;
@@ -110,6 +110,6 @@ public class PermissionsController extends BaseBackendController {
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
 		        buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
-		return "redirect:/admin/permissions";
+		return "redirect:/admin/manage/permissions";
 	}
 }

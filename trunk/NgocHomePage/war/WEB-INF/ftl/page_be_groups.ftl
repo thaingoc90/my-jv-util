@@ -25,7 +25,7 @@
 					<#if group.getId() != 1>
 						<a href="#editModal" class="modal-edit-group" data-toggle="modal" data-id="${group.getId()}" title="Edit"><i class="icon-pencil"></i></a>
 						<a href="#permMappingModel" class="modal-permission-mapping" data-toggle="modal" data-id="${group.getId()}" data-group-name="${group.getName()}" title="Permission"><i class="icon-list"> </i></a>
-						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}groups/delete/${group.getId()}" title="Delete"><i class="icon-trash"></i></a>
+						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}manage/groups/delete/${group.getId()}" title="Delete"><i class="icon-trash"></i></a>
 					</#if>
 				</td>
 			</tr>
@@ -35,7 +35,7 @@
 </div>
 
 <div id="createModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}groups/add" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/groups/add" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Create Group</div>
@@ -71,7 +71,7 @@
 </div>
 
 <div id="editModal" class="modal hide fade modal-form" >
-	<form action="${baseUrl}groups/edit" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/groups/edit" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Edit Group</div>
@@ -105,7 +105,7 @@
 </div>
 
 <div id="permMappingModel" class="modal hide fade modal-form">
-	<form action="${baseUrl}groups/permission" method="post" class="form-horizontal">
+	<form action="${baseUrl}manage/groups/permission" method="post" class="form-horizontal">
 		<div class="modal-header">
 	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     		<div class="title-medium">Edit Group</div>
