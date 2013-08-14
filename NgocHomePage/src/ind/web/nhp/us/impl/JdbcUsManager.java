@@ -2,6 +2,7 @@ package ind.web.nhp.us.impl;
 
 import ind.web.nhp.base.BaseJdbcDao;
 import ind.web.nhp.us.IGroup;
+import ind.web.nhp.us.IMenu;
 import ind.web.nhp.us.IPermission;
 import ind.web.nhp.us.IUsManager;
 import ind.web.nhp.us.IUser;
@@ -23,6 +24,17 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		if (user != null) {
 			deleteFromCache(cacheKeyUserById(user.getId()));
 			deleteFromCache(cacheKeyUserByEmail(user.getEmail()));
+		}
+		deleteFromCache(cacheKeyAllUsers());
+	}
+
+	private void invalidateCacheUserInGroup(IGroup group) {
+		IUser[] listUsers = getAllUsers();
+		for (IUser user : listUsers) {
+			if (user.getGroupId() == group.getId()) {
+				deleteFromCache(cacheKeyUserById(user.getId()));
+				deleteFromCache(cacheKeyUserByEmail(user.getEmail()));
+			}
 		}
 		deleteFromCache(cacheKeyAllUsers());
 	}
@@ -248,6 +260,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 			throw new RuntimeException(e);
 		} finally {
 			invalidateCacheGroup(group);
+			invalidateCacheUserInGroup(group);
 		}
 	}
 
@@ -330,11 +343,6 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		deleteFromCache(cacheKeyAllPermissions());
 	}
 
-	/**
-	 * Not use yet
-	 * 
-	 * @return
-	 */
 	public static String cacheKeyAllPermissions() {
 		return "ALL_PERMISSIONS";
 	}
@@ -526,6 +534,111 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		} finally {
 			invalidateCacheGroupPermission(group);
 		}
+	}
+
+	/*----------------------MENU---------------------------*/
+
+	public static String cacheKeyAllMenus() {
+		return "ALL_MENUS";
+	}
+
+	public static String cacheKeyMenuById(int munuId) {
+		return "MENU_" + munuId;
+	}
+
+	private void invalidateCacheMenu(IMenu menu) {
+		if (menu != null) {
+			deleteFromCache(cacheKeyMenuById(menu.getId()));
+		}
+		deleteFromCache(cacheKeyAllMenus());
+	}
+
+	@Override
+	public IMenu[] getAllMenus() {
+		final String sqlKey = "sql.getAllMenus";
+		String cacheKey = cacheKeyAllMenus();
+		Map<String, Object> params = new HashMap<String, Object>();
+		try {
+			IMenu[] menus = executeSelect(sqlKey, params, MenuBo.class, cacheKey);
+			if (menus == null || menus.length == 0) {
+				return null;
+			}
+			return menus;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public IMenu getMenuById(int menuId) {
+		final String sqlKey = "sql.getMenuById";
+		String cacheKey = cacheKeyMenuById(menuId);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(MenuBo.COL_ID, menuId);
+		try {
+			IMenu[] menus = executeSelect(sqlKey, params, MenuBo.class, cacheKey);
+			return (menus != null && menus.length > 0) ? menus[0] : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public IMenu updateMenu(IMenu menu) {
+		final String sqlKey = "sql.updateMenu";
+		Map<String, Object> params = _buildParamMenu(menu);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result == 1) ? menu : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+			invalidateCacheMenu(menu);
+		}
+	}
+
+	@Override
+	public IMenu createMenu(IMenu menu) {
+		final String sqlKey = "sql.createMenu";
+		Map<String, Object> params = _buildParamMenu(menu);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result == 1) ? menu : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+			invalidateCacheMenu(menu);
+		}
+	}
+
+	@Override
+	public void deleteMenu(IMenu menu) {
+		final String sqlKey = "sql.deleteMenu";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(MenuBo.COL_ID, menu.getId());
+		try {
+			executeNonSelect(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+			invalidateCacheMenu(menu);
+		}
+	}
+
+	private static Map<String, Object> _buildParamMenu(IMenu menu) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(MenuBo.COL_ID, menu.getId());
+		params.put(MenuBo.COL_NAME, menu.getName());
+		params.put(MenuBo.COL_PARENT_ID, menu.getParentId() == 0 ? null : menu.getParentId());
+		params.put(MenuBo.COL_URL, menu.getUrl());
+		params.put(MenuBo.COL_POSITION, menu.getPosition());
+		params.put(MenuBo.COL_PERMISSION, menu.getPermission());
+		return params;
 	}
 
 }

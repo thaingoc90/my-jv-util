@@ -71,7 +71,31 @@ $(document).on('click', '.modal-edit-permission', function() {
 	$('#editModal #inputId').attr('value', id);
 	$('#editModal #labelId').html(id);
 	$('#editModal #inputDesc').attr('value', desc);
+	$("#editModal #inputPid").val('0');
 	if (!isEmpty(parentId)) {
 		$("#editModal #inputPid").val(parentId);
+	}
+});
+
+$(document).on('click', '.modal-edit-menu', function() {
+	var grandFather = $(this).parent().parent();
+	var id = $(this).attr("data-id");
+	var name = grandFather.find(".menu-name").html();
+	var url = grandFather.find(".menu-url").html();
+	var position = grandFather.find(".menu-position").html();
+	var parentId = grandFather.find(".menu-parent").html();
+	var permission = grandFather.find(".menu-permission").html();
+	
+	$('#editModal #inputId').attr('value', id);
+	$('#editModal #inputName').attr('value', name);
+	$('#editModal #inputUrl').attr('value', url);
+	$('#editModal #inputPosition').attr('value', position);
+	$("#editModal #inputParentId").val('0');
+	$("#editModal #inputPermission").val('0');
+	if (!isEmpty(parentId)) {
+		$("#editModal #inputParentId").val(parentId);
+	}
+	if (!isEmpty(permission)) {
+		$("#editModal #inputPermission").val(permission);
 	}
 });

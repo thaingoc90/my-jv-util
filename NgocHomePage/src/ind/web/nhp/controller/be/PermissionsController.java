@@ -2,7 +2,6 @@ package ind.web.nhp.controller.be;
 
 import ind.web.nhp.base.Constants;
 import ind.web.nhp.base.ErrorConstants;
-import ind.web.nhp.form.PermissionBEForm;
 import ind.web.nhp.model.ErrorModel;
 import ind.web.nhp.us.IPermission;
 import ind.web.nhp.us.impl.PermissionBo;
@@ -24,6 +23,13 @@ public class PermissionsController extends BaseBackendController {
 	@RequestMapping(value = { "/admin/manage/permissions", "/admin/manage/permissions/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IPermission[] permisions = usManager.getAllPermissions();
+
+		if (errorObj.isError()) {
+			model.addAttribute(ErrorConstants.MODEL_ERRORS, errorObj.getMsgErrors());
+		} else if (errorObj.getErrorCode() != 0) {
+			model.addAttribute(ErrorConstants.MODEL_SUCCESS, errorObj.getMsgSuccess());
+		}
+
 		model.addAttribute("PERMISSIONS", permisions);
 		return VIEW_NAME;
 	}
@@ -35,7 +41,7 @@ public class PermissionsController extends BaseBackendController {
 	 * @return
 	 */
 	@RequestMapping(value = "/admin/manage/permissions/add", method = RequestMethod.POST)
-	public String addPerm(@ModelAttribute PermissionBEForm form,
+	public String addPerm(@ModelAttribute PermissionBo form,
 	        RedirectAttributes redirectAttributes) {
 		String id = form.getId();
 		String succMsg = this.lang.getMessage("msg.permission.create.success");
@@ -63,7 +69,7 @@ public class PermissionsController extends BaseBackendController {
 	}
 
 	@RequestMapping(value = "/admin/manage/permissions/edit", method = RequestMethod.POST)
-	public String editPerm(@ModelAttribute PermissionBEForm form,
+	public String editPerm(@ModelAttribute PermissionBo form,
 	        RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.permission.edit.success");
 		String errMsg = null;

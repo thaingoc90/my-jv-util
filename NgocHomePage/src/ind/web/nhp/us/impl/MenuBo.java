@@ -26,12 +26,12 @@ public class MenuBo extends BaseBo implements IMenu {
 	@Override
 	public Map<String, Object[]> getFieldMap() {
 		Map<String, Object[]> result = new HashMap<String, Object[]>();
-		result.put(COL_ID, new Object[] { "id", String.class });
+		result.put(COL_ID, new Object[] { "id", int.class });
 		result.put(COL_NAME, new Object[] { "name", String.class });
 		result.put(COL_URL, new Object[] { "url", String.class });
-		result.put(COL_POSITION, new Object[] { "postion", String.class });
+		result.put(COL_POSITION, new Object[] { "position", Integer.class });
 		result.put(COL_PERMISSION, new Object[] { "permission", String.class });
-		result.put(COL_PARENT_ID, new Object[] { "parentId", String.class });
+		result.put(COL_PARENT_ID, new Object[] { "parentId", Integer.class });
 		return result;
 	}
 
@@ -61,8 +61,16 @@ public class MenuBo extends BaseBo implements IMenu {
 		return position;
 	}
 
+	public void setPosition(Integer position) {
+		this.position = position == null ? 0 : position;
+	}
+
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public void setParentId(int parentId) {
+		this.parentId = parentId;
 	}
 
 	@Override
@@ -70,8 +78,8 @@ public class MenuBo extends BaseBo implements IMenu {
 		return parentId;
 	}
 
-	public void setParentId(int parentId) {
-		this.parentId = parentId;
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId == null ? 0 : parentId;
 	}
 
 	@Override

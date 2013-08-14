@@ -23,6 +23,9 @@ public class BaseBackendController extends BaseController {
 
 	@Autowired
 	protected IUsManager usManager;
+	
+	@Autowired
+	protected BuildMenu menuBuilder;
 
 	@ModelAttribute("baseUrl")
 	public String modelBaseUrl(HttpServletRequest request) {
@@ -37,7 +40,7 @@ public class BaseBackendController extends BaseController {
 			return new LinkedList<IMenu>();
 		}
 		List<String> listPermIds = new LinkedList<String>();
-		return BuildMenu.buildMainMenu(listPermIds);
+		return menuBuilder.buildMainMenu(listPermIds);
 	}
 
 	public IUser getCurrentUser(HttpServletRequest request) {
