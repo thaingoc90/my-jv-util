@@ -17,8 +17,8 @@ public class MenuBo extends BaseBo implements IMenu {
 	public static final String COL_PERMISSION = "mPermission";
 	public static final String COL_PARENT_ID = "mParentId";
 
-	private int id, position;
-	private int parentId;
+	private int id, parentId;
+	private Integer position;
 	private String name, url;
 	private String permission;
 	private List<IMenu> childs;
@@ -57,16 +57,12 @@ public class MenuBo extends BaseBo implements IMenu {
 	}
 
 	@Override
-	public int getPosition() {
+	public Integer getPosition() {
 		return position;
 	}
 
 	public void setPosition(Integer position) {
 		this.position = position == null ? 0 : position;
-	}
-
-	public void setPosition(int position) {
-		this.position = position;
 	}
 
 	public void setParentId(int parentId) {

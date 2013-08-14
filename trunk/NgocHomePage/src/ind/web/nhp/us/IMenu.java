@@ -6,7 +6,7 @@ public interface IMenu {
 
 	public int getId();
 
-	public int getPosition();
+	public Integer getPosition();
 
 	public int getParentId();
 

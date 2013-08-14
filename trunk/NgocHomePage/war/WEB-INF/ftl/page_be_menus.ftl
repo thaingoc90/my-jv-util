@@ -26,7 +26,7 @@
 			<td>${count}</td>
 			<td><span class="menu-name">${menu.getName()}</span></td>
 			<td><span class="menu-url">${menu.getUrl()}</span></td>
-			<td class="menu-position ta-cen"><span>${menu.getPosition()}</span></td>
+			<td class="ta-cen"><span class="menu-position">${menu.getPosition()}</span></td>
 			<td><span class="menu-parent hide"></span></td>
 			<td><span class="menu-permission"><#if menu.getPermission()??>${menu.getPermission()}</#if></span></td>
 			<td>
