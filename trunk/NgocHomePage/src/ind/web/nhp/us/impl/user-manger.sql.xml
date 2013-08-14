@@ -18,16 +18,22 @@
 	<entry key="_cols.group.select"><![CDATA[gid AS groupId, gname AS groupName, gdesc AS groupDesc, gis_system AS groupIsSystem]]></entry>
 	<entry key="_cols.group.insert"><![CDATA[(gid, gname, gdesc, gis_system) VALUES (@{groupId}, @{groupName}, @{groupDesc}, @{groupIsSystem})]]></entry>
 	<entry key="_cols.group.update"><![CDATA[gname=@{groupName}, gdesc=@{groupDesc}, gis_system=@{groupIsSystem}]]></entry>
-	
-	
+
+
 	<entry key="_tbl.permission">nhp_permission</entry>
 	<entry key="_col.permissionId.where">id=@{perId}</entry>
 	<entry key="_cols.permission.select"><![CDATA[id AS perId, pdesc AS perDesc, parent_id AS parentId]]></entry>
 	<entry key="_cols.permission.insert"><![CDATA[(id, pdesc, parent_id) VALUES (@{perId}, @{perDesc}, @{parentId})]]></entry>
 	<entry key="_cols.permission.update"><![CDATA[pdesc=@{perDesc}, parent_id=@{parentId}]]></entry>
-	
+
 	<entry key="_tbl.group_permission">nhp_group_permission</entry>
-	
+
+	<entry key="_tbl.menu">nhp_menu</entry>
+	<entry key="_col.menu.id.where">mid=@{mId}</entry>
+	<entry key="_cols.menu.select"><![CDATA[mid AS mId, mname AS mName, murl AS mUrl, mposition AS mPosition, mparent_id AS mParentId, mpermission AS mPermission]]></entry>
+	<entry key="_cols.menu.insert"><![CDATA[(mname, murl, mposition, mparent_id, mpermission ) VALUES (@{mName}, @{mUrl}, @{mPosition}, @{mParentId}, @{mPermission})]]></entry>
+	<entry key="_cols.menu.update"><![CDATA[mname=@{mName}, murl=@{mUrl}, mposition=@{mPosition}, mparent_id=@{mParentId}, mpermission=@{mPermission}]]></entry>
+
 
 	<entry key="sql.getUserById"><![CDATA[
     	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
@@ -50,21 +56,21 @@
 	<entry key="sql.getAllUsers"><![CDATA[
     	SELECT ${_cols.user.select} FROM ${_tbl.user} ORDER BY uid
     ]]></entry>
-    <entry key="sql.getUserById"><![CDATA[
+	<entry key="sql.getUserById"><![CDATA[
     	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
     ]]></entry>
-    <entry key="sql.createUser"><![CDATA[
+	<entry key="sql.createUser"><![CDATA[
     	INSERT INTO ${_tbl.user} ${_cols.user.insert} 
     ]]></entry>
-    <entry key="sql.deleteUser"><![CDATA[
+	<entry key="sql.deleteUser"><![CDATA[
     	DELETE FROM ${_tbl.user} WHERE ${_col.userId.where} 
     ]]></entry>
-    
-    
-    <entry key="sql.getAllGroups"><![CDATA[
+
+
+	<entry key="sql.getAllGroups"><![CDATA[
  		SELECT ${_cols.group.select} FROM ${_tbl.group} ORDER BY gid 
     ]]></entry>
-    <entry key="sql.createGroup"><![CDATA[
+	<entry key="sql.createGroup"><![CDATA[
     	INSERT INTO ${_tbl.group} ${_cols.group.insert}
     ]]></entry>
 	<entry key="sql.deleteGroup"><![CDATA[
@@ -96,16 +102,33 @@
 	<entry key="sql.addPermission"><![CDATA[
     	INSERT INTO ${_tbl.permission} ${_cols.permission.insert}
     ]]></entry>
-	
+
 
 	<entry key="sql.getAllPermissionsOfGroup"><![CDATA[
     	SELECT P.id AS perId, P.pdesc AS perDesc, P.parent_id AS parentId FROM ${_tbl.group_permission} GP JOIN ${_tbl.permission} P ON (GP.pid = P.id AND GP.gid = @{groupId})
     ]]></entry>
-    <entry key="sql.deletePermisionsOfGroup"><![CDATA[
+	<entry key="sql.deletePermisionsOfGroup"><![CDATA[
     	DELETE FROM ${_tbl.group_permission} WHERE gid=@{groupId}
     ]]></entry>
-    <entry key="sql.addPermisionForGroup"><![CDATA[
+	<entry key="sql.addPermisionForGroup"><![CDATA[
     	INSERT INTO ${_tbl.group_permission} (gid, pid) VALUES (@{groupId}, @{perId})
+    ]]></entry>
+
+
+	<entry key="sql.getMenuById"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.getAllMenus"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} ORDER BY mparent_id, mposition, mid
+    ]]></entry>
+	<entry key="sql.deleteMenu"><![CDATA[
+    	DELETE FROM ${_tbl.menu} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.updateMenu"><![CDATA[
+    	UPDATE ${_tbl.menu} SET ${_cols.menu.update} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.createMenu"><![CDATA[
+    	INSERT INTO ${_tbl.menu} ${_cols.menu.insert}
     ]]></entry>
 
 </properties>

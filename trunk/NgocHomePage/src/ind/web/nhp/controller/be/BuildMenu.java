@@ -1,14 +1,21 @@
 package ind.web.nhp.controller.be;
 
 import ind.web.nhp.us.IMenu;
+import ind.web.nhp.us.IUsManager;
 import ind.web.nhp.us.impl.MenuBo;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class BuildMenu {
+
+	@Autowired
+	protected IUsManager usManager;
 
 	public static List<IMenu> createMainMenu() {
 		List<IMenu> mainMenu = new LinkedList<IMenu>();
@@ -80,9 +87,9 @@ public class BuildMenu {
 		return mainMenu;
 	}
 
-	public static List<IMenu> buildMainMenu(List<String> permissions) {
+	public List<IMenu> buildMainMenu(List<String> permissions) {
 		List<IMenu> mainMenu = new LinkedList<IMenu>();
-		List<IMenu> rawMenu = createMainMenu();
+		IMenu[] rawMenu = usManager.getAllMenus();
 		for (IMenu menu : rawMenu) {
 			if (menu.getParentId() > 0) {
 				break;

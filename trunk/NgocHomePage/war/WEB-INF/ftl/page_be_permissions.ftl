@@ -23,7 +23,7 @@
 			<td><span class="perm-desc">${perm.getDesc()}</span></td>
 			<td><span class="perm-parent-id"><#if perm.getPid()??>${perm.getPid()}</#if></span></td>
 			<td>
-				<a href="#editModal" class="modal-edit-permission" data-toggle="modal" data-id="${perm.getId()}" title="Edit"><i class="icon-pencil"></i></a>
+				<a href="#editModal" class="modal-edit-permission" data-toggle="modal" title="Edit"><i class="icon-pencil"></i></a>
 				<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}manage/permissions/delete/${perm.getId()}" title="Delete"><i class="icon-trash"></i></a>
 			</td>
 		</tr>
@@ -82,7 +82,7 @@
 			<div class="control-group">
 				<label class="control-label" for="inputId">Id</label>
 			    <div class="controls">
-			      	<input type="hidden" id="inputId" name="id" disable placeholder="Id">
+			      	<input type="hidden" id="inputId" name="id" placeholder="Id">
 			      	<span class="span-in-control" id="labelId">Id</span>
 			    </div>
 		  	</div>
