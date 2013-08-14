@@ -484,17 +484,8 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 
 	@Override
 	public IPermission[] getAllPermisionsOfGroupId(int groupId) {
-		final String sqlKey = "sql.getAllPermissionsOfGroup";
-		String cacheKey = cacheKeyAllPermissionsOfGroup(groupId);
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(GroupBo.COL_ID, groupId);
-		try {
-			IPermission[] permissions = executeSelect(sqlKey, params, PermissionBo.class, cacheKey);
-			return (permissions == null || permissions.length == 0) ? null : permissions;
-		} catch (SQLException e) {
-			LOGGER.error(e.getMessage(), e);
-			throw new RuntimeException();
-		}
+		IGroup group = getGroup(groupId);
+		return group == null ? null : getAllPermisionsOfGroup(group);
 	}
 
 	@Override

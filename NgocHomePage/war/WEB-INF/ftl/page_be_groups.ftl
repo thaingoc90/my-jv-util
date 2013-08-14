@@ -121,13 +121,13 @@
 		  	<div class="control-group">
 				<label class="control-label" for="inputPermission">Permissions</label>
 			    <div class="controls">
-			    	<select  id="inputPermission" name="permissions" multiple="multiple">
-			    		<#if PERMISSIONS??>
+			    	<#if PERMISSIONS??>
+			    	<select  id="inputPermission" name="permissions" size="${PERMISSIONS?size}" multiple="multiple">
 		      			<#list PERMISSIONS as permission>
 						  	<option value="${permission.getId()}">${permission.getId()}</option>
 					  	</#list>
-					  	</#if>
 					</select>
+					</#if>
 			    </div>
 		  	</div>
 		</div>
