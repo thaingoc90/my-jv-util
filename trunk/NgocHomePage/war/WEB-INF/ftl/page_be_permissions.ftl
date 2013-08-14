@@ -56,9 +56,11 @@
 		    	<div class="controls">
 		      		<select id="inputPid" name="pid">
 		      			<option value="0">--Select parent--</option>
+		      			<#if PERMISSIONS??>
 		      			<#list PERMISSIONS as perm>
 						  	<option value="${perm.getId()}">${perm.getId()}</option>
 					  	</#list>
+					  	</#if>
 					</select>
 		    	</div>
 		  	</div>
@@ -95,9 +97,11 @@
 		    	<div class="controls">
 		      		<select id="inputPid" name="pid">
 		      			<option value="0">--Select parent--</option>
+		      			<#if PERMISSIONS??>
 		      			<#list PERMISSIONS as perm>
 						  	<option value="${perm.getId()}">${perm.getId()}</option>
 					  	</#list>
+					  	</#if>
 					</select>
 		    	</div>
 		  	</div>
