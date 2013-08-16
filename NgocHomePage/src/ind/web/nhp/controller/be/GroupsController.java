@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,8 +30,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class GroupsController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_groups";
+	private static final String URL_MAPPING = "/admin/manage/groups";
 
-	@RequestMapping(value = { "/admin/manage/groups", "/admin/manage/groups/**" })
+	@PostConstruct
+	public void init() {
+		setUrlMapping(URL_MAPPING);
+	}
+
+	@RequestMapping(value = { URL_MAPPING, "/admin/manage/groups/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IGroup[] listGroups = usManager.getAllGroups();
 		IPermission[] permisions = usManager.getAllPermissions();

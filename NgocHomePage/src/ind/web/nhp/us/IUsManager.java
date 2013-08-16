@@ -216,6 +216,6 @@ public interface IUsManager {
 
 	public void deleteMenu(IMenu menu);
 	
-	public IMenu[] getMenusByPermission();
+	public String getPermissionOfUrl(String url);
 
 }

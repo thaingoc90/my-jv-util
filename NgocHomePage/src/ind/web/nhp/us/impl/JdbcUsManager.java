@@ -533,6 +533,10 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		return "ALL_MENUS";
 	}
 
+	public static String cacheKeyPermissionOfUrl(String url) {
+		return "MENUS_BY_PERM_" + url;
+	}
+
 	public static String cacheKeyMenuById(int munuId) {
 		return "MENU_" + munuId;
 	}
@@ -540,6 +544,7 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 	private void invalidateCacheMenu(IMenu menu) {
 		if (menu != null) {
 			deleteFromCache(cacheKeyMenuById(menu.getId()));
+			deleteFromCache(cacheKeyPermissionOfUrl(menu.getUrl()));
 		}
 		deleteFromCache(cacheKeyAllMenus());
 	}
@@ -630,6 +635,27 @@ public class JdbcUsManager extends BaseJdbcDao implements IUsManager {
 		params.put(MenuBo.COL_POSITION, menu.getPosition());
 		params.put(MenuBo.COL_PERMISSION, menu.getPermission());
 		return params;
+	}
+
+	/* ------------------------------------------- */
+	@Override
+	public String getPermissionOfUrl(String url) {
+		String sqlKey = "sql.getPermissionOfUrl";
+		String cacheKey = cacheKeyPermissionOfUrl(url);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(MenuBo.COL_URL, url);
+
+		try {
+			List<Map<String, Object>> dbResults = executeSelect(sqlKey, params, cacheKey);
+			if (dbResults == null || dbResults.size() == 0) {
+				return "";
+			}
+			Object permission = dbResults.get(0).get(MenuBo.COL_PERMISSION);
+			return permission == null ? "" : permission.toString().trim();
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		}
 	}
 
 }

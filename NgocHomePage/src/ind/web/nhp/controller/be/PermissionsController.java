@@ -1,5 +1,7 @@
 package ind.web.nhp.controller.be;
 
+import javax.annotation.PostConstruct;
+
 import ind.web.nhp.base.Constants;
 import ind.web.nhp.base.ErrorConstants;
 import ind.web.nhp.model.ErrorModel;
@@ -19,8 +21,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class PermissionsController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_permissions";
+	private static final String URL_MAPPING = "/admin/manage/permissions";
 
-	@RequestMapping(value = { "/admin/manage/permissions", "/admin/manage/permissions/**" })
+	@PostConstruct
+	public void init() {
+		setUrlMapping(URL_MAPPING);
+	}
+
+	@RequestMapping(value = { URL_MAPPING, "/admin/manage/permissions/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		IPermission[] permisions = usManager.getAllPermissions();
 
@@ -41,8 +49,7 @@ public class PermissionsController extends BaseBackendController {
 	 * @return
 	 */
 	@RequestMapping(value = "/admin/manage/permissions/add", method = RequestMethod.POST)
-	public String addPerm(@ModelAttribute PermissionBo form,
-	        RedirectAttributes redirectAttributes) {
+	public String addPerm(@ModelAttribute PermissionBo form, RedirectAttributes redirectAttributes) {
 		String id = form.getId();
 		String succMsg = this.lang.getMessage("msg.permission.create.success");
 		String errMsg = null;
@@ -69,8 +76,7 @@ public class PermissionsController extends BaseBackendController {
 	}
 
 	@RequestMapping(value = "/admin/manage/permissions/edit", method = RequestMethod.POST)
-	public String editPerm(@ModelAttribute PermissionBo form,
-	        RedirectAttributes redirectAttributes) {
+	public String editPerm(@ModelAttribute PermissionBo form, RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.permission.edit.success");
 		String errMsg = null;
 

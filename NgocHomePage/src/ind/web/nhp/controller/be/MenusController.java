@@ -10,6 +10,8 @@ import ind.web.nhp.us.impl.MenuBo;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,8 +25,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class MenusController extends BaseBackendController {
 
 	private static final String VIEW_NAME = "be_menus";
+	private static final String URL_MAPPING = "/admin/manage/menus";
 
-	@RequestMapping(value = { "/admin/manage/menus", "/admin/manage/menus/**" })
+	@PostConstruct
+	public void init() {
+		setUrlMapping(URL_MAPPING);
+	}
+
+	@RequestMapping(value = { URL_MAPPING, "/admin/manage/menus/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj, Model model) {
 		List<IMenu> menus = buildAllMainMenu();
 		IPermission[] permissions = usManager.getAllPermissions();

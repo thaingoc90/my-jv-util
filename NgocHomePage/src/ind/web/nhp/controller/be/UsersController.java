@@ -15,6 +15,7 @@ import ind.web.nhp.utils.Utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class UsersController extends BaseBackendController {
 	private static final String VIEW_NAME = "be_users";
+	private static final String URL_MAPPING = "/admin/manage/users";
 
 	@Autowired
 	private ISaltGenerator saltGenerator;
@@ -41,6 +43,11 @@ public class UsersController extends BaseBackendController {
 	@Autowired
 	private UserBEFormValidator userFormValidator;
 
+	@PostConstruct
+	public void init() {
+		setUrlMapping(URL_MAPPING);
+	}
+
 	/**
 	 * Manage users
 	 * 
@@ -48,7 +55,7 @@ public class UsersController extends BaseBackendController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = { "/admin/manage/users", "/admin/manage/users/**" })
+	@RequestMapping(value = { URL_MAPPING, "/admin/manage/users/**" })
 	public String get(@ModelAttribute(Constants.ERROR_PARAM) ErrorModel errorObj,
 	        HttpServletRequest request, Model model) {
 		IUser[] listUsers = usManager.getAllUsers();
