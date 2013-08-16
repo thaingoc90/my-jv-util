@@ -27,6 +27,11 @@
 			<mvc:mapping path="/admin/**"/>
 			<bean class="ind.web.nhp.interceptor.LoginAuthentication"/>
 		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/admin" />
+			<mvc:mapping path="/admin/**"/>
+			<bean class="ind.web.nhp.interceptor.PermissionAuthorization"/>
+		</mvc:interceptor>
 	</mvc:interceptors>
 
 	<!-- freemarker config -->

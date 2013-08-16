@@ -130,5 +130,11 @@
 	<entry key="sql.createMenu"><![CDATA[
     	INSERT INTO ${_tbl.menu} ${_cols.menu.insert}
     ]]></entry>
-
+	<entry key="sql.getMenusByNonPermission"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE mpermission IS NULL
+    ]]></entry>
+    <entry key="sql.getPermissionOfUrl"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE murl = @{mUrl} OR murl = CONCAT(@{mUrl}, '/') 
+    ]]></entry>
+    
 </properties>

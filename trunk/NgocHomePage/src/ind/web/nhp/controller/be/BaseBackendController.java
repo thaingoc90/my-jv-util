@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class BaseBackendController extends BaseController {
 
 	private boolean loginAuthentication = true;
+	private String urlMapping;
 
 	@Autowired
 	protected IUsManager usManager;
@@ -65,9 +66,11 @@ public class BaseBackendController extends BaseController {
 			return listPermissionIds;
 		}
 		IPermission[] listPermisions = usManager.getAllPermisionsOfGroupId(user.getGroupId());
-		for (IPermission perm : listPermisions) {
-			String permId = perm.getId().trim();
-			listPermissionIds.add(permId);
+		if (listPermisions != null) {
+			for (IPermission perm : listPermisions) {
+				String permId = perm.getId().trim();
+				listPermissionIds.add(permId);
+			}
 		}
 		return listPermissionIds;
 	}
@@ -79,4 +82,13 @@ public class BaseBackendController extends BaseController {
 	public void setLoginAuthentication(boolean loginAuthentication) {
 		this.loginAuthentication = loginAuthentication;
 	}
+
+	public String getUrlMapping() {
+		return urlMapping;
+	}
+
+	public void setUrlMapping(String urlMapping) {
+		this.urlMapping = urlMapping;
+	}
+
 }
