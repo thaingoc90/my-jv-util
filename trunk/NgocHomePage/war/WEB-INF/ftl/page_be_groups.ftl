@@ -120,13 +120,28 @@
 		  	</div>
 		  	<div class="control-group">
 				<label class="control-label" for="inputPermission">Permissions</label>
-			    <div class="controls">
+			    <div class="controls" style="padding-top: 5px;">
 			    	<#if PERMISSIONS??>
-			    	<select  id="inputPermission" name="permissions" size="${PERMISSIONS?size}" multiple="multiple">
-		      			<#list PERMISSIONS as permission>
-						  	<option value="${permission.getId()}">${permission.getId()}</option>
-					  	</#list>
-					</select>
+			    	
+			    	<#list PERMISSIONS as permission>
+					  	<#if !permission.getPid()?? || permission.getPid() == "">
+					  	<div>
+					  		<label class="checkbox">
+					  			<input type="checkbox" value="${permission.getId()}" id="${permission.getId()}" name="permissions"/> ${permission.getId()}
+					  		</label>
+					  		<div class="pad-lef-20">
+					  		<#list PERMISSIONS as subPerm>
+								<#if subPerm.getPid()??	&& subPerm.getPid()	== permission.getId()>
+									<label class="checkbox">
+							  			<input type="checkbox" value="${subPerm.getId()}" id="${subPerm.getId()}" name="permissions"/> ${subPerm.getId()}
+							  		</label>
+								</#if>		  			
+					  		</#list>
+					  		</div>
+					  	</div>
+					  	</#if>
+				  	</#list>
+				  	
 					</#if>
 			    </div>
 		  	</div>
