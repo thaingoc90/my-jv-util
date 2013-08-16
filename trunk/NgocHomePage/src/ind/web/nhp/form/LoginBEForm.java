@@ -4,6 +4,7 @@ public class LoginBEForm {
 
 	private String email, password;
 	private int remember;
+	private String oldPassword, confirmPassword;
 
 	public String getEmail() {
 		return email;
@@ -27,6 +28,22 @@ public class LoginBEForm {
 
 	public void setRemember(int remember) {
 		this.remember = remember;
+	}
+
+	public String getOldPassword() {
+		return oldPassword;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
 }
