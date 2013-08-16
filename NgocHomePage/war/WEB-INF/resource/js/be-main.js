@@ -11,6 +11,7 @@ $( '.modal-delete-open').bind('click', function() {
 	$('#deleteModal .modal-footer a').attr("href", link);
 });
 
+/* USERS */
 $( '.modal-edit-user').bind('click', function() {
 	var id = $(this).attr("data-id");
 	var grandFather = $(this).parent().parent();
@@ -27,6 +28,7 @@ $( '.modal-edit-user').bind('click', function() {
 	$("#editModal #inputGroup").val(groupId);
 });
 
+/* GROUPS */
 $( '.modal-edit-group').bind('click', function() {
 	var id = $(this).attr("data-id");
 	var grandFather = $(this).parent().parent();
@@ -45,23 +47,30 @@ $( '.modal-edit-group').bind('click', function() {
 	}
 });
 
+$(document).on('change', "#permMappingModel input[type='checkbox']", function() {
+	$(this).parent().siblings('.pad-lef-20').find("input[type='checkbox']").prop('checked', this.checked);
+	if ($(this).is(":checked")) {
+		$(this).parents('.pad-lef-20').siblings().find("input[type='checkbox']").prop('checked', this.checked);
+	}
+});
+
 $(document).on('click', '.modal-permission-mapping', function() {
 	var groupId = $(this).attr("data-id");
 	var groupName = $(this).attr("data-group-name");
 	
 	$('#permMappingModel #inputId').attr('value', groupId);
 	$('#permMappingModel #inputName').text(groupName);
+	$("#permMappingModel input[type='checkbox']").prop('checked', false);
 	var permissions = gpMapping[groupId];
 	var listPermId = new Array();
 	for (var index in permissions) {
 		perm = permissions[index];
 		permId = perm.id;
-		listPermId[index] = permId;
+		$('#permMappingModel #' + permId).prop('checked', true);
 	}
-	
-	$('#permMappingModel #inputPermission').val(listPermId);
 });
 
+/* PERMISSIONS */
 $(document).on('click', '.modal-edit-permission', function() {
 	var grandFather = $(this).parent().parent();
 	var id = grandFather.find(".perm-id").html();
@@ -77,6 +86,7 @@ $(document).on('click', '.modal-edit-permission', function() {
 	}
 });
 
+/* MENUS */
 $(document).on('click', '.modal-edit-menu', function() {
 	var grandFather = $(this).parent().parent();
 	var id = $(this).attr("data-id");
