@@ -215,5 +215,7 @@ public interface IUsManager {
 	public IMenu createMenu(IMenu menu);
 
 	public void deleteMenu(IMenu menu);
+	
+	public IMenu[] getMenusByPermission();
 
 }
