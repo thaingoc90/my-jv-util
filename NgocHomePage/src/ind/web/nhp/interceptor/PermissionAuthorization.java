@@ -3,6 +3,7 @@ package ind.web.nhp.interceptor;
 import ind.web.nhp.controller.be.BaseBackendController;
 import ind.web.nhp.utils.UrlUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +25,12 @@ public class PermissionAuthorization extends HandlerInterceptorAdapter {
 		HandlerMethod handler = (HandlerMethod) handlerObj;
 		if (handler.getBean() instanceof BaseBackendController) {
 			BaseBackendController controller = (BaseBackendController) handler.getBean();
+			List<String> listUserPermissions = controller.getPermissionIds();
+			
+			
 			String[] accessPermissions = new String[2];
 			// String[] accessPermissions = controller.getAccessPermissions();
 			if (accessPermissions != null && accessPermissions.length > 0) {
-				List<String> listUserPermissions = controller.getPermissionIds();
 				for (String permission : accessPermissions) {
 					if (!listUserPermissions.contains(permission)) {
 						return false;
@@ -37,4 +40,11 @@ public class PermissionAuthorization extends HandlerInterceptorAdapter {
 		}
 		return super.preHandle(request, response, handler);
 	}
+	
+	public static void main(String[] args) {
+	    List<String> list = new LinkedList<String>();
+	    list.add("ab");
+	    list.add("e");
+	    System.out.println(list);
+    }
 }
