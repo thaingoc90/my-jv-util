@@ -23,7 +23,7 @@
                    <ul class="nav pull-right">
                    	<li class="divider-vertical"></li>
                    	<li class="dropdown">
-                   		<a href="#" class="dropdown-toggle" data-toggle="dropdown"> Welcome admin <b class="caret"></b></a>
+                   		<a href="#" class="dropdown-toggle" data-toggle="dropdown"> Welcome <#if USER??>${USER.getDisplayName()!""}</#if> <b class="caret"></b></a>
                    		<ul class="dropdown-menu">
                    			<li class="nav-header"><i class="icon-user icon-white"></i> Manage Profile</li>
                          		<li><a href="#">Profile</a></li>
