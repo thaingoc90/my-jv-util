@@ -44,6 +44,7 @@ public class BaseBackendController extends BaseController {
 		return menuBuilder.buildMainMenu(listPermIds);
 	}
 
+	@ModelAttribute("USER")
 	public IUser getCurrentUser() {
 		IUser user = null;
 		Object userIdObj = Utils.getSessionAttribute(false, Constants.NHP_USER_ID);
