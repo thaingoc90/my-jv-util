@@ -2,9 +2,11 @@
 <@layout.masterTemplate title="Profile">
 
 <div class="row-fluid wrapper">
-	<div class="body-content" style="width: 450px">
+	<div class="body-change-pass">
 		<header class="text-center title-large">Change Password</header>
-		<form action="${baseUrl}profile/changePassword" method="post" class="form-horizontal">
+		
+		<#include "inc_error_zone.ftl" />
+		<form action="${baseUrl}profile/changePassword" method="post" class="form-horizontal" id="formChangePassword">
 			<div class="control-group">
 				<label class="control-label" for="inputOldPassword">Old Password <span class="require">*</span></label>
 			    <div class="controls">
@@ -25,7 +27,7 @@
 		  	</div>
 		  	<div class="control-group text-center">
 		  		<button type="submit" class="btn btn-info">Save</button>
-		  		<button type="button" class="btn">Cancel</button>
+		  		<button type="button" class="btn" onclick="clearInput('formChangePassword');">Clear</button>
 			</div>
 	 	</form>
 	</div>
