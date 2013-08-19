@@ -27,7 +27,7 @@
                    		<ul class="dropdown-menu">
                    			<li class="nav-header"><i class="icon-user icon-white"></i> Manage Profile</li>
                          		<li><a href="#">Profile</a></li>
-                          	<li><a href="#">Change password</a></li>
+                          	<li><a href="${baseUrl}profile/changePassword">Change password</a></li>
                           	<li><a href="#">History</a></li>
                           	<li class="divider"></li>
                           	<li><a href="${baseUrl}logout"><i class="icon-off icon-white"></i> Logout</a></li>

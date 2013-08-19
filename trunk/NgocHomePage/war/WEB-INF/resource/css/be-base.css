@@ -28,6 +28,17 @@ a:hover {
 	position: relative;
 }
 
+.body-change-pass {
+	width: 450px;
+	margin: 60px auto;
+	padding: 20px 0;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border: 1px solid #ccc;
+	position: relative;
+}
+
 .ta-cen {
 	text-align: center !important;
 }
