@@ -18,11 +18,19 @@
 		<link rel="stylesheet" type="text/css" href="${staticResourceRoot}${customCss}.css"/>
 	</#list>
     
+    <script type="text/javascript" src="${staticResourceRoot}js/jquery-2.0.2.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="${staticResourceRoot}bootstrap2.3.2/js/bootstrap.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="${staticResourceRoot}js/be-main.js" charset="utf-8"></script>
+    <#list customJsList as customJs>
+		<script type="text/javascript" src="${staticResourceRoot}${customJs}.js"></script>
+	</#list>
+	
 	<script type="text/javascript">
 		var baseUrl = '<#if baseUrl??>${baseUrl}</#if>';
 	</script>
 </head>
 <body>
+	<#setting time_zone="GMT+7">
 	<!-- MENU -->
 	<#if isLogin>
 		<#include "inc_menu.ftl" />	
@@ -34,11 +42,5 @@
 		<#nested />
 	</section>
 	
-	<script type="text/javascript" src="${staticResourceRoot}js/jquery-2.0.2.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="${staticResourceRoot}bootstrap2.3.2/js/bootstrap.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="${staticResourceRoot}js/be-main.js" charset="utf-8"></script>
-    <#list customJsList as customJs>
-		<script type="text/javascript" src="${staticResourceRoot}${customJs}.js"></script>
-	</#list>
 </body>
 </#macro>

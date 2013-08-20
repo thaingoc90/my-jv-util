@@ -96,6 +96,12 @@ a:hover {
 	-webkit-border-radius: 10px;
 }
 
+.seperatorLine {
+	background-color: #ccc;
+	height: 2px;
+	margin-bottom: 20px;
+}
+
 /* ---------MODAL -------------*/
 .modal-form {
 	width: 460px;

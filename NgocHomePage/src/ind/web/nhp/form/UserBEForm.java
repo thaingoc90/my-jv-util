@@ -1,11 +1,14 @@
 package ind.web.nhp.form;
 
+import java.util.Date;
+
 public class UserBEForm {
 
 	private int id, groupId;
 	private String email, loginName, displayName;
 	private String password, confirmPassword, newPassword;
 	private boolean locked;
+	private Date birthday;
 
 	public int getId() {
 		return id;
@@ -77,6 +80,14 @@ public class UserBEForm {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
 }

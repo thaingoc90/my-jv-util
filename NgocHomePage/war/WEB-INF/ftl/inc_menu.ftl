@@ -26,9 +26,9 @@
                    		<a href="#" class="dropdown-toggle" data-toggle="dropdown"> Welcome <#if USER??>${USER.getDisplayName()!""}</#if> <b class="caret"></b></a>
                    		<ul class="dropdown-menu">
                    			<li class="nav-header"><i class="icon-user icon-white"></i> Manage Profile</li>
-                         		<li><a href="#">Profile</a></li>
+                         		<li><a href="${baseUrl}profile">Profile</a></li>
                           	<li><a href="${baseUrl}profile/changePassword">Change password</a></li>
-                          	<li><a href="#">History</a></li>
+                          	<li><a href="${baseUrl}profile/history">History</a></li>
                           	<li class="divider"></li>
                           	<li><a href="${baseUrl}logout"><i class="icon-off icon-white"></i> Logout</a></li>
                        	</ul>
