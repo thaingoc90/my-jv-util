@@ -28,9 +28,9 @@
 					</li>
 					<li>
 						<label>Birthday:</label>
-						<span id="label-birthday">${USER.getBirthday()?string("dd/MM/yyyy")!""}</span> 
-						<div class="input-append date hide" id="birthday-picker" data-date="${USER.getBirthday()?string("dd-MM-yyyy")!''}" data-date-format="dd-mm-yyyy">
-							<input type="text" class="span7" id="inputBirthday" name="birthday" readonly value='${USER.getBirthday()?string("dd-MM-yyyy")!""}' />
+						<span id="label-birthday"><#if USER.getBirthday()??>${USER.getBirthday()?string("dd/MM/yyyy")}</#if></span> 
+						<div class="input-append date hide" id="birthday-picker" data-date="<#if USER.getBirthday()??>${USER.getBirthday()?string('dd-MM-yyyy')}</#if>" data-date-format="dd-mm-yyyy">
+							<input type="text" class="span7" id="inputBirthday" name="birthday" readonly value="<#if USER.getBirthday()??>${USER.getBirthday()?string('dd-MM-yyyy')}</#if>" />
 							<span class="add-on"><i class="icon-th"></i></span>
 						</div>
 					</li>
