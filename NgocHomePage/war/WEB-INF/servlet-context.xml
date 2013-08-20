@@ -40,6 +40,7 @@
 		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
 		<property name="freemarkerSettings">
 	    	<props>
+	    		<prop key="time_zone">GMT+7</prop>
 	      		<prop key="number_format">0.####</prop>
 	    	</props>
 	  	</property>

@@ -30,7 +30,6 @@
 	</script>
 </head>
 <body>
-	<#setting time_zone="GMT+7">
 	<!-- MENU -->
 	<#if isLogin>
 		<#include "inc_menu.ftl" />	
