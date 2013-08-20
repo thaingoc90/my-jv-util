@@ -27,7 +27,7 @@
 		  	</div>
 		  	<div class="control-group text-center">
 		  		<button type="submit" class="btn btn-info">Save</button>
-		  		<button type="button" class="btn" onclick="clearInput('formChangePassword');">Clear</button>
+		  		<button type="button" class="btn" onclick="toLink('${baseUrl}profile');">Cancel</button>
 			</div>
 	 	</form>
 	</div>
