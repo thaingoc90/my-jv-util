@@ -4,12 +4,15 @@ import ind.web.nhp.base.ErrorConstants;
 import ind.web.nhp.form.LoginBEForm;
 import ind.web.nhp.form.UserBEForm;
 import ind.web.nhp.model.ErrorModel;
+import ind.web.nhp.us.IGroup;
 import ind.web.nhp.us.IUser;
 import ind.web.nhp.us.SimpleAuthenticationAgent;
 import ind.web.nhp.us.impl.UserBo;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -107,5 +110,15 @@ public class ProfileController extends BaseBackendController {
 		}
 
 		return true;
+	}
+
+	@ModelAttribute("GRMapping")
+	public Map<String, String> groupMapping() {
+		IGroup[] listGroups = usManager.getAllGroups();
+		Map<String, String> groupMapping = new HashMap<String, String>();
+		for (IGroup group : listGroups) {
+			groupMapping.put(String.valueOf(group.getId()), group.getName());
+		}
+		return groupMapping;
 	}
 }

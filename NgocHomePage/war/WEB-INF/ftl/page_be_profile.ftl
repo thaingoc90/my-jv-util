@@ -1,13 +1,9 @@
 <#import "inc_layout.ftl" as layout />
 <@layout.masterTemplate title="Profile" customCssList=['bootstrap2.3.2/datepicker/css/datepicker'] customJsList=['bootstrap2.3.2/datepicker/js/bootstrap-datepicker']>
 <style>
-	.profile li {
-		margin-bottom: 5px;
-	} 
-	.well {
-		min-height: 380px !important;
-		margin-right: 50px;
-	}
+	.profile li {margin-bottom: 5px;} 
+	.well {min-height: 380px !important;margin-right: 50px;}
+	#inputBirthday {cursor: default;}
 </style>
 
 <div class="body-content">
@@ -21,12 +17,13 @@
 				<ul class="profile form-inline">
 					<li>Email: <a href="mailto:${USER.getEmail()}"><span class="label label-info">${USER.getEmail()}</span></a></li>
 					<li>Login Name: <span class="label label-warning">${USER.getLoginName()}</span></li>
+					<li>Group: <span class="label">${GRMapping[USER.getGroupId()?string]}</span></li>
 					<li>Password: <a href="${baseUrl}profile/changePassword">Change password</a></li>
 					<li>Register: ${USER.getCreatedDate()?string("dd/MM/yyyy")}</li>
 					<li>Last Login: ${USER.getLastLogin()?string("dd/MM/yyyy")!""}</li>
 					<li>
 						<label>Display Name:</label> 
-						<span class="label" id="label-name">${USER.getDisplayName()}</span> 
+						<span id="label-name">${USER.getDisplayName()}</span> 
 						<input type="text" class="span7 hide" id="inputName" name="displayName" value="${USER.getDisplayName()}" />
 					</li>
 					<li>
