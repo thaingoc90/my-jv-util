@@ -210,6 +210,7 @@ a:hover {
 .portfolio-details {
   border: 1px solid #D8D8D8;
   padding: 12px 12px 10px 12px;
+  background: #FEFFF9;
 }
 .portfolio-details > h4 {
   color: #74744E;

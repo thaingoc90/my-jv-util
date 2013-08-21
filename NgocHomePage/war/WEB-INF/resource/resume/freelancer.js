@@ -47,12 +47,12 @@ $('a[href="#portfolio-tab"]').on('shown', function (e){
 });
 
 /* google maps */
-var myLatlng = new google.maps.LatLng(40.758890,-73.979366);
+var myLatlng = new google.maps.LatLng(10.766717, 106.661447);
 
 var mapInitOpts = {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     center: myLatlng,
-    zoom: 12
+    zoom: 16
 };
 
 var map = new google.maps.Map(document.getElementById("my-location"), mapInitOpts);
@@ -60,7 +60,7 @@ var map = new google.maps.Map(document.getElementById("my-location"), mapInitOpt
 var marker = new google.maps.Marker({
     position: myLatlng, 
     map: map, 
-    title: "My Office" 
+    title: "My Apparment" 
 });
 
 
