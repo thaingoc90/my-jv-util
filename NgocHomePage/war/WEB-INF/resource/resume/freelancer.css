@@ -1,12 +1,12 @@
 body {
-  background: #E1E4DE url('../img/css/patterns/irongrip.png') repeat;  
+  background: #E1E4DE url('img/irongrip.png') repeat;  
   color: #7C7C7C;    
   font-family: "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
   font-weight: 400;
   overflow-y: scroll; 
   padding-bottom:40px; 
-  padding-top:20px; 
+  padding-top:60px; 
 }
 
 h1, h2 , h3, h4, h5, p, li {
@@ -228,6 +228,8 @@ a:hover {
 .portfolio-details > p + img {
   margin-top: 10px;
   margin-bottom: 5px;
+  width: 100%;
+  height: 100px;
 }
 .portfolio-details > h4 + img {
   margin-top: 7px;
@@ -470,49 +472,6 @@ a:hover {
   .phone-480 {
     display: inline;
   }
-  /* demo only */
-  #demo-box {
-    display: none;
-  }
 
 }
 
-/* demo only */
-#demo-box {
-  background-color: #ffffff;
-  border-top: 1px solid #C0C0C0;
-  border-right: 1px solid #C0C0C0;
-  border-bottom: 1px solid #C0C0C0;
-  padding: 7px 0px 0px 0px;
-  position: absolute;
-  top: 20px;
-  width: 35px;
-  z-index: 999;
-}
-#demo-box .demo-bg {
-  border: 1px dotted #C0C0C0;
-  cursor:pointer;
-  display:block;
-  float:left;
-  height:18px;
-  margin:0 8px 7px 7px;
-  text-decoration:none;
-  width:18px;
-}
-#demo-box a {
-  text-decoration:none;
-}
-
-/* demo only - background patterns */
-.bgnoise_lg, #bgnoise_lg { background:url(../img/css/patterns/bgnoise_lg.png) repeat; }
-.escheresque, #escheresque { background:url(../img/css/patterns/escheresque.png) repeat; }
-.farmer, #farmer { background:url(../img/css/patterns/farmer.png) repeat; }
-.grey_sandbag, #grey_sandbag { background:url(../img/css/patterns/grey_sandbag.png) repeat; }
-.grid, #grid { background:url(../img/css/patterns/grid.png) repeat; }
-.irongrip, #irongrip { background:url(../img/css/patterns/irongrip.png) repeat; }
-.kindajean, #kindajean { background:url(../img/css/patterns/kindajean.png) repeat; }
-.light_alu, #light_alu { background:url(../img/css/patterns/light_alu.png) repeat; }
-.little_pluses, #little_pluses { background:url(../img/css/patterns/little_pluses.png) repeat; }
-.noisy_grid, #noisy_grid { background:url(../img/css/patterns/noisy_grid.png) repeat; }
-.purty_wood, #purty_wood { background:url(../img/css/patterns/purty_wood.png) repeat; }
-.retro_intro, #retro_intro { background:url(../img/css/patterns/retro_intro.png) repeat; }
