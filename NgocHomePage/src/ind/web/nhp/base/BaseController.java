@@ -1,6 +1,7 @@
 package ind.web.nhp.base;
 
 import ind.web.nhp.model.ErrorModel;
+import ind.web.nhp.utils.UrlUtils;
 
 import java.util.Locale;
 
@@ -32,6 +33,11 @@ public abstract class BaseController {
 	@ModelAttribute("locale")
 	public String getLocale(Locale locale) {
 		return locale.getLanguage();
+	}
+
+	@ModelAttribute("baseUrl")
+	public String modelBaseUrl(HttpServletRequest request) {
+		return UrlUtils.getBaseUrl(request);
 	}
 
 	protected ErrorModel buildErrorObject(int errCode, String errMsg, String msgSuccess) {

@@ -15,7 +15,8 @@
 	<context:component-scan base-package="ind.web.nhp" />
 	<mvc:annotation-driven />
 	<context:annotation-config />
-	<mvc:annotation-driven ignoreDefaultModelOnRedirect="true" />
+	<mvc:annotation-driven
+		ignoreDefaultModelOnRedirect="true" />
 
 	<mvc:resources mapping="/static/**" location="/WEB-INF/resource/"
 		cache-period="0" />
@@ -24,13 +25,13 @@
 		<ref bean="localeChangeInterceptor" />
 		<mvc:interceptor>
 			<mvc:mapping path="/admin" />
-			<mvc:mapping path="/admin/**"/>
-			<bean class="ind.web.nhp.interceptor.LoginAuthentication"/>
+			<mvc:mapping path="/admin/**" />
+			<bean class="ind.web.nhp.interceptor.LoginAuthentication" />
 		</mvc:interceptor>
 		<mvc:interceptor>
 			<mvc:mapping path="/admin" />
-			<mvc:mapping path="/admin/**"/>
-			<bean class="ind.web.nhp.interceptor.PermissionAuthorization"/>
+			<mvc:mapping path="/admin/**" />
+			<bean class="ind.web.nhp.interceptor.PermissionAuthorization" />
 		</mvc:interceptor>
 	</mvc:interceptors>
 
@@ -39,13 +40,13 @@
 		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
 		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
 		<property name="freemarkerSettings">
-	    	<props>
-	    		<prop key="time_zone">GMT+7</prop>
-	      		<prop key="number_format">0.####</prop>
-	    	</props>
-	  	</property>
+			<props>
+				<prop key="time_zone">GMT+7</prop>
+				<prop key="number_format">0.####</prop>
+			</props>
+		</property>
 	</bean>
-	
+
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
 		<property name="exposeRequestAttributes" value="false" />
@@ -56,13 +57,9 @@
 		<property name="suffix" value=".ftl" />
 	</bean>
 
-	<!-- 
-	<bean id="viewResolver"
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="/WEB-INF/jsp/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
-	 -->
+	<!-- <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		<property name="prefix" value="/WEB-INF/jsp/" /> <property name="suffix" 
+		value=".jsp" /> </bean> -->
 
 	<!-- Locale bean -->
 	<bean id="localeResolver"
@@ -79,5 +76,16 @@
 	<bean id="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename" value="language/core" />
+	</bean>
+
+	<!-- Resolver upload file -->
+	<!-- 
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
+	 -->
+	
+	<bean id="multipartResolver" class="org.gmr.web.multipart.GMultipartResolver">
+	    <property name="maxUploadSize" value="1048576" />
 	</bean>
 </beans>
