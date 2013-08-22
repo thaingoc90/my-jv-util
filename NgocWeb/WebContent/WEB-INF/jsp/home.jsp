@@ -9,7 +9,8 @@
  	<h3>
 		welcome.springmvc : <spring:message code="welcome.springmvc" text="default text" />
 	</h3>
-	
+	<!-- 
 	Current Locale : ${pageContext.response.locale}
+	 -->
 </body>
 </html>
