@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>SQL/DB Configurations for SGN Portal</comment>
+
+	<entry key="_tbl.user">nhp_user</entry>
+	<entry key="_col.userId.where">uid=@{uId}</entry>
+	<entry key="_col.userLoginName.where">ulogin_name=@{uLoginName}</entry>
+	<entry key="_col.userEmail.where">uemail=@{uEmail}</entry>
+	<entry key="_cols.user.select"><![CDATA[uid AS uId, uemail AS uEmail, ulogin_name AS uLoginName, udisplay_name AS uDisplayName, ubirthday AS uBirthday, upassword AS uPassword, gid AS groupId, uis_disabled AS uDisabled, utime_login AS uTimeLogin, ulast_login AS uLastLogin, uforget_token AS uToken, ucreated_date AS uCreatedDate]]></entry>
+	<entry key="_cols.user.insert"><![CDATA[(uid, uemail, ulogin_name, udisplay_name, ubirthday, upassword, gid, uis_disabled, ucreated_date, utime_login, ulast_login, uforget_token) VALUES (@{uId}, @{uEmail}, @{uLoginName}, @{uDisplayName}, @{uBirthday}, @{uPassword}, @{groupId}, @{uDisabled}, NOW(), NOW(), NOW(), '')]]></entry>
+	<entry key="_cols.user.update"><![CDATA[udisplay_name=@{uDisplayName}, ubirthday=@{uBirthday}, upassword=@{uPassword}, gid=@{groupId}, uis_disabled=@{uDisabled}, utime_login=@{uTimeLogin}, ulast_login=@{uLastLogin}, uforget_token=@{uToken}]]></entry>
+
+
+	<entry key="_tbl.group">nhp_group</entry>
+	<entry key="_col.groupId.where">gid=@{groupId}</entry>
+	<entry key="_col.groupName.where">gname=@{groupName}</entry>
+	<entry key="_cols.group.select"><![CDATA[gid AS groupId, gname AS groupName, gdesc AS groupDesc, gis_system AS groupIsSystem]]></entry>
+	<entry key="_cols.group.insert"><![CDATA[(gid, gname, gdesc, gis_system) VALUES (@{groupId}, @{groupName}, @{groupDesc}, @{groupIsSystem})]]></entry>
+	<entry key="_cols.group.update"><![CDATA[gname=@{groupName}, gdesc=@{groupDesc}, gis_system=@{groupIsSystem}]]></entry>
+
+
+	<entry key="_tbl.permission">nhp_permission</entry>
+	<entry key="_col.permissionId.where">id=@{perId}</entry>
+	<entry key="_cols.permission.select"><![CDATA[id AS perId, pdesc AS perDesc, parent_id AS parentId]]></entry>
+	<entry key="_cols.permission.insert"><![CDATA[(id, pdesc, parent_id) VALUES (@{perId}, @{perDesc}, @{parentId})]]></entry>
+	<entry key="_cols.permission.update"><![CDATA[pdesc=@{perDesc}, parent_id=@{parentId}]]></entry>
+
+	<entry key="_tbl.group_permission">nhp_group_permission</entry>
+
+	<entry key="_tbl.menu">nhp_menu</entry>
+	<entry key="_col.menu.id.where">mid=@{mId}</entry>
+	<entry key="_cols.menu.select"><![CDATA[mid AS mId, mname AS mName, murl AS mUrl, mposition AS mPosition, mparent_id AS mParentId, mpermission AS mPermission]]></entry>
+	<entry key="_cols.menu.insert"><![CDATA[(mname, murl, mposition, mparent_id, mpermission ) VALUES (@{mName}, @{mUrl}, @{mPosition}, @{mParentId}, @{mPermission})]]></entry>
+	<entry key="_cols.menu.update"><![CDATA[mname=@{mName}, murl=@{mUrl}, mposition=@{mPosition}, mparent_id=@{mParentId}, mpermission=@{mPermission}]]></entry>
+
+
+	<entry key="sql.getUserById"><![CDATA[
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
+    ]]></entry>
+	<entry key="sql.getUserByLoginName"><![CDATA[
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userLoginName.where}
+    ]]></entry>
+	<entry key="sql.getUserByEmail"><![CDATA[
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userEmail.where}
+    ]]></entry>
+	<entry key="sql.updateUser"><![CDATA[
+    	UPDATE ${_tbl.user} SET ${_cols.user.update} WHERE ${_col.userId.where} 
+    ]]></entry>
+	<entry key="sql.updatePasswordUser"><![CDATA[
+    	UPDATE ${_tbl.user} SET ${_col.userPassword.where} WHERE ${_col.userId.where} 
+    ]]></entry>
+	<entry key="sql.updateLastLoginUser"><![CDATA[
+    	UPDATE ${_tbl.user} SET ${_col.userLastLogin.where} WHERE ${_col.userId.where} 
+    ]]></entry>
+	<entry key="sql.getAllUsers"><![CDATA[
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} ORDER BY uid
+    ]]></entry>
+	<entry key="sql.getUserById"><![CDATA[
+    	SELECT ${_cols.user.select} FROM ${_tbl.user} WHERE ${_col.userId.where}
+    ]]></entry>
+	<entry key="sql.createUser"><![CDATA[
+    	INSERT INTO ${_tbl.user} ${_cols.user.insert} 
+    ]]></entry>
+	<entry key="sql.deleteUser"><![CDATA[
+    	DELETE FROM ${_tbl.user} WHERE ${_col.userId.where} 
+    ]]></entry>
+
+
+	<entry key="sql.getAllGroups"><![CDATA[
+ 		SELECT ${_cols.group.select} FROM ${_tbl.group} ORDER BY gid 
+    ]]></entry>
+	<entry key="sql.createGroup"><![CDATA[
+    	INSERT INTO ${_tbl.group} ${_cols.group.insert}
+    ]]></entry>
+	<entry key="sql.deleteGroup"><![CDATA[
+    	DELETE FROM ${_tbl.group} WHERE ${_col.groupId.where} 
+    ]]></entry>
+	<entry key="sql.getGroupById"><![CDATA[
+    	SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupId.where} 
+    ]]></entry>
+	<entry key="sql.getGroupByName"><![CDATA[
+    	SELECT ${_cols.group.select} FROM ${_tbl.group} WHERE ${_col.groupName.where}
+    ]]></entry>
+	<entry key="sql.updateGroup"><![CDATA[
+    	UPDATE ${_tbl.group} SET ${_cols.group.update} WHERE ${_col.groupId.where} 
+    ]]></entry>
+
+
+	<entry key="sql.getPermission"><![CDATA[
+    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
+    ]]></entry>
+	<entry key="sql.getAllPermissions"><![CDATA[
+    	SELECT ${_cols.permission.select} FROM ${_tbl.permission} ORDER BY parent_id, id
+    ]]></entry>
+	<entry key="sql.deletePermission"><![CDATA[
+    	DELETE FROM ${_tbl.permission} WHERE ${_col.permissionId.where}
+    ]]></entry>
+	<entry key="sql.updatePermission"><![CDATA[
+    	UPDATE ${_tbl.permission} SET ${_cols.permission.update} WHERE ${_col.permissionId.where}
+    ]]></entry>
+	<entry key="sql.addPermission"><![CDATA[
+    	INSERT INTO ${_tbl.permission} ${_cols.permission.insert}
+    ]]></entry>
+
+
+	<entry key="sql.getAllPermissionsOfGroup"><![CDATA[
+    	SELECT P.id AS perId, P.pdesc AS perDesc, P.parent_id AS parentId FROM ${_tbl.group_permission} GP JOIN ${_tbl.permission} P ON (GP.pid = P.id AND GP.gid = @{groupId})
+    ]]></entry>
+	<entry key="sql.deletePermisionsOfGroup"><![CDATA[
+    	DELETE FROM ${_tbl.group_permission} WHERE gid=@{groupId}
+    ]]></entry>
+	<entry key="sql.addPermisionForGroup"><![CDATA[
+    	INSERT INTO ${_tbl.group_permission} (gid, pid) VALUES (@{groupId}, @{perId})
+    ]]></entry>
+
+
+	<entry key="sql.getMenuById"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.getAllMenus"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} ORDER BY mparent_id, mposition, mid
+    ]]></entry>
+	<entry key="sql.deleteMenu"><![CDATA[
+    	DELETE FROM ${_tbl.menu} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.updateMenu"><![CDATA[
+    	UPDATE ${_tbl.menu} SET ${_cols.menu.update} WHERE ${_col.menu.id.where}
+    ]]></entry>
+	<entry key="sql.createMenu"><![CDATA[
+    	INSERT INTO ${_tbl.menu} ${_cols.menu.insert}
+    ]]></entry>
+	<entry key="sql.getMenusByNonPermission"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE mpermission IS NULL
+    ]]></entry>
+    <entry key="sql.getPermissionOfUrl"><![CDATA[
+    	SELECT ${_cols.menu.select} FROM ${_tbl.menu} WHERE murl = @{mUrl} OR murl = CONCAT(@{mUrl}, '/') 
+    ]]></entry>
+    
+</properties>
