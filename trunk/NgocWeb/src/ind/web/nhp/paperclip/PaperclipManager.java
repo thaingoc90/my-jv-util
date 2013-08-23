@@ -25,7 +25,7 @@ public class PaperclipManager extends BaseJdbcDao implements IPaperclipManager {
 
     @Override
     public String createAttachment(IPaperclip paperclip) {
-	final String sqlKey = "sql.createPaperclip";
+	final String sqlKey = "sql.createAttachment";
 	Map<String, Object> params = _buildParamPaperclip(paperclip);
 	try {
 	    long result = executeNonSelect(sqlKey, params);
@@ -40,7 +40,7 @@ public class PaperclipManager extends BaseJdbcDao implements IPaperclipManager {
 
     @Override
     public IPaperclip updateAttachment(IPaperclip paperclip) {
-	final String sqlKey = "sql.updatePaperclip";
+	final String sqlKey = "sql.updateAttachment";
 	Map<String, Object> params = _buildParamPaperclip(paperclip);
 	try {
 	    long result = executeNonSelect(sqlKey, params);
@@ -55,7 +55,7 @@ public class PaperclipManager extends BaseJdbcDao implements IPaperclipManager {
 
     @Override
     public void deleteAttachment(IPaperclip paperclip) {
-	final String sqlKey = "sql.deletePaperclip";
+	final String sqlKey = "sql.deleteAttachment";
 	Map<String, Object> params = new HashMap<String, Object>();
 	params.put(PaperclipBo.COL_ID, paperclip.getId());
 	try {
@@ -70,7 +70,7 @@ public class PaperclipManager extends BaseJdbcDao implements IPaperclipManager {
 
     @Override
     public IPaperclip getAttachment(String id) {
-	final String sqlKey = "sql.getPaperclipById";
+	final String sqlKey = "sql.getAttachment";
 	String cacheKey = cacheKeyPaperclipById(id);
 	Map<String, Object> params = new HashMap<String, Object>();
 	params.put(PaperclipBo.COL_ID, id);

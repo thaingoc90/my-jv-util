@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>SQL/DB Configurations for NHP Web</comment>
+
+	<entry key="_tbl.paperclip">nhp_paperclip</entry>
+	<entry key="_col.paperclip.id.where">pcid=@{pc_id}</entry>
+	<entry key="_cols.paperclip.select"><![CDATA[pcid AS pc_id, pcoriginal_name AS pc_original_name, pccreate_time AS pc_create_time, pcfilesize AS pc_filesize, pcfilestatus AS pc_filestatus, pcmimetype AS pc_mimetype, pcowner AS pc_owner, pcmetadata AS pc_metadata]]></entry>
+	<entry key="_cols.paperclip.insert"><![CDATA[(pcid, pcoriginal_name, pccreate_time, pcfilesize, pcfilestatus, pcmimetype, pcowner, pcmetadata) VALUES (@{pc_id}, @{pc_original_name}, NOW(), @{pc_filesize}, @{pc_filestatus}, @{pc_mimetype}, @{pc_owner}, @{pc_metadata})]]></entry>
+	<entry key="_cols.paperclip.update"><![CDATA[pcoriginal_name=@{pc_original_name}, pcfilesize=@{pc_filesize}, pcfilestatus=@{pc_filestatus}, pcmimetype=@{pc_mimetype}, pcowner=@{pc_owner}, pcmetadata=@{pc_metadata}]]></entry>
+
+	<entry key="sql.getAttachment"><![CDATA[
+        SELECT ${_cols.paperclip.select} FROM ${_tbl.paperclip} WHERE ${_col.paperclip.id.where}
+    ]]></entry>
+	<entry key="sql.createAttachment"><![CDATA[
+        INSERT INTO ${_tbl.paperclip} ${_cols.paperclip.insert} 
+    ]]></entry>
+	<entry key="sql.deleteAttachment"><![CDATA[
+        DELETE FROM ${_tbl.paperclip} WHERE ${_col.paperclip.id.where} 
+    ]]></entry>
+	<entry key="sql.updateAttachment"><![CDATA[
+        UPDATE ${_tbl.paperclip} SET ${_cols.paperclip.update} WHERE ${_col.paperclip.id.where} 
+    ]]></entry>
+
+</properties>
