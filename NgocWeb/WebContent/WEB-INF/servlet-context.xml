@@ -20,6 +20,9 @@
 
 	<mvc:resources mapping="/static/**" location="/WEB-INF/resource/"
 		cache-period="0" />
+		
+	<mvc:resources mapping="/storage/**" location="/storage/"
+        cache-period="0" />
 
 	<mvc:interceptors>
 		<ref bean="localeChangeInterceptor" />

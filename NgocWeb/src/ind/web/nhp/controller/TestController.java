@@ -36,7 +36,7 @@ public class TestController extends BaseController {
 			Model model, HttpServletRequest request) {
 		if (file != null) {
 			try {
-				pcUtils.uploadFile("test", file, 200000, "doc, docx");
+				pcUtils.uploadFile("test", file, 10000000, ".mp3, .rar, .zip");
 			} catch (Exception e) {
 				e.printStackTrace();
 				model.addAttribute(ErrorConstants.MODEL_ERRORS, new String[] { e.getMessage() });
