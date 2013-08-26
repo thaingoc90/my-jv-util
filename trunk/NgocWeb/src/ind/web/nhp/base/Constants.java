@@ -9,4 +9,6 @@ public class Constants {
 
 	public static final String ERROR_PARAM = "errObj";
 	public static final int DEFAULT_PAGESIZE = 10;
+
+	public static final String PATH_STORAGE = "storage";
 }

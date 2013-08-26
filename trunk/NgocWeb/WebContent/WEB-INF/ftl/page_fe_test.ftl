@@ -9,6 +9,8 @@
 <body>
 
 	<h1>Please upload a file</h1>
+	
+	<#include "inc_error_zone.ftl" />   
     <form method="post" action="${baseUrl}/test" enctype="multipart/form-data">
         <input type="text" name="name"/>
         <input type="file" name="file"/>
