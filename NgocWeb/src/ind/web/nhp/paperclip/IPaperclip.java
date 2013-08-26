@@ -4,28 +4,28 @@ import java.util.Date;
 
 public interface IPaperclip {
 
-    public String getId();
+	public String getId();
 
-    public String getOriginalName();
+	public String getOriginalName();
 
-    public String getStatus();
+	public String getStatus();
 
-    public String getType();
+	public String getType();
 
-    public String getOwner();
+	public String getOwner();
 
-    public Date getCreateTime();
+	public Date getCreateTime();
 
-    public int getSize();
+	public long getSize();
 
-    public String getMeta();
+	public String getMeta();
 
-    public String getDiskName();
+	public String getDiskName();
 
-    public String getDir();
+	public String getDir();
 
-    public boolean isExternalStorage();
+	public boolean isExternalStorage();
 
-    public String getUrl(String prefix);
+	public String getUrl(String prefix);
 
 }
