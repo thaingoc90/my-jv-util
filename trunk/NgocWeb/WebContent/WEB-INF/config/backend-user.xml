@@ -35,11 +35,30 @@
 	</bean>
 
 
-	<bean id="pcManager" class="ind.web.nhp.paperclip.PaperclipManager"
+	<bean id="pcManager" class="ind.web.nhp.base.manager.PaperclipManager"
 		scope="singleton" init-method="init" destroy-method="destroy">
 
 		<property name="sqlPropsLocation"
-			value="/ind/web/nhp/paperclip/paperclip-manager.sql.xml" />
+			value="/ind/web/nhp/base/manager/paperclip-manager.sql.xml" />
+		<property name="driver">
+			<value><![CDATA[com.mysql.jdbc.Driver]]></value>
+		</property>
+		<property name="connUrl">
+			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+	</bean>
+	
+	<bean id="configManager" class="ind.web.nhp.base.manager.ConfigManager"
+		scope="singleton" init-method="init" destroy-method="destroy">
+
+		<property name="sqlPropsLocation"
+			value="/ind/web/nhp/base/manager/config-manager.sql.xml" />
 		<property name="driver">
 			<value><![CDATA[com.mysql.jdbc.Driver]]></value>
 		</property>

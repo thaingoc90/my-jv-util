@@ -1,4 +1,4 @@
-package ind.web.nhp.paperclip;
+package ind.web.nhp.base.manager;
 
 public interface IPaperclipManager {
 
