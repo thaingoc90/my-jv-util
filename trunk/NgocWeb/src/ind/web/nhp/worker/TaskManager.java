@@ -8,12 +8,19 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.springframework.stereotype.Component;
+
+@Component
 public class TaskManager implements ITaskManager {
 
 	private ConcurrentHashMap<String, ITask> scheduledTasks;
 	private ConcurrentHashMap<String, ScheduledFuture<?>> scheduledPointer;
 	private ScheduledThreadPoolExecutor threadExecutor;
 
+	@PostConstruct
 	public void init() {
 		int numProc = Runtime.getRuntime().availableProcessors();
 		threadExecutor = new ScheduledThreadPoolExecutor(numProc);
@@ -24,6 +31,7 @@ public class TaskManager implements ITaskManager {
 		scheduledPointer = new ConcurrentHashMap<String, ScheduledFuture<?>>();
 	}
 
+	@PreDestroy
 	public void destroy() {
 		scheduledTasks.clear();
 		for (ScheduledFuture<?> schFulture : scheduledPointer.values()) {
