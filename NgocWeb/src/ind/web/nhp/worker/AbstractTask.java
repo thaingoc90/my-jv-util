@@ -9,22 +9,30 @@ public abstract class AbstractTask implements ITask, Serializable {
 	private static final long serialVersionUID = "$Id: $".hashCode();
 
 	private String id = null;
+	private TaskInfo taskInfo;
 	private boolean interrupted = false;
+
+	public AbstractTask(String id, TaskInfo info) {
+		this.id = id;
+		this.taskInfo = info;
+	}
+
+	@Override
+	public String getId() {
+		return StringUtils.isBlank(id) ? this.getClass().getName() : id;
+	}
 
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	public void init() {}
-
-	public void destroy() {}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public String getId() {
-		return StringUtils.isBlank(id) ? this.getClass().getName() : id;
+	public TaskInfo getTaskInfo() {
+		return taskInfo;
+	}
+
+	public void setTaskInfo(TaskInfo taskInfo) {
+		this.taskInfo = taskInfo;
 	}
 
 	/**

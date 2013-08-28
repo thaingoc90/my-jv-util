@@ -9,7 +9,6 @@ public interface ITask {
 
 	public static enum Scheduling {
 		RUNONCE, // task runs only once
-		CONTINUOUS, // task runs continuously (ignore fixed rate delay)
 		REPEATED, // task runs repeatedly at a fixed rate
 	};
 
@@ -19,6 +18,13 @@ public interface ITask {
 	 * @return
 	 */
 	public String getId();
+
+	/**
+	 * Gets task's info.
+	 * 
+	 * @return
+	 */
+	public TaskInfo getTaskInfo();
 
 	/**
 	 * Executes task.
