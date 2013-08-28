@@ -19,24 +19,29 @@ public class ThreadScheduler {
 
 			@Override
 			public void run() {
-				System.out.println("Fix thread: Time: " + Calendar.getInstance().getTime());
+				System.out.println("Fix thread: Time: "
+						+ Calendar.getInstance().getTime());
 
 			}
 		}, 1, TimeUnit.SECONDS);
 
+		// Run threads after delay after pre thread starts.
 		thread1 = schedule1.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
-				System.out.println("thread 1: after 5 second " + Calendar.getInstance().getTime());
+				System.out.println("thread 1: after 5 second "
+						+ Calendar.getInstance().getTime());
 			}
 		}, 0, 5, TimeUnit.SECONDS);
 
-		thread2 = schedule1.scheduleAtFixedRate(new Runnable() {
+		// Run threads after delay after pre thread finish.
+		thread2 = schedule1.scheduleWithFixedDelay(new Runnable() {
 
 			@Override
 			public void run() {
-				System.out.println("thread 2: after 3 second " + Calendar.getInstance().getTime());
+				System.out.println("thread 2: after 3 second "
+						+ Calendar.getInstance().getTime());
 			}
 		}, 0, 3, TimeUnit.SECONDS);
 
@@ -45,6 +50,6 @@ public class ThreadScheduler {
 		thread2.cancel(true);
 
 		System.out.println("Finished main thread");
-		
+
 	}
 }
