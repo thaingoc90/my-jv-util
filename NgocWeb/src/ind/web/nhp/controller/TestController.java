@@ -2,6 +2,8 @@ package ind.web.nhp.controller;
 
 import ind.web.nhp.base.BaseController;
 import ind.web.nhp.base.ErrorConstants;
+import ind.web.nhp.base.manager.ConfigBo;
+import ind.web.nhp.base.manager.IConfigManager;
 import ind.web.nhp.utils.PaperclipUtils;
 
 import javax.servlet.ServletContext;
@@ -26,6 +28,9 @@ public class TestController extends BaseController {
 	@Autowired
 	private PaperclipUtils pcUtils;
 
+	@Autowired
+	private IConfigManager configManager;
+
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String get(HttpServletRequest req) {
 		return VIEW_NAME;
@@ -36,6 +41,7 @@ public class TestController extends BaseController {
 			Model model, HttpServletRequest request) {
 		if (file != null) {
 			try {
+				configManager.updateConfig(new ConfigBo(name, "Test"));
 				pcUtils.uploadFile("test", file, 10000000, ".mp3, .rar, .zip");
 			} catch (Exception e) {
 				e.printStackTrace();

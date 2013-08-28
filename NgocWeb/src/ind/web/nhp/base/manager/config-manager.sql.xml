@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>SQL/DB Configurations for NHP Web</comment>
+
+	<entry key="_tbl.config">nhp_config</entry>
+	<entry key="_col.config.key.where">c_key=@{conf_key}</entry>
+	<entry key="_cols.config.select"><![CDATA[c_key AS conf_key, c_value AS conf_value]]></entry>
+	<entry key="_cols.config.insert"><![CDATA[(c_key, c_value) VALUES (@{conf_key}, @{conf_value})]]></entry>
+	<entry key="_cols.config.update"><![CDATA[c_value=@{conf_value}]]></entry>
+
+	<entry key="sql.getConfig"><![CDATA[
+        SELECT ${_cols.config.select} FROM ${_tbl.config} WHERE ${_col.config.key.where}
+    ]]></entry>
+	<entry key="sql.createConfig"><![CDATA[
+        INSERT INTO ${_tbl.config} ${_cols.config.insert} 
+    ]]></entry>
+	<entry key="sql.deleteConfig"><![CDATA[
+        DELETE FROM ${_tbl.config} WHERE ${_col.config.key.where} 
+    ]]></entry>
+	<entry key="sql.updateConfig"><![CDATA[
+        UPDATE ${_tbl.config} SET ${_cols.config.update} WHERE ${_col.config.key.where} 
+    ]]></entry>
+    
+</properties>

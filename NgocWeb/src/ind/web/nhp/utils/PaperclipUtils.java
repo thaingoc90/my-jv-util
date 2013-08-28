@@ -1,9 +1,9 @@
 package ind.web.nhp.utils;
 
 import ind.web.nhp.base.Constants;
-import ind.web.nhp.paperclip.IPaperclip;
-import ind.web.nhp.paperclip.IPaperclipManager;
-import ind.web.nhp.paperclip.PaperclipBo;
+import ind.web.nhp.base.manager.IPaperclip;
+import ind.web.nhp.base.manager.IPaperclipManager;
+import ind.web.nhp.base.manager.PaperclipBo;
 
 import java.io.File;
 import java.io.FileOutputStream;

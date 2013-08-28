@@ -1,4 +1,4 @@
-package ind.web.nhp.paperclip;
+package ind.web.nhp.base.manager;
 
 import ind.web.nhp.base.BaseBo;
 import ind.web.nhp.utils.JsonUtils;
