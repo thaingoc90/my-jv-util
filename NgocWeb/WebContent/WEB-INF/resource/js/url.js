@@ -14,7 +14,7 @@ function removeParameterFromUrl(url, parameter) {
 			// idiom for string.startsWith
 			if (pars[i].lastIndexOf(prefix, 0) !== -1)
 				pars.splice(i, 1);
-		url = urlparts[0] + '?' + pars.join('&');
+		url = urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
 	}
 	return url;
 }
