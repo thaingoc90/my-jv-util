@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+	
+	<bean id="commentDao" class="ind.web.nhp.comment.CommentDao"
+		scope="singleton" init-method="init" destroy-method="destroy">
+
+		<property name="sqlPropsLocation"
+			value="/ind/web/nhp/comment/comment-manager.sql.xml" />
+		<property name="driver">
+			<value><![CDATA[com.mysql.jdbc.Driver]]></value>
+		</property>
+		<property name="connUrl">
+			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+	</bean>
+
+</beans>
