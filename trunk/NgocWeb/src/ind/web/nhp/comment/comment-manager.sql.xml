@@ -29,6 +29,6 @@
         SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE parent_comment_id=@{parent_comment_id} AND token=@{token} AND target_id=@{target_id} ORDER BY created DESC
     ]]></entry>
     <entry key="sql.getCommentsByTarget"><![CDATA[
-        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (${ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
+        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
     ]]></entry>
 </properties>

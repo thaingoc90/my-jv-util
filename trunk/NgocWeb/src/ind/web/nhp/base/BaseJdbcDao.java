@@ -41,7 +41,7 @@ public class BaseJdbcDao extends CacheDao {
 	private String sqlPropsLocation;
 	private Properties sqlProps = new SqlProperties();
 	private ConcurrentMap<String, String> cacheSqlProps = new MapMaker().concurrencyLevel(
-	        NUM_PROCESSORS).makeMap();
+			NUM_PROCESSORS).makeMap();
 
 	public void init() {
 		super.init();
@@ -65,7 +65,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @return
 	 */
 	public DataSource buildDataSource(String driver, String connUrl, String username,
-	        String password) {
+			String password) {
 		BasicDataSource bds = new BasicDataSource();
 		bds.setDriverClassName(driver);
 		bds.setUrl(connUrl);
@@ -84,11 +84,16 @@ public class BaseJdbcDao extends CacheDao {
 		String sqlLocation = getSqlPropsLocation();
 		if (sqlLocation != null) {
 			InputStream is = getClass().getResourceAsStream(sqlLocation);
-			Properties props = PropsUtils.loadProperties(is, sqlLocation.endsWith(".xml"));
-			if (props != null) {
-				this.sqlProps.putAll(props);
+			if (is != null) {
+				Properties props = PropsUtils.loadProperties(is, sqlLocation.endsWith(".xml"));
+				if (props != null) {
+					this.sqlProps.putAll(props);
+				} else {
+					String msg = "Can not load SQL properties from [" + sqlLocation + "]!";
+					LOGGER.warn(msg);
+				}
 			} else {
-				String msg = "Can not load SQL properties from [" + sqlLocation + "]!";
+				String msg = "Location of sql is invalid!";
 				LOGGER.warn(msg);
 			}
 		} else {
@@ -121,7 +126,7 @@ public class BaseJdbcDao extends CacheDao {
 	 */
 	protected String buildSqlProps(final Object sqlKey) {
 		final String finalKey = (sqlKey instanceof Object[]) ? ((Object[]) sqlKey)[0].toString()
-		        : sqlKey.toString();
+				: sqlKey.toString();
 		String sql = getSqlProps(finalKey);
 		if (sql != null && sqlKey instanceof Object[]) {
 			Object[] temp = (Object[]) sqlKey;
@@ -188,7 +193,7 @@ public class BaseJdbcDao extends CacheDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public PreparedStatement preparedStatement(Connection conn, String sql, Object params)
-	        throws SQLException {
+			throws SQLException {
 		if (params == null) {
 			return buildStatement(conn, sql, (Object[]) params);
 		} else if (params instanceof Object[]) {
@@ -209,7 +214,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	public PreparedStatement buildStatement(Connection conn, String sql, Map<String, Object> params)
-	        throws SQLException {
+			throws SQLException {
 		String cleanSql = RegexUtils.replaceRegexToValue(sql, PATTERN_TABLE, params);
 		String[] listParams = RegexUtils.extractParams(cleanSql, PATTERN_PARAM);
 		List<Object> listValues = new ArrayList<Object>();
@@ -233,7 +238,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	public PreparedStatement buildStatement(Connection conn, String sql, Object[] params)
-	        throws SQLException {
+			throws SQLException {
 		String cleanSql = sql.replaceAll(PATTERN_PARAM, "?");
 		PreparedStatement stmt = conn.prepareStatement(cleanSql);
 		int numNeedParam = StringUtils.countMatches(cleanSql, "?");
@@ -274,7 +279,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	public List<PreparedStatement> getListStatements(Connection conn, String[] sqlCommands,
-	        Object params) throws SQLException {
+			Object params) throws SQLException {
 		List<PreparedStatement> listStates = new ArrayList<PreparedStatement>();
 		for (String command : sqlCommands) {
 			PreparedStatement preState = preparedStatement(conn, command, params);
@@ -383,7 +388,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	public List<Map<String, Object>> executeSelect(String sqlKey, Object params)
-	        throws SQLException {
+			throws SQLException {
 		return executeSelect(sqlKey, params, (String) null);
 	}
 
@@ -398,7 +403,7 @@ public class BaseJdbcDao extends CacheDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> executeSelect(String sqlKey, Object params, String cacheKey)
-	        throws SQLException {
+			throws SQLException {
 		List<Map<String, Object>> result = null;
 		// GET FROM CACHE
 		if (!StringUtils.isBlank(cacheKey) && cacheEnabled()) {
@@ -461,7 +466,7 @@ public class BaseJdbcDao extends CacheDao {
 	 * @throws SQLException
 	 */
 	public <T extends BaseBo> T[] executeSelect(String sqlKey, Object params, Class<T> clazz)
-	        throws SQLException {
+			throws SQLException {
 		return executeSelect(sqlKey, params, clazz, (String) null);
 	}
 
@@ -478,7 +483,7 @@ public class BaseJdbcDao extends CacheDao {
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T extends BaseBo> T[] executeSelect(String sqlKey, Object params, Class<T> clazz,
-	        String cacheKey) throws SQLException {
+			String cacheKey) throws SQLException {
 		List<Map<String, Object>> dbResult = executeSelect(sqlKey, params, cacheKey);
 		if (dbResult == null || dbResult.size() <= 0) {
 			return null;
