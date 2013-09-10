@@ -1,0 +1,210 @@
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+
+.clear {
+	clear: both;
+}
+
+html,body {
+	margin: 0px;
+	padding: 0px;
+	font-size: 13px;
+	font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+	border: 1px solid #ccc;
+}
+
+a,a:visited {
+	text-decoration: none;
+	outline-style: none;
+	color: #b1034f;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: #b1034f;
+}
+
+/*COMMENT*/
+section#comment {
+	width: 100%;
+	min-width: 330px;
+	background: white;
+	margin: auto;
+	padding-bottom: 20px;
+}
+
+section#comment header {
+	font-size: 20px;
+	line-height: 22px;
+	padding: 10px 10px;
+}
+
+section#comment article {
+	display: block;
+	padding: 8px 20px;
+	border-top: 1px dotted #CCC;
+}
+
+
+/*COMMENT - header*/
+.cmt-header {
+	padding: 3px 20px 5px;
+}
+
+.cmt-header .totals {
+	display: inline-block;
+	font-weight: bold;
+	color: #6A6A6A;
+}
+
+.cmt-header .paging {
+	display: inline-block;
+	float: right;
+	margin-right: 10px;
+}
+
+.cmt-header .paging a {
+	padding: 1px 5px 1px 5px;
+	border: 1px solid #CCC;
+	font-size: 12px;
+}
+
+.cmt-header .paging a:hover {
+	text-decoration: none;
+	background: #eee;
+}
+
+/*COMMENT - list comment*/
+.cmt-body {
+	display: block;
+	margin-left: 50px;
+}
+
+.cmt-body .cmt-user-name {
+	font-weight: bold;
+}
+
+.cmt-body .cmt-toolbox>span {
+	display: inline-block;
+	margin-right: 10px;
+	font-size: 12px;
+}
+
+.cmt-toolbox img {
+	width: 10px;
+	height: 10px;
+	margin-left: 3px;
+}
+
+.cmt-body .cmt-toolbox .cmt-time {
+	color: gray;
+}
+
+.cmt-avatar {
+	display: block;
+	float: left;
+	width: 35px;
+	height: 35px;
+}
+
+.cmt-avatar img {
+	width: 35px;
+	max-width: 35px;
+	height: 35px;
+	max-height: 35px;
+}
+
+/*COMMENT - reply post*/
+.cmt-reply-post {
+	margin: 4px 0px 8px 50px;
+	padding-top: 4px;
+	border-top: 1px dotted #ccc;
+	display: none;
+}
+
+.reply-post-avatar {
+	display: block;
+	float: left;
+	width: 25px;
+	height: 25px;
+}
+
+
+.reply-post-avatar img {
+	width: 25px;
+	max-width: 25px;
+	height: 25px;
+	max-height: 25px;
+}
+
+.reply-post-body {
+	display: block;
+	margin-left: 30px;
+	font-size: 11.5px;
+}
+
+.reply-post-message textarea {
+	border: 1px solid #CCC;
+	width: 100%;
+	height: 20px;
+	resize: none;
+	overflow: hidden;
+}
+
+.reply-post-error {
+	float: right;
+	color: red;
+	font-weight: bold;
+}
+
+/*COMMENT - new post*/
+.cmt-new-post {
+	padding: 8px 20px;
+	border-bottom: 1px dotted #CCC;
+	border-top: 1px dotted #CCC;
+}
+
+.new-post-avatar {
+	display: block;
+	float: left;
+	width: 35px;
+	height: 35px;
+}
+
+.new-post-avatar img {
+	width: 35px;
+	max-width: 35px;
+	height: 35px;
+	max-height: 35px;
+}
+
+.new-post-body {
+	display: block;
+	margin-left: 50px;
+	font-size: 11.5px;
+}
+
+.new-post-message textarea {
+	border: 1px solid #CCC;
+	width: 100%;
+	height: 20px;
+	resize: none;
+	overflow: hidden;
+}
+
+.new-post-error {
+	float: right;
+	color: red;
+	font-weight: bold;
+}
+
+/*END - COMMENT*/

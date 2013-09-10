@@ -5,7 +5,7 @@
 	
 	<entry key="_tbl.comment">nhp_comment</entry>
 	<entry key="_tbl.comment.key.where">comment_id=@{comment_id} AND token=@{token} AND target_id=@{target_id}</entry>
-	<entry key="_cols.comment.select"><![CDATA[comment_id, account_name, content ,target_id ,token ,created ,updated ,status ,approved_by, updated_by ,parent_comment_id ,total_likes  ]]></entry>
+	<entry key="_cols.comment.select"><![CDATA[comment_id, account_name, CONVERT(content USING utf8) AS content ,target_id ,token ,created ,updated ,status ,approved_by, updated_by ,parent_comment_id ,total_likes  ]]></entry>
 	<entry key="_cols.comment.insert"><![CDATA[(comment_id, account_name, content ,target_id ,token ,created ,updated ,status ,parent_comment_id) VALUES (@{comment_id}, @{account_name}, @{content} ,@{target_id} ,@{token} ,NOW() ,NOW() ,@{status} ,@{parent_comment_id})]]></entry>
 	<entry key="_cols.comment.update"><![CDATA[content=@{content} ,updated=NOW() ,updated_by=@{updated_by}]]></entry>
 	<entry key="_cols.comment.update.approve"><![CDATA[status=@{status} ,updated=NOW() ,approved_by=@{approved_by}]]></entry>

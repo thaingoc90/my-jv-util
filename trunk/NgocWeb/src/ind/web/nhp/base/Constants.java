@@ -11,4 +11,9 @@ public class Constants {
 	public static final int DEFAULT_PAGESIZE = 10;
 
 	public static final String PATH_STORAGE = "storage";
+
+	public static final String AJAX_FIELD_STATUS = "status";
+	public static final String AJAX_FIELD_MESSAGE = "message";
+	public static final int AJAX_STATUS_SUCCESS = 200;
+	public static final int AJAX_STATUS_ERROR = 404;
 }

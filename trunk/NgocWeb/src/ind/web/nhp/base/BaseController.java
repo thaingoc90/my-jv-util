@@ -3,7 +3,9 @@ package ind.web.nhp.base;
 import ind.web.nhp.model.ErrorModel;
 import ind.web.nhp.utils.UrlUtils;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,5 +44,19 @@ public abstract class BaseController {
 
 	protected ErrorModel buildErrorObject(int errCode, String errMsg, String msgSuccess) {
 		return new ErrorModel(errCode, errMsg, msgSuccess);
+	}
+
+	protected Map<String, Object> createAjaxResult(int returnCode, Object message) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put(Constants.AJAX_FIELD_STATUS, returnCode);
+		result.put(Constants.AJAX_FIELD_MESSAGE, message);
+		return result;
+	}
+
+	protected Map<String, Object> createAjaxOk(Object message) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put(Constants.AJAX_FIELD_STATUS, Constants.AJAX_STATUS_SUCCESS);
+		result.put(Constants.AJAX_FIELD_MESSAGE, message);
+		return result;
 	}
 }
