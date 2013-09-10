@@ -6,7 +6,7 @@ import java.util.Map;
 public interface ICommentDao {
 
 	public Long addComment(String accountName, String content, Long targetId, String token,
-			Long parentCommentId);
+			Long parentCommentId, int status);
 
 	public boolean deleteComment(Long commentId, Long targetId, String token);
 

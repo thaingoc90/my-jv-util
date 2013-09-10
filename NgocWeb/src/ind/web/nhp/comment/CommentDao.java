@@ -34,7 +34,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 
 	@Override
 	public Long addComment(String accountName, String content, Long targetId, String token,
-			Long parentCommentId) {
+			Long parentCommentId, int status) {
 		final String sqlKey = "sql.addComment";
 		long commentId = Utils.generateLongId64();
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -42,7 +42,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 		params.put(FIELD_ACCOUNT_NAME, accountName);
 		params.put(FIELD_TARGET_ID, targetId);
 		params.put(FIELD_CONTENT, content);
-		params.put(FIELD_STATUS, 0);
+		params.put(FIELD_STATUS, status);
 		params.put(FIELD_TOKEN, token);
 		params.put(FIELD_PARENT_ID, parentCommentId);
 		try {
