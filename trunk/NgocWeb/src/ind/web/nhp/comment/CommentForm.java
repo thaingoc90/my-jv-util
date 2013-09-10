@@ -4,6 +4,7 @@ public class CommentForm {
 
 	private String token, content;
 	private long targetId;
+	int limit, page;
 
 	public String getToken() {
 		return token;
@@ -27,6 +28,22 @@ public class CommentForm {
 
 	public void setTargetId(long targetId) {
 		this.targetId = targetId;
+	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
 	}
 
 }

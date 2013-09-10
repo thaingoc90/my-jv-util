@@ -31,4 +31,7 @@
     <entry key="sql.getCommentsByTarget"><![CDATA[
         SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
     ]]></entry>
+    <entry key="sql.getNumberOfCommentsByTarget"><![CDATA[
+        SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status})
+    ]]></entry>
 </properties>

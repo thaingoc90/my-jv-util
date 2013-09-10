@@ -23,4 +23,6 @@ public interface ICommentDao {
 
 	public List<Map<String, Object>> getCommentsByTarget(Long targetId, String token,
 			Integer status, Integer page, Integer pageSize);
+
+	public int getNumberOfCommentsByTarget(Long targetId, String token, Integer status);
 }

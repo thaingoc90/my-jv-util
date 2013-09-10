@@ -25,12 +25,12 @@ body {
 a,a:visited {
 	text-decoration: none;
 	outline-style: none;
-	color: #b1034f;
+	color: #0066FF;
 }
 
 a:hover {
 	text-decoration: underline;
-	color: #b1034f;
+	color: #0066FF;
 }
 
 /*COMMENT*/
@@ -38,7 +38,6 @@ section#comment {
 	width: 100%;
 	min-width: 330px;
 	background: white;
-	margin: auto;
 	padding-bottom: 20px;
 }
 
@@ -70,6 +69,11 @@ section#comment article {
 	display: inline-block;
 	float: right;
 	margin-right: 10px;
+}
+
+.cmt-header .paging a.active {
+	background: #bbb;
+	font-weight: bold;
 }
 
 .cmt-header .paging a {
@@ -166,6 +170,13 @@ section#comment article {
 	font-weight: bold;
 }
 
+.reply-post-success {
+	display: none;
+	float: right;
+	color: #009900;
+	font-weight: bold;
+}
+
 /*COMMENT - new post*/
 .cmt-new-post {
 	padding: 8px 20px;
@@ -202,9 +213,24 @@ section#comment article {
 }
 
 .new-post-error {
+	display: none;
 	float: right;
 	color: red;
 	font-weight: bold;
 }
 
+.new-post-success {
+	display: none;
+	float: right;
+	color: #009900;
+	font-weight: bold;
+}
+
+.new-post-note {
+	display: none;
+}
+
+.new-post-note>span, .reply-post-note>span {
+	font-weight: bold;
+}
 /*END - COMMENT*/
