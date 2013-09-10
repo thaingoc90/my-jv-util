@@ -167,4 +167,22 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 		} finally {
 		}
 	}
+
+	@Override
+	public int getNumberOfCommentsByTarget(Long targetId, String token, Integer status) {
+		final String sqlKey = "sql.getNumberOfCommentsByTarget";
+		int ignoreStatus = status == null ? 1 : 0;
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET_ID, targetId);
+		params.put(FIELD_TOKEN, token);
+		params.put("ignore_status", ignoreStatus);
+		params.put(FIELD_STATUS, status);
+		try {
+			return (int) executeCount(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
 }
