@@ -6,6 +6,11 @@ var Comment = {
 			Comment.GetComments();
 		}, 60000);
 
+		$(document).on('click', '.cmt-reply', function() {
+			$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
+			Comment.setHeightIframe();
+		});
+		
 		$(document).on('keydown', '.cmt-new-post textarea', function(e) {
 			if (e.keyCode == 13 && !e.shiftKey) {
 				e.preventDefault();
@@ -146,6 +151,7 @@ var Comment = {
 					}
 					$(".timeago").timeago();
 					Comment.RenderPaging();
+					Comment.setHeightIframe();
 				} else {
 					alert(data.status);
 				}
@@ -168,7 +174,7 @@ var Comment = {
 		result += 	"</div>";
 		result += 	"<div class='cmt-body'>";
 		result += 		"<span class='cmt-user-name'>";
-		result += 			"<a href='#'>" + comment.account_name + "</a> :";
+		result += 			"<a href='#'>" + comment.account_name + "</a> ";
 		result += 		"</span>";
 		result += 		"<span class='cmt-content'>" + comment.content.replace(/\n/g, '<br />'); + "</span>";
 		result += 		"<div class='cmt-toolbox'>";
@@ -212,6 +218,9 @@ var Comment = {
 		var targetId = $('section#comment').attr('data-target-id');
 		var token = $('section#comment').attr('data-token');
 		var content = $('#frm-new-post textarea').val();
+		if (isBlank(content)) {
+			return;
+		}
 		$.ajax({
 			url : '/comment/post',
 			type : 'POST',
@@ -235,4 +244,19 @@ var Comment = {
 			}
 		});
 	},
+	
+	/** Reset Height Iframe **/
+    setHeightIframe: function() {
+        var height = $('body').height() + 25;
+        var targetId = $('section#comment').attr('data-target-id');
+		var token = $('section#comment').attr('data-token');
+        var keyif = token + "_" + targetId;
+        var dataMessage = '{"action":"setHeight", "height":"'+height+'", "target":"'+keyif+'"}';
+        var referrerUrl = (window.location != window.parent.location) ? document.referrer : document.location.href;
+        window.parent.postMessage(dataMessage, referrerUrl);
+    },
 };
+
+$(document).ready(function() {
+	Comment.initEvent();
+});

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CommentController extends BaseController {
 
 	private final static String VIEW_NAME = "cm_frame";
-	private final static int DEFAULT_WIDTH = 500;
-	private final static int DEFAULT_HEIGHT = 300;
-	private final static int DEFAULT_LIMIT = 5;
+	private final static int DEFAULT_LIMIT = 2;
 
 	@Autowired
 	private ICommentDao cmDao;
@@ -34,6 +33,8 @@ public class CommentController extends BaseController {
 
 		String token = request.getParameter("token");
 		long targetId = Utils.toInt(request.getParameter("target"));
+		String targetUrl = request.getParameter("target_url");
+		String url = new String(Base64.decodeBase64(targetUrl));
 		int limit = Utils.toInt(request.getParameter("limit"));
 		limit = limit > 0 ? limit : DEFAULT_LIMIT;
 		int page = Utils.toInt(request.getParameter("page"));
@@ -45,8 +46,7 @@ public class CommentController extends BaseController {
 				CommentConstants.COMMENT_STATUS_VALID);
 		int maxPage = rows % limit == 0 ? rows / limit : rows / limit + 1;
 
-		model.addAttribute("cm_box_width", DEFAULT_WIDTH);
-		model.addAttribute("cm_box_height", DEFAULT_HEIGHT);
+		model.addAttribute("url", url);
 		model.addAttribute("limit", limit);
 		model.addAttribute("numComments", rows);
 		model.addAttribute("maxPage", maxPage);

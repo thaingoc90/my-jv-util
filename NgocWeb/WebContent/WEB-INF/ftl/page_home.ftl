@@ -91,6 +91,9 @@
 	<h1>Spring MVC FreeMarker</h1>
  
 	<h2>Hello World</h2> ${locale}
+	
+	<div class="commentNhp" data-target="123" data-token="ngoc" data-width="500px" data-height="auto" data-nums="3"></div>
+	<script src="/static/js/comment-main.js"></script>
  
  	<div class="clock">
 		<div id="Date"></div>

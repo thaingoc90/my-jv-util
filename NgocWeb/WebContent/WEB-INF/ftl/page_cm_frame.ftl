@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="${staticResourceRoot}css/comment.css"/>
 
 	<script type="text/javascript" src="${staticResourceRoot}js/jquery-2.0.2.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="${staticResourceRoot}js/comment-base.js" charset="utf-8"></script>
 	<script type="text/javascript" src="${staticResourceRoot}js/comment.js" charset="utf-8"></script>
 	<script type="text/javascript" src="${staticResourceRoot}js/jquery.timeago.js" charset="utf-8"></script>
 	<script type="text/javascript" src="${staticResourceRoot}js/date.format.js" charset="utf-8"></script>
@@ -15,11 +16,7 @@
 </head>
 <body>
 
-	<section id="comment" data-target-id="123" data-token="ngoc" data-limit="${limit}" data-page="${curPage}" data-max-page="${maxPage}"
-		style="width: ${cm_box_width}px">
-		<header>
-			Comments
-		</header>
+	<section id="comment" data-target-id="123" data-token="ngoc" data-limit="${limit}" data-page="${curPage}" data-max-page="${maxPage}">
 		<div class="cmt-header">
 			<div class="totals"><span>${numComments}</span> comment(s)</div>
 			<div class="paging">
@@ -41,9 +38,9 @@
 				</div>	
 				<div class="new-post-body">
 					<div class="new-post-message">
-						<textarea placeholder="Write a comment ..." maxlength="500" onkeyup="textAreaAdjust(this)" ></textarea>
+						<textarea placeholder="Write a comment ..." maxlength="500" required onkeyup="textAreaAdjust(this)" ></textarea>
 					</div>
-					<div>
+					<div style="min-height: 16px;">
 						<span class="new-post-note">Remaining characters: <span>500<span></span>
 						<span class="new-post-error">Bạn chưa đăng nhập.</span>
 						<span class="new-post-success">Thành công.</span>
@@ -52,19 +49,6 @@
 			</form>
 		</div>
 	</section>
-	
-	<script>
-	function textAreaAdjust(o) {
-	    o.style.height = "1px";
-	    o.style.height = (o.scrollHeight)+"px";
-	}
-	
-	$(document).on('click', '.cmt-reply', function() {
-		$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
-	});
-	
-	Comment.initEvent();
-	</script>
 </body>
 </html>
 
