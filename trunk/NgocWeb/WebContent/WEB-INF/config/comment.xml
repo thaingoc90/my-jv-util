@@ -23,4 +23,22 @@
 		</property>
 	</bean>
 
+	<bean id="likeDao" class="ind.web.nhp.comment.LikeDao"
+		scope="singleton" init-method="init" destroy-method="destroy">
+
+		<property name="sqlPropsLocation"
+			value="/ind/web/nhp/comment/like-manager.sql.xml" />
+		<property name="driver">
+			<value><![CDATA[com.mysql.jdbc.Driver]]></value>
+		</property>
+		<property name="connUrl">
+			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+	</bean>
 </beans>

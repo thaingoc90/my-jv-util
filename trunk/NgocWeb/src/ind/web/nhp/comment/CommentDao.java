@@ -27,6 +27,11 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	public final static String FIELD_APPROVED_BY = "approved_by";
 	public final static String FIELD_TOTAL_LIKES = "total_likes";
 
+	public final static String FIELD_TARGET = "target";
+	public final static String FIELD_TARGET_URL = "target_url";
+	public final static String FIELD_INFO = "info";
+	public final static String FIELD_COMMENT_NUMBER = "comment_number";
+
 	public final static String FIELD_START_INDEX = "start_index";
 	public final static String FIELD_PAGE_SIZE = "page_size";
 
@@ -36,7 +41,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	public Long addComment(String accountName, String content, Long targetId, String token,
 			Long parentCommentId, int status) {
 		final String sqlKey = "sql.addComment";
-		long commentId = Utils.generateLongId64();
+		long commentId = Utils.generateLongId48();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_COMMENT_ID, commentId);
 		params.put(FIELD_ACCOUNT_NAME, accountName);
@@ -179,6 +184,96 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 		params.put(FIELD_STATUS, status);
 		try {
 			return (int) executeCount(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	/* -------------------------------------------------------------------------------- */
+	/* --------------------------------TARGET------------------------------------------ */
+	/* -------------------------------------------------------------------------------- */
+
+	@Override
+	public Long createTarget(String target, String targetUrl, String token) {
+		final String sqlKey = "sql.createTarget";
+		long targetId = Utils.generateLongId48();
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET_ID, targetId);
+		params.put(FIELD_TARGET_URL, targetUrl);
+		params.put(FIELD_TARGET, target);
+		params.put(FIELD_TOKEN, token);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? targetId : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public boolean deleteTarget(Long targetId) {
+		final String sqlKey = "sql.deleteTarget";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET_ID, targetId);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? true : false;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public Long updateTarget(Long targetId, String target, String targetUrl, String token,
+			int cmtNumber, String info) {
+		final String sqlKey = "sql.updateTarget";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET_ID, targetId);
+		params.put(FIELD_TARGET_URL, targetUrl);
+		params.put(FIELD_TARGET, target);
+		params.put(FIELD_TOKEN, token);
+		params.put(FIELD_COMMENT_NUMBER, cmtNumber);
+		params.put(FIELD_INFO, info);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? targetId : 0l;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public Map<String, Object> getTargetById(Long targetId) {
+		final String sqlKey = "sql.getTargetById";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET_ID, targetId);
+		try {
+			List<Map<String, Object>> dbResults = executeSelect(sqlKey, params);
+			return dbResults != null && dbResults.size() > 0 ? dbResults.get(0) : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public Map<String, Object> getTargetByTarget(String target, String token) {
+		final String sqlKey = "sql.getTargetByTarget";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TARGET, target);
+		params.put(FIELD_TOKEN, token);
+		try {
+			List<Map<String, Object>> dbResults = executeSelect(sqlKey, params);
+			return dbResults != null && dbResults.size() > 0 ? dbResults.get(0) : null;
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();

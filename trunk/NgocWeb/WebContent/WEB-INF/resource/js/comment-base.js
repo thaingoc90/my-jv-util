@@ -7,6 +7,8 @@ function isBlank(str) {
 }
 
 function textAreaAdjust(o) {
-    o.style.height = "1px";
-    o.style.height = (o.scrollHeight)+"px";
+	o.style.height = "1px";
+	var minHeight = 20;
+    var height = o.scrollHeight < minHeight ? minHeight :o.scrollHeight;
+    o.style.height = (height)+"px";
 }

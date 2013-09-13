@@ -16,18 +16,10 @@
 </head>
 <body>
 
-	<section id="comment" data-target-id="123" data-token="ngoc" data-limit="${limit}" data-page="${curPage}" data-max-page="${maxPage}">
+	<section id="comment" data-target-id="${targetId}" data-token="${token}" data-limit="${limit}" data-page="${curPage}" data-max-page="${maxPage}">
 		<div class="cmt-header">
 			<div class="totals"><span>${numComments}</span> comment(s)</div>
-			<div class="paging">
-				<a href="javascript:;" data-p='first'>&laquo;</a>
-				<a href="javascript:;" data-p='pre'>&lt;</a>
-				<span>
-				
-				</span>
-				<a href="javascript:;" data-p='next'>&gt;</a>
-				<a href="javascript:;" data-p='last'>&raquo;</a>
-			</div>
+			<div class="paging"></div>
 		</div>
 		<div class="cmt-list">
 		</div>
@@ -38,7 +30,7 @@
 				</div>	
 				<div class="new-post-body">
 					<div class="new-post-message">
-						<textarea placeholder="Write a comment ..." maxlength="500" required onkeyup="textAreaAdjust(this)" ></textarea>
+						<textarea placeholder="Write a comment ..." maxlength="500" onkeyup="textAreaAdjust(this)" ></textarea>
 					</div>
 					<div style="min-height: 16px;">
 						<span class="new-post-note">Remaining characters: <span>500<span></span>

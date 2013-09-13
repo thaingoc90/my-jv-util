@@ -25,4 +25,15 @@ public interface ICommentDao {
 			Integer status, Integer page, Integer pageSize);
 
 	public int getNumberOfCommentsByTarget(Long targetId, String token, Integer status);
+
+	public Long createTarget(String target, String targetUrl, String token);
+
+	public boolean deleteTarget(Long targetId);
+
+	public Long updateTarget(Long targetId, String target, String targetUrl, String token,
+			int cmtNumber, String info);
+
+	public Map<String, Object> getTargetById(Long targetId);
+
+	public Map<String, Object> getTargetByTarget(String target, String token);
 }

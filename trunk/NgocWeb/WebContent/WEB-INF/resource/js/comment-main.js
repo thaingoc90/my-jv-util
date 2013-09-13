@@ -9,18 +9,19 @@ var CommentPlugin = {
 	},
 
 	init : function() {
-		var target_url = $.base64.encode(this.getReducedUrl(document.location.href));
-		var commentField = $(this.constants.commentBoxKey);
-		var width = $(commentField).attr('data-width');
-		var height = $(commentField).attr('data-height');
-		var target = $(commentField).attr('data-target');
-		var token = $(commentField).attr('data-token');
-		var limit = $(commentField).attr('data-nums');
+		var url = document.location.href;
+		var target_url = $.base64.encode(this.getReducedUrl(url));
+		var commentField = this.constants.commentBoxKey;
+		var width = this.getAttribute(commentField, 'data-width', '');
+		var height = this.getAttribute(commentField, 'data-height', '');
+		var target = this.getAttribute(commentField, 'data-target', '');
+		var token = this.getAttribute(commentField, 'data-token', '');
+		var limit = this.getAttribute(commentField, 'data-nums', 0);
 		var href = "//" + this.constants.baseUrl + this.constants.commentFrame
 				+ "/?token=" + token + "&target=" + target + "&target_url="
 				+ target_url + "&limit=" + limit;
-		CommentPlugin.createIFrame($(commentField), token + "_" + target,
-				href, width, height);
+		CommentPlugin.createIFrame($(commentField), token + "_" + target, href,
+				width, height);
 	},
 
 	createIFrame : function(element, id, href, width, height) {
@@ -59,22 +60,36 @@ var CommentPlugin = {
 		document.getElementsByTagName("HEAD")[0].appendChild(e);
 	}, 
     
+	/**
+	 * Creates iframe's id
+	 */
 	createId : function(idTemp) {
 		return idTemp.replace(/[^a-zA-Z0-9_]/g, "");
 	},
 	
+	/**
+	 * Reduces url's protocol (http, https, ftp...) 
+	 */
 	getReducedUrl : function(url) {
-		if (url.indexOf("?") > -1) {
-			url = url.substr(0, url.indexOf("?"));
+		if (url.indexOf("://") > -1) {
+			url = url.substr(url.indexOf('://') + 3);
 		}
 		return url;
 	},
 	
+	getAttribute : function(ele, attr, dv) {
+		if ($(ele).attr(attr) !== undefined) {
+			return $(ele).attr(attr);
+		} else {
+			return dv;
+		}
+	},
+	
 	getMessage: function(event) {
-		var content = jQuery.parseJSON(event.data);
+		content = jQuery.parseJSON(event.data);
 		if (content.action == "setHeight") {
-			var keyIframe = CommentPlugin.createId(content.target);
-			var iframe = $("iframe#" + keyIframe);
+			var commentField = CommentPlugin.constants.commentBoxKey;
+			var iframe = $(commentField + " iframe");
 			var dataHeight = iframe.attr("data-height");
 			if (dataHeight == 'auto') {
 				iframe.css('height', content.height);

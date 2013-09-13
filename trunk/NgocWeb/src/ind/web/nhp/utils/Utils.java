@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class Utils {
 
 	public static final long MASK_TIMESTAMP_32 = 0xFFFFFFFFL; // 32bit
+	public static final long MASK_TIMESTAMP_16 = 0xFFFFL; // 16bit
 	private static final long ORIGINAL_TIMESTAMP = 1356973200000L;
 	private static Random rd = new Random(System.currentTimeMillis());
 
@@ -233,4 +234,14 @@ public class Utils {
 		return result;
 	}
 
+	public static long generateLongId48() {
+		long timestamp = System.currentTimeMillis() - ORIGINAL_TIMESTAMP;
+		timestamp = timestamp & MASK_TIMESTAMP_32;
+		timestamp = timestamp << 16L;
+		long randomInt = rd.nextInt(Short.MAX_VALUE * 2);
+		randomInt = randomInt & MASK_TIMESTAMP_16;
+		long result = timestamp | randomInt;
+		return result;
+	}
+	
 }

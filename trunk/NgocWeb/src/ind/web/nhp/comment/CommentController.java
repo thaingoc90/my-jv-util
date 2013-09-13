@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,24 +24,50 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CommentController extends BaseController {
 
 	private final static String VIEW_NAME = "cm_frame";
+	private final static String VIEW_NAME_ERROR = "cm_frame_error";
 	private final static int DEFAULT_LIMIT = 2;
 
 	@Autowired
 	private ICommentDao cmDao;
 
+	@Autowired
+	private ILikeDao likeDao;
+
+	/**
+	 * Renders comment view.
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = { "/comment", "/comment/*" }, method = RequestMethod.GET)
 	public String handle(HttpServletRequest request, Model model) {
 
 		String token = request.getParameter("token");
-		long targetId = Utils.toInt(request.getParameter("target"));
+		String target = request.getParameter("target");
 		String targetUrl = request.getParameter("target_url");
 		String url = new String(Base64.decodeBase64(targetUrl));
 		int limit = Utils.toInt(request.getParameter("limit"));
 		limit = limit > 0 ? limit : DEFAULT_LIMIT;
 		int page = Utils.toInt(request.getParameter("page"));
 		page = page > 0 ? page : 1;
-		targetId = 123l;
-		token = "ngoc";
+
+		// TODO: Check token.
+
+		if (StringUtils.isBlank(target)) {
+			target = url;
+		}
+		Long targetId = null;
+		Map<String, Object> targetObj = cmDao.getTargetByTarget(target, token);
+		if (targetObj == null) {
+			targetId = cmDao.createTarget(target, url, token);
+		} else {
+			targetId = Utils.getValue(targetObj, "target_id", Long.class);
+		}
+
+		if (targetId == null) {
+			return VIEW_NAME_ERROR;
+		}
 
 		int rows = cmDao.getNumberOfCommentsByTarget(targetId, token,
 				CommentConstants.COMMENT_STATUS_VALID);
@@ -48,6 +75,8 @@ public class CommentController extends BaseController {
 
 		model.addAttribute("url", url);
 		model.addAttribute("limit", limit);
+		model.addAttribute("token", token);
+		model.addAttribute("targetId", targetId);
 		model.addAttribute("numComments", rows);
 		model.addAttribute("maxPage", maxPage);
 		model.addAttribute("curPage", page);
@@ -55,6 +84,13 @@ public class CommentController extends BaseController {
 		return VIEW_NAME;
 	}
 
+	/**
+	 * Posts a comment.
+	 * 
+	 * @param form
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/post", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> postComment(@ModelAttribute CommentForm form,
@@ -66,8 +102,9 @@ public class CommentController extends BaseController {
 		}
 		String token = form.getToken();
 		Long targetId = form.getTargetId();
+		String accountName = getCurrentUser();
 		try {
-			cmDao.addComment("Ngoc Thai", form.getContent(), targetId, token, null,
+			cmDao.addComment(accountName, form.getContent(), targetId, token, null,
 					CommentConstants.COMMENT_STATUS_VALID);
 		} catch (Exception e) {
 			msg = "Error while posting.";
@@ -80,7 +117,14 @@ public class CommentController extends BaseController {
 		return true;
 	}
 
-	@RequestMapping(value = "/comment/getComments")
+	/**
+	 * Gets list comments of a target.
+	 * 
+	 * @param form
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/comment/getComments", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getComments(@ModelAttribute CommentForm form,
 			HttpServletRequest request) {
@@ -112,4 +156,52 @@ public class CommentController extends BaseController {
 		}
 		return createAjaxOk(result);
 	}
+
+	@RequestMapping(value = "/comment/countLikes", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> countLikes(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = getCurrentUser();
+		int totalLikes = likeDao.countLikes(targetId, commentId);
+		Map<String, Object> checkUser = likeDao.getLike(accountName, targetId, commentId);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("totalLikes", totalLikes);
+		result.put("user", checkUser);
+		result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		return createAjaxOk(result);
+	}
+
+	@RequestMapping(value = "/comment/like", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> like(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = getCurrentUser();
+		boolean result = likeDao.like(accountName, targetId, commentId);
+		if (result) {
+			return createAjaxOk(result);
+		} else {
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, result);
+		}
+	}
+
+	@RequestMapping(value = "/comment/unlike", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> unlike(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = "Ngoc Thai";
+		boolean result = likeDao.unlike(accountName, targetId, commentId);
+		if (result) {
+			return createAjaxOk(result);
+		} else {
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, result);
+		}
+	}
+
+	private String getCurrentUser() {
+		return "Ngoc Thai";
+	}
+
 }
