@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS nhp_comment;
 DROP TABLE IF EXISTS nhp_target;
 DROP TABLE IF EXISTS nhp_like;
 DROP TABLE IF EXISTS nhp_dislike;
+DROP TABLE IF EXISTS nhp_cmt_token;
 
 CREATE TABLE nhp_comment (
 	comment_id 				BIGINT(20) NOT NULL,
@@ -66,5 +67,14 @@ CREATE TABLE nhp_dislike (
   		INDEX (comment_id),
   	created 				DATETIME,
   		INDEX (created),
-  	PRIMARY KEY (account_name,target_id,comment_id),
+  	PRIMARY KEY (account_name,target_id,comment_id)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci; 
+
+CREATE TABLE nhp_cmt_token (
+	token 					VARCHAR(64),
+	comment_type			TINYINT NOT NULL DEFAULT 0,
+  	target_domains			TEXT,
+  	created 				DATETIME,
+  		INDEX(created),
+  	PRIMARY KEY (token)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci; 

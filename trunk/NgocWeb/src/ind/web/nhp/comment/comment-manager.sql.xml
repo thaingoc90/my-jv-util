@@ -61,4 +61,28 @@
 	<entry key="sql.updateTarget"><![CDATA[
         UPDATE ${_tbl.target} SET ${_cols.target.update} WHERE ${_col.target.key.where} 
     ]]></entry>
+    
+    <!-- ********************************* -->
+    <!-- TOKEN -->
+    <entry key="_tbl.token">nhp_cmt_token</entry>
+    <entry key="_col.token.key.where">token=@{token}</entry>
+	<entry key="_cols.token.select"><![CDATA[token ,comment_type, target_domains, created]]></entry>
+	<entry key="_cols.token.insert"><![CDATA[(token ,comment_type, target_domains, created) VALUES (@{token}, @{comment_type}, @{target_domains} ,NOW())]]></entry>
+	<entry key="_cols.token.update"><![CDATA[comment_type=@{comment_type} ,target_domains=@{target_domains}]]></entry>
+    
+    <entry key="sql.getToken"><![CDATA[
+        SELECT ${_cols.token.select} FROM ${_tbl.token} WHERE ${_col.token.key.where}
+    ]]></entry>
+    <entry key="sql.getAllTokens"><![CDATA[
+        SELECT ${_cols.token.select} FROM ${_tbl.token} ORDER BY created DESC
+    ]]></entry>
+	<entry key="sql.createToken"><![CDATA[
+        INSERT INTO ${_tbl.token} ${_cols.token.insert} 
+    ]]></entry>
+    <entry key="sql.deleteToken"><![CDATA[
+        DELETE FROM ${_tbl.token} WHERE ${_col.token.key.where} 
+    ]]></entry>
+	<entry key="sql.updateToken"><![CDATA[
+        UPDATE ${_tbl.token} SET ${_cols.token.update} WHERE ${_col.token.key.where} 
+    ]]></entry>
 </properties>

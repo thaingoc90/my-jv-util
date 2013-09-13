@@ -91,7 +91,6 @@ var Comment = {
 			var cmtEle = $(this).closest('.cmt-item');
 			var liked = $(this).attr('data-like');
 			Comment.LikeComment(cmtEle, parseInt(liked));
-			Comment.RenderLike(cmtEle);
 		});
 		
 		/* Dislike */
@@ -99,7 +98,6 @@ var Comment = {
 			var cmtEle = $(this).closest('.cmt-item');
 			var disliked = $(this).attr('data-dislike');
 			Comment.DislikeComment(cmtEle, parseInt(disliked));
-			Comment.RenderLike(cmtEle);
 		});
 	},
 
@@ -489,7 +487,7 @@ var Comment = {
 		
 		var createdDate = new Date(comment.created);
 		var result = "";
-		result += 	"<div class='cmt-item clearfix' data-user-name='" + comment.account_name + "'data-comment-id='" + comment.comment_id + "'>";
+		result += 	"<div class='cmt-item clearfix' data-child-cmt = '1' data-user-name='" + comment.account_name + "'data-comment-id='" + comment.comment_id + "'>";
 		result += 		"<div class='reply-post-avatar'>";
 		result += 			"<img src='" + staticResourceRoot + "/images/icon/avatar-default.jpg'/>";
 		result += 		"</div>";
@@ -565,8 +563,13 @@ var Comment = {
 	 * 
 	 */
 	RenderLike : function(cmtEle) {
-		var commentId = $(cmtEle).attr('data-comment-id');
 		var targetId = $('section#comment').attr('data-target-id');
+		var commentId = $(cmtEle).attr('data-comment-id');
+		var isChildCmt = $(cmtEle).attr('data-child-cmt');
+		isChildCmt = (isChildCmt != undefined) ? true : false;
+		if (!isChildCmt) {
+			cmtEle = $(cmtEle).find('.cmt-body');
+		} 
 		
 		var result = this.CountLikesOfComment(commentId, targetId);
 		var totalLikes = result.totalLikes;
@@ -628,7 +631,6 @@ var Comment = {
 	LikeComment : function(cmtEle, isUnlike) {
 		var commentId = $(cmtEle).attr('data-comment-id');
 		var targetId = $('section#comment').attr('data-target-id');
-		var result = 0;
 		$.ajax({
 			url : '/comment/' + (isUnlike == 1 ? 'unlike' : 'like'),
 			type : 'POST',
@@ -639,14 +641,13 @@ var Comment = {
 			dataType : 'json',
 			success : function(data) {
 				if (data.status == 200) {
-					result = parseInt(data.message);
+					Comment.RenderLike(cmtEle);
 				}
 			},
 			error : function(content) {
 				console.log("error");
 			}
 		});
-		return result;
 	},
 	
 	/*======================== DISLIKE ==================================*/
@@ -685,7 +686,6 @@ var Comment = {
 	DislikeComment : function(cmtEle, isUnDislike) {
 		var commentId = $(cmtEle).attr('data-comment-id');
 		var targetId = $('section#comment').attr('data-target-id');
-		var result = 0;
 		$.ajax({
 			url : '/comment/' + (isUnDislike == 1 ? 'unDislike' : 'dislike'),
 			type : 'POST',
@@ -696,14 +696,13 @@ var Comment = {
 			dataType : 'json',
 			success : function(data) {
 				if (data.status == 200) {
-					result = parseInt(data.message);
+					Comment.RenderLike(cmtEle);
 				}
 			},
 			error : function(content) {
 				console.log("error");
 			}
 		});
-		return result;
 	},
 	
 	/** Reset Height Iframe * */

@@ -32,6 +32,9 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	public final static String FIELD_INFO = "info";
 	public final static String FIELD_COMMENT_NUMBER = "comment_number";
 
+	public final static String FIELD_COMMENT_TYPE = "comment_type";
+	public final static String FIELD_TARGET_DOMAINS = "target_domains";
+
 	public final static String FIELD_START_INDEX = "start_index";
 	public final static String FIELD_PAGE_SIZE = "page_size";
 
@@ -304,4 +307,87 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 		} finally {
 		}
 	}
+
+	/* -------------------------------------------------------------------------------- */
+	/* --------------------------------TOKEN------------------------------------------ */
+	/* -------------------------------------------------------------------------------- */
+
+	@Override
+	public String createToken(String token, String cmtType, String targetDomains) {
+		final String sqlKey = "sql.createToken";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TOKEN, token);
+		params.put(FIELD_COMMENT_TYPE, cmtType);
+		params.put(FIELD_TARGET_DOMAINS, targetDomains);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? token : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public boolean deleteToken(String token) {
+		final String sqlKey = "sql.deleteToken";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TOKEN, token);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? true : false;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public String updateToken(String token, String cmtType, String targetDomains) {
+		final String sqlKey = "sql.updateToken";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TOKEN, token);
+		params.put(FIELD_COMMENT_TYPE, cmtType);
+		params.put(FIELD_TARGET_DOMAINS, targetDomains);
+		try {
+			long result = executeNonSelect(sqlKey, params);
+			return (result > 0) ? token : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public Map<String, Object> getToken(String token) {
+		final String sqlKey = "sql.getToken";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TOKEN, token);
+		try {
+			List<Map<String, Object>> dbResults = executeSelect(sqlKey, params);
+			return dbResults != null && dbResults.size() > 0 ? dbResults.get(0) : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getAllTokens() {
+		final String sqlKey = "sql.getAllTokens";
+		Map<String, Object> params = new HashMap<String, Object>();
+		try {
+			List<Map<String, Object>> dbResults = executeSelect(sqlKey, params);
+			return dbResults != null && dbResults.size() > 0 ? dbResults : null;
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
 }
