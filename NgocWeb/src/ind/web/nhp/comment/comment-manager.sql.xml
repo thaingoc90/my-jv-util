@@ -4,12 +4,12 @@
 	<comment>SQL/DB Commenturations for NHP Web</comment>
 	
 	<entry key="_tbl.comment">nhp_comment</entry>
-	<entry key="_tbl.comment.key.where">comment_id=@{comment_id} AND token=@{token} AND target_id=@{target_id}</entry>
+	<entry key="_col.comment.key.where">comment_id=@{comment_id} AND token=@{token} AND target_id=@{target_id}</entry>
 	<entry key="_cols.comment.select"><![CDATA[comment_id, account_name, CONVERT(content USING utf8) AS content ,target_id ,token ,created ,updated ,status ,approved_by, updated_by ,parent_comment_id ,total_likes  ]]></entry>
 	<entry key="_cols.comment.insert"><![CDATA[(comment_id, account_name, content ,target_id ,token ,created ,updated ,status ,parent_comment_id) VALUES (@{comment_id}, @{account_name}, @{content} ,@{target_id} ,@{token} ,NOW() ,NOW() ,@{status} ,@{parent_comment_id})]]></entry>
 	<entry key="_cols.comment.update"><![CDATA[content=@{content} ,updated=NOW() ,updated_by=@{updated_by}]]></entry>
 	<entry key="_cols.comment.update.approve"><![CDATA[status=@{status} ,updated=NOW() ,approved_by=@{approved_by}]]></entry>
-
+	
 	<entry key="sql.getComment"><![CDATA[
         SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE ${_col.comment.key.where}
     ]]></entry>
@@ -33,5 +33,29 @@
     ]]></entry>
     <entry key="sql.getNumberOfCommentsByTarget"><![CDATA[
         SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status})
+    ]]></entry>
+    
+    <!-- ********************************* -->
+    <!-- TARGET -->
+    <entry key="_tbl.target">nhp_target</entry>
+    <entry key="_col.target.key.where">target_id=@{target_id}</entry>
+	<entry key="_cols.target.select"><![CDATA[target_id, target, target_url ,created ,comment_number ,token ,info]]></entry>
+	<entry key="_cols.target.insert"><![CDATA[(target_id, target, target_url ,created ,token) VALUES (@{target_id}, @{target}, @{target_url} ,NOW() ,@{token})]]></entry>
+	<entry key="_cols.target.update"><![CDATA[target=@{target} ,target_url=@{target_url} ,comment_number=@{comment_number}, token=@{token}, info=@{info}]]></entry>
+    
+    <entry key="sql.getTargetById"><![CDATA[
+        SELECT ${_cols.target.select} FROM ${_tbl.target} WHERE ${_col.target.key.where}
+    ]]></entry>
+    <entry key="sql.getTargetByTarget"><![CDATA[
+        SELECT ${_cols.target.select} FROM ${_tbl.target} WHERE target=@{target} AND token=@{token}
+    ]]></entry>
+	<entry key="sql.createTarget"><![CDATA[
+        INSERT INTO ${_tbl.target} ${_cols.target.insert} 
+    ]]></entry>
+    <entry key="sql.deleteTarget"><![CDATA[
+        DELETE FROM ${_tbl.target} WHERE ${_col.target.key.where} 
+    ]]></entry>
+	<entry key="sql.updateTarget"><![CDATA[
+        UPDATE ${_tbl.target} SET ${_cols.target.update} WHERE ${_col.target.key.where} 
     ]]></entry>
 </properties>
