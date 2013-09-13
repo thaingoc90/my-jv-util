@@ -15,4 +15,14 @@ public interface ILikeDao {
 
 	public int countLikes(Long targetId, Long commentId);
 
+	public boolean dislike(String accountName, Long targetId, Long commentId);
+
+	public boolean unDislike(String accountName, Long targetId, Long commentId);
+
+	public Map<String, Object> getDislike(String accountName, Long targetId, Long commentId);
+
+	public List<Map<String, Object>> getDislikes(Long targetId, Long commentId);
+
+	public int countDislikes(Long targetId, Long commentId);
+
 }

@@ -1,10 +1,17 @@
 var Comment = {
+	
+	constants : {
+		refreshTime : 60000,
+		taMaxWord : 500,
+		pageRange : 4,
+	},
+		
 	initEvent : function() {
 		Comment.GetComments();
 
 		setInterval(function() {
 			Comment.GetComments();
-		}, 60000);
+		}, Comment.constants.refreshTime);
 
 		$(document).on('click', '.cmt-reply', function() {
 			$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
@@ -20,7 +27,7 @@ var Comment = {
 		});
 
 		$(document).on('keyup', '.cmt-new-post textarea', function(e) {
-			$(".new-post-note >span").text(500 - $(this).val().length);
+			$(".new-post-note >span").text(Comment.constants.taMaxWord - $(this).val().length);
 		});
 
 		$(document).on('focus', '.cmt-new-post textarea', function(e) {
@@ -46,6 +53,16 @@ var Comment = {
 			var cmtEle = $(this).parents('article');
 			var liked = $(this).attr('data-like');
 			Comment.LikeComment(cmtEle, parseInt(liked));
+			Comment.RenderLike(cmtEle);
+		});
+		
+		/**
+		 * Dislike
+		 */
+		$(document).on('click', '.cmt-dislike', function() {
+			var cmtEle = $(this).parents('article');
+			var disliked = $(this).attr('data-dislike');
+			Comment.DislikeComment(cmtEle, parseInt(disliked));
 			Comment.RenderLike(cmtEle);
 		});
 	},
@@ -104,7 +121,7 @@ var Comment = {
 		$('.paging').html('');
 		var result = "";
 		var startPage = 1, endPage = maxPage;
-		var range = 4;
+		var range = Comment.constants.pageRange;
 		var temp = parseInt(range / 2);
 
 		if (maxPage <= 1) {
@@ -188,6 +205,11 @@ var Comment = {
 		var result = this.CountLikesOfComment(comment.comment_id, comment.target_id);
 		var totalLikes = result.totalLikes;
 		var flagUser = result.flagUser;
+		
+		var resultDl = this.CountDislikesOfComment(comment.comment_id, comment.target_id);
+		var totalDislikes = resultDl.totalDislikes;
+		var flagUserDl = resultDl.flagUser;
+		
 		var createdDate = new Date(comment.created);
 		var result = "";
 		result += "<article class='cmt-item clearfix' data-user-name='" + comment.account_name + "'data-comment-id='" + comment.comment_id + "'>";
@@ -210,10 +232,12 @@ var Comment = {
 		result += 				"</span>";
 		result += 			"</span>";
 		result += 			"<span>";
-		result += 				"<a href='javascript:;' class='cmt-dislike'>Dislike</a>";
-		result +=				"<span class='icon-dislike'>";
+		result += 				"<a href='javascript:;' class='cmt-dislike' data-dislike='" + flagUserDl + "'>";
+		result += 					(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		result += 				"</a>";
+		result +=				"<span class='icon-dislike' style='display:" + (totalDislikes > 0 ? "inline'>" : "none'>");
 		result += 					"<img src='" + staticResourceRoot + "/images/icon/dislike-icon.png' /> ";
-		result += 					"<span class='totals-dislike'>2</span>";
+		result += 					"<span class='total-dislikes'>" + totalDislikes + "</span>";
 		result += 				"</span>";
 		result += 			"</span>";
 		result += 			"<span><a href='javascript:;' class='cmt-reply'>Reply</a></span>";
@@ -272,7 +296,42 @@ var Comment = {
 			}
 		});
 	},
-
+	
+	/**
+	 * Update the total likes, icon-like, text(unlike or like).
+	 * 
+	 */
+	RenderLike : function(cmtEle) {
+		var commentId = $(cmtEle).attr('data-comment-id');
+		var targetId = $('section#comment').attr('data-target-id');
+		
+		var result = this.CountLikesOfComment(commentId, targetId);
+		var totalLikes = result.totalLikes;
+		var flagUser = result.flagUser;
+		$(cmtEle).find('.total-likes').text(totalLikes);
+		$(cmtEle).find('.cmt-like').attr("data-like", flagUser);
+		$(cmtEle).find('.cmt-like').text(flagUser == 1 ? "Unlike" : "Like");
+		if (totalLikes > 0) {
+			$(cmtEle).find('.icon-like').css("display", "inline");
+		} else {
+			$(cmtEle).find('.icon-like').css("display", "none");
+		}
+		
+		var resultDl = this.CountDislikesOfComment(commentId, targetId);
+		console.log(resultDl);
+		var totalDislikes = resultDl.totalDislikes;
+		var flagUserDl = resultDl.flagUser;
+		$(cmtEle).find('.total-dislikes').text(totalDislikes);
+		$(cmtEle).find('.cmt-dislike').attr("data-dislike", flagUserDl);
+		$(cmtEle).find('.cmt-dislike').text(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		if (totalDislikes > 0) {
+			$(cmtEle).find('.icon-dislike').css("display", "inline");
+		} else {
+			$(cmtEle).find('.icon-dislike').css("display", "none");
+		}
+	},
+	
+	/*======================== LIKE ==================================*/
 	/**
 	 * Counts the number of like of a comment.
 	 * 
@@ -302,26 +361,6 @@ var Comment = {
 	},
 	
 	/**
-	 * Update the total likes, icon-like, text(unlike or like).
-	 * 
-	 */
-	RenderLike : function(cmtEle) {
-		var commentId = $(cmtEle).attr('data-comment-id');
-		var targetId = $('section#comment').attr('data-target-id');
-		var result = this.CountLikesOfComment(commentId, targetId);
-		var totalLikes = result.totalLikes;
-		var flagUser = result.flagUser;
-		$(cmtEle).find('.total-likes').text(totalLikes);
-		$(cmtEle).find('.cmt-like').attr("data-like", flagUser);
-		$(cmtEle).find('.cmt-like').text(flagUser == 1 ? "Unlike" : "Like");
-		if (totalLikes > 0) {
-			$(cmtEle).find('.icon-like').css("display", "inline");
-		} else {
-			$(cmtEle).find('.icon-like').css("display", "none");
-		}
-	},
-	
-	/**
 	 * Like a comment.
 	 * 
 	 */
@@ -331,6 +370,63 @@ var Comment = {
 		var result = 0;
 		$.ajax({
 			url : '/comment/' + (isUnlike == 1 ? 'unlike' : 'like'),
+			type : 'POST',
+			data : {
+				"targetId" : targetId,
+				"commentId" : commentId,
+			},
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					result = parseInt(data.message);
+				}
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+		return result;
+	},
+	
+	/*======================== DISLIKE ==================================*/
+	/**
+	 * Counts the number of dislike of a comment.
+	 * 
+	 */
+	CountDislikesOfComment : function(commentId, targetId) {
+		var result = new Array();
+		$.ajax({
+			url : '/comment/countDislikes',
+			type : 'POST',
+			async: false,
+			data : {
+				"targetId" : targetId,
+				"commentId" : commentId,
+			},
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					result["totalDislikes"] = parseInt(data.message.totalDislikes);
+					result["flagUser"] = data.message.flagUser;
+				}
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+		return result;
+	},
+	
+	/**
+	 * Dislike a comment.
+	 * 
+	 */
+	DislikeComment : function(cmtEle, isUnDislike) {
+		var commentId = $(cmtEle).attr('data-comment-id');
+		var targetId = $('section#comment').attr('data-target-id');
+		var result = 0;
+		$.ajax({
+			url : '/comment/' + (isUnDislike == 1 ? 'unDislike' : 'dislike'),
 			type : 'POST',
 			data : {
 				"targetId" : targetId,
