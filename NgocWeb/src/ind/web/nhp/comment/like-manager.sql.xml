@@ -23,4 +23,25 @@
     <entry key="sql.countLikes"><![CDATA[
         SELECT COUNT(*) FROM ${_tbl.like} WHERE target_id=@{target_id} AND ((@{ignore_comment}=1 AND comment_id IS NULL) OR (@{ignore_comment}=0 AND comment_id=@{comment_id}))
     ]]></entry>
+    
+    <entry key="_tbl.dislike">nhp_dislike</entry>
+    <entry key="_col.dislike.key.where">account_name=@{account_name} AND target_id=@{target_id} AND comment_id=@{comment_id}</entry>
+	<entry key="_cols.dislike.select"><![CDATA[account_name, target_id, comment_id ,created]]></entry>
+	<entry key="_cols.dislike.insert"><![CDATA[(account_name, target_id, comment_id ,created) VALUES (@{account_name}, @{target_id}, @{comment_id} ,NOW())]]></entry>
+	
+	<entry key="sql.dislike"><![CDATA[
+        INSERT INTO ${_tbl.dislike} ${_cols.dislike.insert} 
+    ]]></entry>
+    <entry key="sql.unDislike"><![CDATA[
+        DELETE FROM ${_tbl.dislike} WHERE ${_col.dislike.key.where} 
+    ]]></entry>
+	<entry key="sql.getDislike"><![CDATA[
+        SELECT ${_cols.dislike.select} FROM ${_tbl.dislike} WHERE ${_col.dislike.key.where}
+    ]]></entry>
+    <entry key="sql.getDislikes"><![CDATA[
+        SELECT ${_cols.dislike.select} FROM ${_tbl.dislike} WHERE target_id=@{target_id} AND ((@{ignore_comment}=1 AND comment_id IS NULL) OR (@{ignore_comment}=0 AND comment_id=@{comment_id}))
+    ]]></entry>
+    <entry key="sql.countDislikes"><![CDATA[
+        SELECT COUNT(*) FROM ${_tbl.dislike} WHERE target_id=@{target_id} AND ((@{ignore_comment}=1 AND comment_id IS NULL) OR (@{ignore_comment}=0 AND comment_id=@{comment_id}))
+    ]]></entry>
 </properties>

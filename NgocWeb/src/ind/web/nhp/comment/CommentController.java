@@ -33,6 +33,10 @@ public class CommentController extends BaseController {
 	@Autowired
 	private ILikeDao likeDao;
 
+	private String getCurrentUser() {
+		return "Ngoc Thai";
+	}
+
 	/**
 	 * Renders comment view.
 	 * 
@@ -200,8 +204,47 @@ public class CommentController extends BaseController {
 		}
 	}
 
-	private String getCurrentUser() {
-		return "Ngoc Thai";
+	@RequestMapping(value = "/comment/countDislikes", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> countDislikes(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = getCurrentUser();
+		int totalDislikes = likeDao.countDislikes(targetId, commentId);
+		Map<String, Object> checkUser = likeDao.getDislike(accountName, targetId, commentId);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("totalDislikes", totalDislikes);
+		result.put("user", checkUser);
+		result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		return createAjaxOk(result);
+	}
+
+	@RequestMapping(value = "/comment/dislike", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> dislike(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = getCurrentUser();
+		boolean result = likeDao.dislike(accountName, targetId, commentId);
+		if (result) {
+			return createAjaxOk(result);
+		} else {
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, result);
+		}
+	}
+
+	@RequestMapping(value = "/comment/unDislike", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> unDislike(@ModelAttribute LikeForm form) {
+		Long targetId = form.getTargetId();
+		Long commentId = form.getCommentId();
+		String accountName = "Ngoc Thai";
+		boolean result = likeDao.unDislike(accountName, targetId, commentId);
+		if (result) {
+			return createAjaxOk(result);
+		} else {
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, result);
+		}
 	}
 
 }
