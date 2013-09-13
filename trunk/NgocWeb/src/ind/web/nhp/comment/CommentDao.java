@@ -42,6 +42,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 			Long parentCommentId, int status) {
 		final String sqlKey = "sql.addComment";
 		long commentId = Utils.generateLongId48();
+		parentCommentId = (parentCommentId == 0) ? null : parentCommentId;
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_COMMENT_ID, commentId);
 		params.put(FIELD_ACCOUNT_NAME, accountName);
@@ -137,14 +138,37 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 
 	@Override
 	public List<Map<String, Object>> getChildComments(Long parentCommentId, Long targetId,
-			String token) {
+			String token, Integer status) {
 		final String sqlKey = "sql.getChildComments";
+		int ignoreStatus = status == null ? 1 : 0;
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_PARENT_ID, parentCommentId);
 		params.put(FIELD_TARGET_ID, targetId);
 		params.put(FIELD_TOKEN, token);
+		params.put("ignore_status", ignoreStatus);
+		params.put(FIELD_STATUS, status);
 		try {
 			return executeSelect(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public int getNumberOfChildComments(Long parentCommentId, Long targetId, String token,
+			Integer status) {
+		final String sqlKey = "sql.getNumberOfChildComments";
+		int ignoreStatus = status == null ? 1 : 0;
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_PARENT_ID, parentCommentId);
+		params.put(FIELD_TARGET_ID, targetId);
+		params.put(FIELD_TOKEN, token);
+		params.put("ignore_status", ignoreStatus);
+		params.put(FIELD_STATUS, status);
+		try {
+			return (int) executeCount(sqlKey, params);
 		} catch (SQLException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException();

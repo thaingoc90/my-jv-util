@@ -1,23 +1,34 @@
 var Comment = {
 	
+	/**
+	 * Declares constants.
+	 */
 	constants : {
-		refreshTime : 60000,
+		refreshTime : 300000, // 5m
 		taMaxWord : 500,
 		pageRange : 4,
+		timeagoPeriod: 30000, // 30s
 	},
 		
+	/**
+	 * Init method.
+	 */
 	initEvent : function() {
 		Comment.GetComments();
 
+		/* Refresh comments*/
+		if (Comment.constants.refreshTime > 0) {
+			setInterval(function() {
+				Comment.GetComments();
+			}, Comment.constants.refreshTime);
+		}
+		
+		/* Update timeago */
 		setInterval(function() {
-			Comment.GetComments();
-		}, Comment.constants.refreshTime);
+			$(".timeago").timeago();
+		}, Comment.constants.timeagoPeriod);
 
-		$(document).on('click', '.cmt-reply', function() {
-			$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
-			Comment.setHeightIframe();
-		});
-
+		/* Set enter-key is submit-button*/
 		$(document).on('keydown', '.cmt-new-post textarea', function(e) {
 			if (e.keyCode == 13 && !e.shiftKey) {
 				e.preventDefault();
@@ -26,10 +37,12 @@ var Comment = {
 			Comment.setHeightIframe();
 		});
 
+		/*  Counts remain character*/
 		$(document).on('keyup', '.cmt-new-post textarea', function(e) {
 			$(".new-post-note >span").text(Comment.constants.taMaxWord - $(this).val().length);
 		});
 
+		/* Hide/Show remain character*/
 		$(document).on('focus', '.cmt-new-post textarea', function(e) {
 			$(".new-post-note").show();
 		});
@@ -37,30 +50,48 @@ var Comment = {
 		$(document).on('blur', '.cmt-new-post textarea', function(e) {
 			$(".new-post-note").hide();
 		});
+		
+		$(document).on('focus', '.reply-post-message textarea', function(e) {
+			$(this).parents('.reply-post-body').find('.reply-post-note').show();
+		});
 
-		/**
-		 * Processing paging
-		 */
+		$(document).on('blur', '.reply-post-message textarea', function(e) {
+			$(this).parents('.reply-post-body').find('.reply-post-note').hide();
+		});
+
+		/* Click reply*/
+		$(document).on('click', '.cmt-reply', function() {
+			$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
+			Comment.GetChildComments(this);
+			Comment.setHeightIframe();
+		});
+		
+		/* Reply comment*/
+		$(document).on('keydown', '.cmt-reply-post textarea', function(e) {
+			if (e.keyCode == 13 && !e.shiftKey) {
+				e.preventDefault();
+				Comment.ReplyComment(this);
+			}
+			Comment.setHeightIframe();
+		});
+		
+		/* Processing paging */
 		$(document).on('click', '.paging a', function() {
 			var page = $(this).attr('data-p');
 			Comment.Paging(page);
 		});
 		
-		/**
-		 * Like
-		 */
+		/* Like */
 		$(document).on('click', '.cmt-like', function() {
-			var cmtEle = $(this).parents('article');
+			var cmtEle = $(this).closest('.cmt-item');
 			var liked = $(this).attr('data-like');
 			Comment.LikeComment(cmtEle, parseInt(liked));
 			Comment.RenderLike(cmtEle);
 		});
 		
-		/**
-		 * Dislike
-		 */
+		/* Dislike */
 		$(document).on('click', '.cmt-dislike', function() {
-			var cmtEle = $(this).parents('article');
+			var cmtEle = $(this).closest('.cmt-item');
 			var disliked = $(this).attr('data-dislike');
 			Comment.DislikeComment(cmtEle, parseInt(disliked));
 			Comment.RenderLike(cmtEle);
@@ -210,6 +241,8 @@ var Comment = {
 		var totalDislikes = resultDl.totalDislikes;
 		var flagUserDl = resultDl.flagUser;
 		
+		var countChild = this.CountChildComment(comment.comment_id);
+		
 		var createdDate = new Date(comment.created);
 		var result = "";
 		result += "<article class='cmt-item clearfix' data-user-name='" + comment.account_name + "'data-comment-id='" + comment.comment_id + "'>";
@@ -220,7 +253,7 @@ var Comment = {
 		result += 		"<span class='cmt-user-name'>";
 		result += 			"<a href='javascript:;'>" + comment.account_name + "</a> ";
 		result += 		"</span>";
-		result += 		"<span class='cmt-content'>" + comment.content.replace(/\n/g, '<br />'); + "</span>";
+		result += 		"<span class='cmt-content'>" + comment.content.replace(/\n/g, '<br />') + "</span>";
 		result += 		"<div class='cmt-toolbox'>";
 		result += 			"<span>";
 		result += 				"<a href='javascript:;' class='cmt-like' data-like='" + flagUser + "'>";
@@ -240,13 +273,19 @@ var Comment = {
 		result += 					"<span class='total-dislikes'>" + totalDislikes + "</span>";
 		result += 				"</span>";
 		result += 			"</span>";
-		result += 			"<span><a href='javascript:;' class='cmt-reply'>Reply</a></span>";
+		result += 			"<span>";
+		result +=				"<a href='javascript:;' class='cmt-reply'>";
+		result +=					"Reply <span>" + (countChild > 0 ? ("(" + countChild + ")") : "") + "</span>"; 
+		result +=				"</a>";
+		result +=			"</span>";
 		result += 			"<span class='cmt-time timeago' title='" + createdDate.toISOString() + "'>" 
 								+ createdDate.format("dd-mm-yyyy 'at' HH:MM") + "</span>";
 		result += 		"</div>";
 		result += 	"</div>";
 		result += 	"<div class='clear'></div>";
 		result += 	"<div class='cmt-reply-post'>";
+		result += 		"<div class='reply-post-list'>";
+		result +=		"</div>";
 		result += 		"<div class='reply-post-avatar'>";
 		result += 			"<img src='" + staticResourceRoot + "/images/icon/avatar-default.jpg'/>";
 		result += 		"</div>";
@@ -285,7 +324,8 @@ var Comment = {
 			success : function(data) {
 				if (data.status == 200) {
 					$('#frm-new-post textarea').val('');
-					Comment.GetComments(1);
+					$('section#comment').attr('data-page', 1);
+					Comment.GetComments();
 					Comment.showSuccessPostCmt(data.message);
 				} else {
 					Comment.showErrorPostCmt(data.message);
@@ -297,6 +337,154 @@ var Comment = {
 		});
 	},
 	
+	/** Counts the number of comment's child. */
+	CountChildComment : function(parentCommentId) {
+		var targetId = $('section#comment').attr('data-target-id');
+		var token = $('section#comment').attr('data-token');
+		var result = 0;
+		$.ajax({
+			url : '/comment/countChildComment',
+			type : 'POST',
+			data : {
+				"targetId" : targetId,
+				"token" : token,
+				"parentCommentId" : parentCommentId,
+			},
+			async: false,
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					result = parseInt(data.message);
+				} 
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+		return result;
+	},
+	
+	/* Gets list of child comments*/
+	GetChildComments : function(ele) {
+		var targetId = $('section#comment').attr('data-target-id');
+		var token = $('section#comment').attr('data-token');
+		var parentCommentId = $(ele).parents('article').attr('data-comment-id');
+		$.ajax({
+			url : '/comment/getChildComments',
+			type : 'POST',
+			data : {
+				"targetId" : targetId,
+				"token" : token,
+				"parentCommentId" : parentCommentId,
+			},
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					var numChildCmts = data.message.numChildComments;
+					var htmlCount = numChildCmts > 0 ? ("(" + numChildCmts + ")") : "";
+					$(ele).find('span').html(htmlCount);
+					$(ele).parents('article').find('.reply-post-list').html('');
+					var listChildCmts = data.message.listChildComments;
+					if (listChildCmts == null || listChildCmts.length == 0) {
+						return;
+					}
+					for ( var i = listChildCmts.length - 1; i >= 0; i--) {
+						var result = Comment.RenderChildComment(listChildCmts[i]);
+						$(ele).parents('article').find('.reply-post-list').append(result);
+					}
+					$(".timeago").timeago();
+					Comment.setHeightIframe();
+				} 
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+	}, 
+	
+	/** Render comment's child */
+	RenderChildComment : function(comment) {
+		var result = this.CountLikesOfComment(comment.comment_id, comment.target_id);
+		var totalLikes = result.totalLikes;
+		var flagUser = result.flagUser;
+		
+		var resultDl = this.CountDislikesOfComment(comment.comment_id, comment.target_id);
+		var totalDislikes = resultDl.totalDislikes;
+		var flagUserDl = resultDl.flagUser;
+		
+		var createdDate = new Date(comment.created);
+		var result = "";
+		result += 	"<div class='cmt-item clearfix' data-user-name='" + comment.account_name + "'data-comment-id='" + comment.comment_id + "'>";
+		result += 		"<div class='reply-post-avatar'>";
+		result += 			"<img src='" + staticResourceRoot + "/images/icon/avatar-default.jpg'/>";
+		result += 		"</div>";
+		result += 		"<div class='reply-post-body'>";
+		result += 			"<span class='cmt-user-name'>";
+		result += 				"<a href='javascript:;'>" + comment.account_name + "</a> ";
+		result += 			"</span>";	
+		result += 			"<span class='cmt-content'>" + comment.content.replace(/\n/g, '<br />') + "</span>";
+		result += 			"<div class='cmt-toolbox'>";
+		result += 				"<span>";
+		result += 					"<a href='javascript:;' class='cmt-like' data-like='" + flagUser + "'>";
+		result += 						(flagUser == 1 ? "Unlike" : "Like");
+		result += 					"</a>";
+		result +=					"<span class='icon-like' style='display:" + (totalLikes > 0 ? "inline'>" : "none'>");
+		result += 						"<img src='" + staticResourceRoot + "/images/icon/like-icon.png' />";
+		result += 						"<span class='total-likes'>" + totalLikes + "</span>";
+		result += 					"</span>";
+		result += 				"</span>";
+		result += 				"<span>";
+		result += 					"<a href='javascript:;' class='cmt-dislike' data-dislike='" + flagUserDl + "'>";
+		result += 						(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		result += 					"</a>";
+		result +=					"<span class='icon-dislike' style='display:" + (totalDislikes > 0 ? "inline'>" : "none'>");
+		result += 						"<img src='" + staticResourceRoot + "/images/icon/dislike-icon.png' /> ";
+		result += 						"<span class='total-dislikes'>" + totalDislikes + "</span>";
+		result +=					"</span>";
+		result +=				"</span>";
+		result +=				"<span class='cmt-time timeago' title='" + createdDate.toISOString() + "'>"; 
+		result +=			"</div>";
+		result +=		"</div>";
+		result +=	"</div>";
+		return result;
+	},
+	
+	/** Reply a comment */
+	ReplyComment : function(ele) {
+		var targetId = $('section#comment').attr('data-target-id');
+		var token = $('section#comment').attr('data-token');
+		var parentCommentId = $(ele).parents('article').attr('data-comment-id');
+		var content = $(ele).val();
+		if (isBlank(content)) {
+			return;
+		}
+		$.ajax({
+			url : '/comment/post',
+			type : 'POST',
+			data : {
+				"targetId" : targetId,
+				"token" : token,
+				"parentCommentId": parentCommentId,
+				"content" : content,
+			},
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					$(ele).val('');
+					var replyEle = $(ele).parents('article').find('.cmt-reply');
+					Comment.GetChildComments(replyEle);
+					Comment.showSuccessPostCmt(data.message);
+				} else {
+					Comment.showErrorPostCmt(data.message);
+				}
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+	},
+	
+	/*======================== LIKE ==================================*/	
 	/**
 	 * Update the total likes, icon-like, text(unlike or like).
 	 * 
@@ -331,7 +519,6 @@ var Comment = {
 		}
 	},
 	
-	/*======================== LIKE ==================================*/
 	/**
 	 * Counts the number of like of a comment.
 	 * 

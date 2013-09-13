@@ -107,8 +107,9 @@ public class CommentController extends BaseController {
 		String token = form.getToken();
 		Long targetId = form.getTargetId();
 		String accountName = getCurrentUser();
+		Long parentCommentId = form.getParentCommentId();
 		try {
-			cmDao.addComment(accountName, form.getContent(), targetId, token, null,
+			cmDao.addComment(accountName, form.getContent(), targetId, token, parentCommentId,
 					CommentConstants.COMMENT_STATUS_VALID);
 		} catch (Exception e) {
 			msg = "Error while posting.";
@@ -161,6 +162,52 @@ public class CommentController extends BaseController {
 		return createAjaxOk(result);
 	}
 
+	@RequestMapping(value = "/comment/countChildComment", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> countChildComment(@ModelAttribute CommentForm form) {
+		int result = 0;
+		String token = form.getToken();
+		Long targetId = form.getTargetId();
+		Long parentCommentId = form.getParentCommentId();
+		try {
+			result = cmDao.getNumberOfChildComments(parentCommentId, targetId, token,
+					CommentConstants.COMMENT_STATUS_VALID);
+		} catch (Exception e) {
+			String msg = "Error while processing.";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
+		return createAjaxOk(result);
+	}
+
+	@RequestMapping(value = "/comment/getChildComments", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getChildComments(@ModelAttribute CommentForm form) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String token = form.getToken();
+		Long targetId = form.getTargetId();
+		Long parentCommentId = form.getParentCommentId();
+		try {
+			int rows = cmDao.getNumberOfChildComments(parentCommentId, targetId, token,
+					CommentConstants.COMMENT_STATUS_VALID);
+			List<Map<String, Object>> listChildsCmt = cmDao.getChildComments(parentCommentId,
+					targetId, token, CommentConstants.COMMENT_STATUS_VALID);
+			result.put("numChildComments", rows);
+			result.put("listChildComments", listChildsCmt);
+		} catch (Exception e) {
+			String msg = "Error while processing.";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
+		return createAjaxOk(result);
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/* --------------------------- LIKE ----------------------------------------- */
+	/**
+	 * Counts the number of like. And check current-user liked or not?
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/countLikes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> countLikes(@ModelAttribute LikeForm form) {
@@ -176,6 +223,12 @@ public class CommentController extends BaseController {
 		return createAjaxOk(result);
 	}
 
+	/**
+	 * Like comment.
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/like", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> like(@ModelAttribute LikeForm form) {
@@ -190,6 +243,12 @@ public class CommentController extends BaseController {
 		}
 	}
 
+	/**
+	 * Unlike comment.
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/unlike", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> unlike(@ModelAttribute LikeForm form) {
@@ -204,6 +263,12 @@ public class CommentController extends BaseController {
 		}
 	}
 
+	/**
+	 * Counts the number of dislike. And check current-user disliked or not?
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/countDislikes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> countDislikes(@ModelAttribute LikeForm form) {
@@ -219,6 +284,12 @@ public class CommentController extends BaseController {
 		return createAjaxOk(result);
 	}
 
+	/**
+	 * Dislike comment.
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/dislike", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> dislike(@ModelAttribute LikeForm form) {
@@ -233,6 +304,12 @@ public class CommentController extends BaseController {
 		}
 	}
 
+	/**
+	 * Undislike comment.
+	 * 
+	 * @param form
+	 * @return
+	 */
 	@RequestMapping(value = "/comment/unDislike", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> unDislike(@ModelAttribute LikeForm form) {

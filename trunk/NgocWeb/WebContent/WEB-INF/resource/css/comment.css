@@ -49,7 +49,7 @@ section#comment header {
 
 section#comment article {
 	display: block;
-	padding: 8px 20px;
+	padding: 8px 20px 6px;
 	border-top: 1px dotted #CCC;
 }
 
@@ -93,12 +93,16 @@ section#comment article {
 	margin-left: 50px;
 }
 
-.cmt-body .cmt-user-name {
+.cmt-user-name {
 	font-weight: bold;
 	padding-right: 3px;
 }
 
-.cmt-body .cmt-toolbox>span {
+.cmt-toolbox {
+	margin-top: 3px;
+}
+
+.cmt-toolbox>span {
 	display: inline-block;
 	margin-right: 10px;
 	font-size: 12px;
@@ -110,7 +114,7 @@ section#comment article {
 	margin-left: 3px;
 }
 
-.cmt-body .cmt-toolbox .cmt-time {
+.cmt-toolbox .cmt-time {
 	color: gray;
 }
 
@@ -129,8 +133,15 @@ section#comment article {
 }
 
 /*COMMENT - reply post*/
+
+.reply-post-list .reply-post-body {
+	border-bottom: 1px solid #d0d4e4;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+}
+
 .cmt-reply-post {
-	margin: 4px 0px 8px 50px;
+	margin: 4px 0px 0px 50px;
 	padding-top: 4px;
 	border-top: 1px dotted #ccc;
 	display: none;
@@ -157,12 +168,20 @@ section#comment article {
 	font-size: 11.5px;
 }
 
+.reply-post-body>div {
+	min-height: 16px;
+}
+
 .reply-post-message textarea {
 	border: 1px solid #CCC;
 	width: 100%;
 	height: 20px;
 	resize: none;
 	overflow: hidden;
+}
+
+.reply-post-note {
+	display: none;
 }
 
 .reply-post-error {
