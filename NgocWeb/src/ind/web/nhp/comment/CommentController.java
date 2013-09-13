@@ -34,7 +34,7 @@ public class CommentController extends BaseController {
 	private ILikeDao likeDao;
 
 	private String getCurrentUser() {
-		return "Ngoc Thai";
+		return "Ngoc";
 	}
 
 	/**
@@ -62,21 +62,26 @@ public class CommentController extends BaseController {
 			target = url;
 		}
 		Long targetId = null;
-		Map<String, Object> targetObj = cmDao.getTargetByTarget(target, token);
-		if (targetObj == null) {
-			targetId = cmDao.createTarget(target, url, token);
-		} else {
-			targetId = Utils.getValue(targetObj, "target_id", Long.class);
-		}
-
-		if (targetId == null) {
+		int rows = 0;
+		try {
+			Map<String, Object> targetObj = cmDao.getTargetByTarget(target, token);
+			if (targetObj == null) {
+				targetId = cmDao.createTarget(target, url, token);
+			} else {
+				targetId = Utils.getValue(targetObj, "target_id", Long.class);
+			}
+			if (targetId == null) {
+				return VIEW_NAME_ERROR;
+			}
+			rows = cmDao.getNumberOfCommentsByTarget(targetId, token,
+					CommentConstants.COMMENT_STATUS_VALID);
+		} catch (Exception e) {
 			return VIEW_NAME_ERROR;
 		}
 
-		int rows = cmDao.getNumberOfCommentsByTarget(targetId, token,
-				CommentConstants.COMMENT_STATUS_VALID);
 		int maxPage = rows % limit == 0 ? rows / limit : rows / limit + 1;
-
+		String accountName = getCurrentUser();
+		model.addAttribute("isLogin", StringUtils.isEmpty(accountName) ? 0 : 1);
 		model.addAttribute("url", url);
 		model.addAttribute("limit", limit);
 		model.addAttribute("token", token);
@@ -86,6 +91,18 @@ public class CommentController extends BaseController {
 		model.addAttribute("curPage", page);
 
 		return VIEW_NAME;
+	}
+
+	/**
+	 * Checks user logged?
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/comment/checkLogin", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> checkLogin() {
+		String accountName = getCurrentUser();
+		return createAjaxOk(StringUtils.isEmpty(accountName) ? 0 : 1);
 	}
 
 	/**
@@ -156,7 +173,7 @@ public class CommentController extends BaseController {
 			result.put("maxPage", maxPage);
 			result.put("listComments", listComments);
 		} catch (Exception e) {
-			msg = "Error while posting.";
+			msg = "Error while processing.";
 			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
 		}
 		return createAjaxOk(result);
@@ -214,12 +231,17 @@ public class CommentController extends BaseController {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
 		String accountName = getCurrentUser();
-		int totalLikes = likeDao.countLikes(targetId, commentId);
-		Map<String, Object> checkUser = likeDao.getLike(accountName, targetId, commentId);
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("totalLikes", totalLikes);
-		result.put("user", checkUser);
-		result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		try {
+			int totalLikes = likeDao.countLikes(targetId, commentId);
+			Map<String, Object> checkUser = likeDao.getLike(accountName, targetId, commentId);
+			result.put("totalLikes", totalLikes);
+			result.put("user", checkUser);
+			result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		} catch (Exception e) {
+			String msg = "Error while processing.";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
 		return createAjaxOk(result);
 	}
 
@@ -275,12 +297,17 @@ public class CommentController extends BaseController {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
 		String accountName = getCurrentUser();
-		int totalDislikes = likeDao.countDislikes(targetId, commentId);
-		Map<String, Object> checkUser = likeDao.getDislike(accountName, targetId, commentId);
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("totalDislikes", totalDislikes);
-		result.put("user", checkUser);
-		result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		try {
+			int totalDislikes = likeDao.countDislikes(targetId, commentId);
+			Map<String, Object> checkUser = likeDao.getDislike(accountName, targetId, commentId);
+			result.put("totalDislikes", totalDislikes);
+			result.put("user", checkUser);
+			result.put("flagUser", checkUser != null && checkUser.size() > 0 ? 1 : 0);
+		} catch (Exception e) {
+			String msg = "Error while processing.";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
 		return createAjaxOk(result);
 	}
 
@@ -323,5 +350,4 @@ public class CommentController extends BaseController {
 			return createAjaxResult(Constants.AJAX_STATUS_ERROR, result);
 		}
 	}
-
 }

@@ -23,7 +23,7 @@
 		</div>
 		<div class="cmt-list">
 		</div>
-		<div class="cmt-new-post">
+		<div class="cmt-new-post" style="display: <#if isLogin &gt; 0> block <#else> none</#if>">
 			<form action="" id="frm-new-post">
 				<div class="new-post-avatar">
 					<img src="${staticResourceRoot}/images/icon/avatar-default.jpg"/>
@@ -33,11 +33,20 @@
 						<textarea placeholder="Write a comment ..." maxlength="500" onkeyup="textAreaAdjust(this)" ></textarea>
 					</div>
 					<div style="min-height: 16px;">
-						<span class="new-post-note">Remaining characters: <span>500<span></span>
-						<span class="new-post-error">Bạn chưa đăng nhập.</span>
-						<span class="new-post-success">Thành công.</span>
+						<a class="logout-link" href="javascript:;"> Use another account</a>
+						<span class="new-post-note">Remaining characters: <span>500</span></span>
+						<span class="new-post-error"></span>
+						<span class="new-post-success"></span>
 					</div>
 				</div>	
+			</form>
+		</div>
+		<div class="cmt-login-form" style="display: <#if isLogin &gt; 0> none <#else> block</#if>">
+			<div class="login-desc">Login to comment</div>
+			<form method="post" onsubmit="return false;">
+				<input type="text" maxlength="32" spellcheck="false" name="account" placeholder="Account">
+				<input type="password" maxlength="32" spellcheck="false" name="password" placeholder="Password">
+				<button type="submit" name="submit">Login</button>
 			</form>
 		</div>
 	</section>

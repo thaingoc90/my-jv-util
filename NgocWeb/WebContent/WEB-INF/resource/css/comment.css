@@ -14,8 +14,8 @@
 html,body {
 	margin: 0px;
 	padding: 0px;
-	font-size: 13px;
-	font-family: Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	font-family: Verdana, Geneva, sans-serif;
 }
 
 body {
@@ -49,10 +49,9 @@ section#comment header {
 
 section#comment article {
 	display: block;
-	padding: 8px 20px 6px;
+	padding: 5px 20px 2px;
 	border-top: 1px dotted #CCC;
 }
-
 
 /*COMMENT - header*/
 .cmt-header {
@@ -79,7 +78,6 @@ section#comment article {
 .cmt-header .paging a {
 	padding: 1px 5px 1px 5px;
 	border: 1px solid #CCC;
-	font-size: 12px;
 }
 
 .cmt-header .paging a:hover {
@@ -93,19 +91,18 @@ section#comment article {
 	margin-left: 50px;
 }
 
+.cmt-user-name,.cmt-content,.cmt-dislike,.cmt-like,.cmt-reply,.cmt-time{
+	line-height: 20px;
+}
+
 .cmt-user-name {
 	font-weight: bold;
 	padding-right: 3px;
 }
 
-.cmt-toolbox {
-	margin-top: 3px;
-}
-
 .cmt-toolbox>span {
 	display: inline-block;
-	margin-right: 10px;
-	font-size: 12px;
+	margin-right: 7px;
 }
 
 .cmt-toolbox img {
@@ -133,7 +130,6 @@ section#comment article {
 }
 
 /*COMMENT - reply post*/
-
 .reply-post-list .reply-post-body {
 	border-bottom: 1px solid #d0d4e4;
 	padding-bottom: 4px;
@@ -154,7 +150,6 @@ section#comment article {
 	height: 25px;
 }
 
-
 .reply-post-avatar img {
 	width: 25px;
 	max-width: 25px;
@@ -165,7 +160,6 @@ section#comment article {
 .reply-post-body {
 	display: block;
 	margin-left: 30px;
-	font-size: 11.5px;
 }
 
 .reply-post-body>div {
@@ -188,6 +182,7 @@ section#comment article {
 	float: right;
 	color: red;
 	font-weight: bold;
+	display: none;
 }
 
 .reply-post-success {
@@ -195,11 +190,12 @@ section#comment article {
 	float: right;
 	color: #009900;
 	font-weight: bold;
+	display: none;
 }
 
 /*COMMENT - new post*/
 .cmt-new-post {
-	padding: 8px 20px;
+	padding: 5px 20px 2px;
 	border-bottom: 1px dotted #CCC;
 	border-top: 1px dotted #CCC;
 }
@@ -221,7 +217,6 @@ section#comment article {
 .new-post-body {
 	display: block;
 	margin-left: 50px;
-	font-size: 11.5px;
 }
 
 .new-post-message textarea {
@@ -250,7 +245,46 @@ section#comment article {
 	display: none;
 }
 
-.new-post-note>span, .reply-post-note>span {
+.new-post-note>span,.reply-post-note>span {
 	font-weight: bold;
+}
+
+/* COMMENT-LOGIN-BOX */
+.cmt-login-form {
+	padding: 5px 20px 8px;
+	border-bottom: 1px dotted #CCC;
+	border-top: 1px dotted #CCC;
+}
+
+.cmt-login-form input {
+	height: 18px;
+	margin-right: 5px;
+	padding: 2px 2px 2px 5px;
+	border: 1px solid #CCC;
+}
+
+.cmt-login-form form button {
+	cursor: pointer;
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	font-weight: bold;
+	text-align: center;
+	padding: 2px 10px;
+	background-color: #009900;
+	border: 1px solid #5BA020;
+}
+
+.login-desc {
+	font-size: 11.5px;
+	line-height: 20px;
+	margin-bottom: 3px;
+	font-weight: bold;
+}
+
+.login-required {
+	color: red;
+	height: 20px;
 }
 /*END - COMMENT*/
