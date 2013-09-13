@@ -2,6 +2,7 @@ package ind.web.nhp.comment;
 
 import ind.web.nhp.base.BaseController;
 import ind.web.nhp.base.Constants;
+import ind.web.nhp.utils.JsonUtils;
 import ind.web.nhp.utils.Utils;
 
 import java.util.HashMap;
@@ -56,7 +57,9 @@ public class CommentController extends BaseController {
 		int page = Utils.toInt(request.getParameter("page"));
 		page = page > 0 ? page : 1;
 
-		// TODO: Check token.
+		if (!checkToken(token, url)) {
+			return VIEW_NAME_ERROR;
+		}
 
 		if (StringUtils.isBlank(target)) {
 			target = url;
@@ -68,7 +71,7 @@ public class CommentController extends BaseController {
 			if (targetObj == null) {
 				targetId = cmDao.createTarget(target, url, token);
 			} else {
-				targetId = Utils.getValue(targetObj, "target_id", Long.class);
+				targetId = Utils.getValue(targetObj, CommentDao.FIELD_TARGET_ID, Long.class);
 			}
 			if (targetId == null) {
 				return VIEW_NAME_ERROR;
@@ -125,9 +128,16 @@ public class CommentController extends BaseController {
 		Long targetId = form.getTargetId();
 		String accountName = getCurrentUser();
 		Long parentCommentId = form.getParentCommentId();
+		String content = form.getContent();
 		try {
-			cmDao.addComment(accountName, form.getContent(), targetId, token, parentCommentId,
-					CommentConstants.COMMENT_STATUS_VALID);
+			Map<String, Object> tokenInfo = cmDao.getToken(token);
+			int cmtType = Utils.getInt(tokenInfo, CommentDao.FIELD_COMMENT_TYPE);
+			int status = CommentConstants.COMMENT_STATUS_VALID;
+			if (cmtType == CommentConstants.COMMENT_TYPE_CHECK) {
+				status = CommentConstants.COMMENT_STATUS_NOT_CHECKED;
+				msg = "Please, wait for aprroval.";
+			}
+			cmDao.addComment(accountName, content, targetId, token, parentCommentId, status);
 		} catch (Exception e) {
 			msg = "Error while posting.";
 			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
@@ -135,9 +145,35 @@ public class CommentController extends BaseController {
 		return createAjaxOk(msg);
 	}
 
+	/* ---- PRIVATE FUNCTION ------- */
+
 	private boolean validateForm(CommentForm form) {
 		return true;
 	}
+
+	@SuppressWarnings("unchecked")
+	private boolean checkToken(String token, String url) {
+		Map<String, Object> tokenInfo = cmDao.getToken(token);
+		if (tokenInfo == null) {
+			return false;
+		}
+		String targetDomainsObj = Utils.getString(tokenInfo, CommentDao.FIELD_TARGET_DOMAINS);
+		List<String> targetDomains = JsonUtils.fromJson(targetDomainsObj, List.class);
+		url = getDomain(url);
+		return targetDomains.contains(url);
+	}
+
+	private String getDomain(String url) {
+		int index = url.indexOf("?");
+		url = (index != -1) ? url.substring(0, index) : url;
+		index = url.indexOf("://");
+		url = (index != -1) ? url.substring(index + 3) : url;
+		index = url.indexOf("/");
+		url = (index != -1) ? url.substring(0, index) : url;
+		return url;
+	}
+
+	/* ---- END PRIVATE FUNCTION ---- */
 
 	/**
 	 * Gets list comments of a target.
@@ -276,7 +312,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> unlike(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = "Ngoc Thai";
+		String accountName = getCurrentUser();
 		boolean result = likeDao.unlike(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);
@@ -342,7 +378,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> unDislike(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = "Ngoc Thai";
+		String accountName = getCurrentUser();
 		boolean result = likeDao.unDislike(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);

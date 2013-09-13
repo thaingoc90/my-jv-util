@@ -45,4 +45,18 @@ public interface ICommentDao {
 	public Map<String, Object> getTargetById(Long targetId);
 
 	public Map<String, Object> getTargetByTarget(String target, String token);
+	
+	/* ============================================= */
+	/* ============== TOKEN ======================== */
+	/* ============================================= */
+	
+	public String createToken(String token, String cmtType, String targetDomains);
+
+	public boolean deleteToken(String token);
+
+	public String updateToken(String token, String cmtType, String targetDomains);
+	
+	public Map<String, Object> getToken(String token);
+	
+	public List<Map<String, Object>> getAllTokens();
 }

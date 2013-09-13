@@ -77,6 +77,9 @@ var CommentPlugin = {
 		return url;
 	},
 	
+	/**
+	 * Gets an attribute of element, return defaultValue if not exist.
+	 */
 	getAttribute : function(ele, attr, dv) {
 		if ($(ele).attr(attr) !== undefined) {
 			return $(ele).attr(attr);
@@ -85,6 +88,9 @@ var CommentPlugin = {
 		}
 	},
 	
+	/**
+	 * Gets message from iframe & setHeight auto. 
+	 */
 	getMessage: function(event) {
 		content = jQuery.parseJSON(event.data);
 		if (content.action == "setHeight") {
@@ -104,11 +110,21 @@ var CommentPlugin = {
 var initCommentPlugin = function() {
 	CommentPlugin.loadLibrary();
 	$(document).ready(function() {
-		// TODO: CHECK LIB
-		setTimeout(function() {
-			CommentPlugin.init();
-		}, 200);
+		checkLibAndInit();
 	});
+};
+
+/**
+ * Check the libs & initiate if having
+ */
+var checkLibAndInit = function() {
+	setTimeout(function() {
+		if ($.base64 != undefined) {
+			CommentPlugin.init();
+		} else {
+			checkLibAndInit();
+		}
+	}, 100);
 };
 
 /**
