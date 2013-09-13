@@ -45,10 +45,12 @@ var Comment = {
 		/* Hide/Show remain character*/
 		$(document).on('focus', '.cmt-new-post textarea', function(e) {
 			$(".new-post-note").show();
+			$(".logout-link").hide();
 		});
 
 		$(document).on('blur', '.cmt-new-post textarea', function(e) {
 			$(".new-post-note").hide();
+			$(".logout-link").show();
 		});
 		
 		$(document).on('focus', '.reply-post-message textarea', function(e) {
@@ -61,9 +63,12 @@ var Comment = {
 
 		/* Click reply*/
 		$(document).on('click', '.cmt-reply', function() {
-			$(this).parents('.cmt-body').siblings('.cmt-reply-post').toggle();
-			Comment.GetChildComments(this);
-			Comment.setHeightIframe();
+			var repleEle = $(this).parents('.cmt-body').siblings('.cmt-reply-post');
+			$(repleEle).toggle();
+			if (!($(repleEle).css("display") == "none")) {
+				Comment.RenderReplyComment(this);
+				Comment.setHeightIframe();
+			}
 		});
 		
 		/* Reply comment*/
@@ -116,6 +121,61 @@ var Comment = {
 		}, 4000);
 	},
 
+	showErrorReplyCmt : function(msg) {
+		var msgEle = $(ele).parents('.reply-post-body').find('.reply-post-error');
+		$(msgEle).html(msg);
+		$(msgEle).show();
+		setTimeout(function() {
+			$(msgEle).fadeOut("slow");
+			$(msgEle).html('');
+		}, 4000);
+	},
+	
+	showSuccessReplyCmt : function(ele, msg) {
+		var msgEle = $(ele).parents('.reply-post-body').find('.reply-post-success');
+		$(msgEle).html(msg);
+		$(msgEle).show();
+		setTimeout(function() {
+			$(msgEle).fadeOut("slow");
+			$(msgEle).html('');
+		}, 4000);
+	},
+	
+	/**
+	 * Checks user who login or not?
+	 */
+	CheckLogin : function () {
+		var result = 0;
+		$.ajax({
+			url : '/comment/checkLogin',
+			type : 'POST',
+			data : {},
+			async: false,
+			dataType : 'json',
+			success : function(data) {
+				if (data.status == 200) {
+					result = parseInt(data.message);
+				} 
+			},
+			error : function(content) {
+				console.log("error");
+			}
+		});
+		return result;
+	},
+	
+	/**If not loging, show login-box*/
+	RenderLoginForm : function() {
+		var isLogin = this.CheckLogin();
+		if (isLogin > 0) {
+			$('.cmt-new-post').show();
+			$('.cmt-login-form').hide();
+		} else {
+			$('.cmt-new-post').hide();
+			$('.cmt-login-form').show();
+		}
+	},
+	
 	/**
 	 * Processes the paging
 	 */
@@ -217,6 +277,7 @@ var Comment = {
 						$('.cmt-list').append(result);
 					}
 					$(".timeago").timeago();
+					Comment.RenderLoginForm();
 					Comment.RenderPaging();
 					Comment.setHeightIframe();
 				} else {
@@ -266,7 +327,7 @@ var Comment = {
 		result += 			"</span>";
 		result += 			"<span>";
 		result += 				"<a href='javascript:;' class='cmt-dislike' data-dislike='" + flagUserDl + "'>";
-		result += 					(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		result += 					(flagUserDl == 1 ? "Undislike" : "Dislike");
 		result += 				"</a>";
 		result +=				"<span class='icon-dislike' style='display:" + (totalDislikes > 0 ? "inline'>" : "none'>");
 		result += 					"<img src='" + staticResourceRoot + "/images/icon/dislike-icon.png' /> ";
@@ -284,21 +345,6 @@ var Comment = {
 		result += 	"</div>";
 		result += 	"<div class='clear'></div>";
 		result += 	"<div class='cmt-reply-post'>";
-		result += 		"<div class='reply-post-list'>";
-		result +=		"</div>";
-		result += 		"<div class='reply-post-avatar'>";
-		result += 			"<img src='" + staticResourceRoot + "/images/icon/avatar-default.jpg'/>";
-		result += 		"</div>";
-		result += 		"<div class='reply-post-body'>";
-		result += 			"<div class='reply-post-message'>";
-		result += 				"<textarea placeholder='Write a comment ...' onkeyup='textAreaAdjust(this)' ></textarea>";
-		result += 			"</div>";
-		result += 			"<div>";
-		result += 				"<span class='reply-post-note'>Remaining characters: <span>500</span></span>";
-		result += 				"<span class='reply-post-error'>Bạn chưa đăng nhập.</span>";
-		result += 				"<span class='reply-post-success'></span>";
-		result += 			"</div>";
-		result += 		"</div>";
 		result += 	"</div>";
 		result += "</article>";
 		return result;
@@ -362,6 +408,35 @@ var Comment = {
 			}
 		});
 		return result;
+	},
+	
+	/**Render reply-div*/
+	RenderReplyComment : function(ele) {
+		var isLogin = this.CheckLogin();
+		$(ele).parents('article').find('.cmt-reply-post').html('');
+		var result = "";
+		result += 		"<div class='reply-post-list'> </div>";
+		if (isLogin == 0) {
+			result += 	"<div class='login-required'>Login to reply</div>";
+		} else {
+			result +=	"<div class='reply-post-content'>";
+			result += 		"<div class='reply-post-avatar'>";
+			result += 			"<img src='" + staticResourceRoot + "/images/icon/avatar-default.jpg'/>";
+			result += 		"</div>";
+			result += 		"<div class='reply-post-body'>";
+			result += 			"<div class='reply-post-message'>";
+			result += 				"<textarea placeholder='Write a comment ...' onkeyup='textAreaAdjust(this)' ></textarea>";
+			result += 			"</div>";
+			result += 			"<div>";
+			result += 				"<span class='reply-post-note'>Remaining characters: <span>500</span></span>";
+			result += 				"<span class='reply-post-error'></span>";
+			result += 				"<span class='reply-post-success'></span>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 	"</div>";
+		}
+		$(ele).parents('article').find('.cmt-reply-post').html(result);
+		this.GetChildComments(ele);
 	},
 	
 	/* Gets list of child comments*/
@@ -435,7 +510,7 @@ var Comment = {
 		result += 				"</span>";
 		result += 				"<span>";
 		result += 					"<a href='javascript:;' class='cmt-dislike' data-dislike='" + flagUserDl + "'>";
-		result += 						(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		result += 						(flagUserDl == 1 ? "Undislike" : "Dislike");
 		result += 					"</a>";
 		result +=					"<span class='icon-dislike' style='display:" + (totalDislikes > 0 ? "inline'>" : "none'>");
 		result += 						"<img src='" + staticResourceRoot + "/images/icon/dislike-icon.png' /> ";
@@ -472,10 +547,10 @@ var Comment = {
 				if (data.status == 200) {
 					$(ele).val('');
 					var replyEle = $(ele).parents('article').find('.cmt-reply');
-					Comment.GetChildComments(replyEle);
-					Comment.showSuccessPostCmt(data.message);
+					Comment.RenderReplyComment(replyEle);
+					Comment.showSuccessReplyCmt(ele, data.message);
 				} else {
-					Comment.showErrorPostCmt(data.message);
+					Comment.showErrorReplyCmt(ele, data.message);
 				}
 			},
 			error : function(content) {
@@ -506,12 +581,11 @@ var Comment = {
 		}
 		
 		var resultDl = this.CountDislikesOfComment(commentId, targetId);
-		console.log(resultDl);
 		var totalDislikes = resultDl.totalDislikes;
 		var flagUserDl = resultDl.flagUser;
 		$(cmtEle).find('.total-dislikes').text(totalDislikes);
 		$(cmtEle).find('.cmt-dislike').attr("data-dislike", flagUserDl);
-		$(cmtEle).find('.cmt-dislike').text(flagUserDl == 1 ? "UnDislike" : "Dislike");
+		$(cmtEle).find('.cmt-dislike').text(flagUserDl == 1 ? "Undislike" : "Dislike");
 		if (totalDislikes > 0) {
 			$(cmtEle).find('.icon-dislike').css("display", "inline");
 		} else {
