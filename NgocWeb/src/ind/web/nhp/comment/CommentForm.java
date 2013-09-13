@@ -3,7 +3,7 @@ package ind.web.nhp.comment;
 public class CommentForm {
 
 	private String token, content;
-	private long targetId;
+	private long targetId, parentCommentId;
 	int limit, page;
 
 	public String getToken() {
@@ -44,6 +44,14 @@ public class CommentForm {
 
 	public void setPage(int page) {
 		this.page = page;
+	}
+
+	public long getParentCommentId() {
+		return parentCommentId;
+	}
+
+	public void setParentCommentId(long parentCommentId) {
+		this.parentCommentId = parentCommentId;
 	}
 
 }

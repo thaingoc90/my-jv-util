@@ -26,13 +26,16 @@
         UPDATE ${_tbl.comment} SET ${_cols.comment.update.approve} WHERE ${_col.comment.key.where} 
     ]]></entry>
     <entry key="sql.getChildComments"><![CDATA[
-        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE parent_comment_id=@{parent_comment_id} AND token=@{token} AND target_id=@{target_id} ORDER BY created DESC
+        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE parent_comment_id=@{parent_comment_id} AND token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC
+    ]]></entry>
+    <entry key="sql.getNumberOfChildComments"><![CDATA[
+        SELECT COUNT(*) FROM ${_tbl.comment} WHERE parent_comment_id=@{parent_comment_id} AND token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status})
     ]]></entry>
     <entry key="sql.getCommentsByTarget"><![CDATA[
-        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
+        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND parent_comment_id IS NULL AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
     ]]></entry>
     <entry key="sql.getNumberOfCommentsByTarget"><![CDATA[
-        SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status})
+        SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND parent_comment_id IS NULL AND (@{ignore_status} OR status=@{status})
     ]]></entry>
     
     <!-- ********************************* -->

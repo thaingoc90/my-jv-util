@@ -5,6 +5,9 @@ import java.util.Map;
 
 public interface ICommentDao {
 
+	/* ============================================= */
+	/* ============== COMMENT ======================= */
+	/* ============================================= */
 	public Long addComment(String accountName, String content, Long targetId, String token,
 			Long parentCommentId, int status);
 
@@ -19,13 +22,19 @@ public interface ICommentDao {
 	public Map<String, Object> getComment(Long commentId, Long targetId, String token);
 
 	public List<Map<String, Object>> getChildComments(Long parentCommentId, Long targetId,
-			String token);
+			String token, Integer status);
+
+	public int getNumberOfChildComments(Long parentCommentId, Long targetId, String token,
+			Integer status);
 
 	public List<Map<String, Object>> getCommentsByTarget(Long targetId, String token,
 			Integer status, Integer page, Integer pageSize);
 
 	public int getNumberOfCommentsByTarget(Long targetId, String token, Integer status);
 
+	/* ============================================= */
+	/* ============== TARGET ======================= */
+	/* ============================================= */
 	public Long createTarget(String target, String targetUrl, String token);
 
 	public boolean deleteTarget(Long targetId);
