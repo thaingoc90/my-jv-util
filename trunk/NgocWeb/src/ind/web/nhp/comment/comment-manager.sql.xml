@@ -74,7 +74,7 @@
         SELECT ${_cols.token.select} FROM ${_tbl.token} WHERE ${_col.token.key.where}
     ]]></entry>
     <entry key="sql.getAllTokens"><![CDATA[
-        SELECT ${_cols.token.select} FROM ${_tbl.token} ORDER BY created DESC
+        SELECT ${_cols.token.select} FROM ${_tbl.token} ORDER BY created
     ]]></entry>
 	<entry key="sql.createToken"><![CDATA[
         INSERT INTO ${_tbl.token} ${_cols.token.insert} 

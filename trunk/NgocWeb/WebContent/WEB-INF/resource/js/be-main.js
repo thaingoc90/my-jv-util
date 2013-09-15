@@ -14,13 +14,13 @@ function toLink(link) {
 	document.location.href = link;
 }
 
-$('.modal-delete-open').bind('click', function() {
+$(document).on('click', '.modal-delete-open', function() {
 	var link = $(this).attr("data-href");
 	$('#deleteModal .modal-footer a').attr("href", link);
 });
 
 /* USERS */
-$('.modal-edit-user').bind('click', function() {
+$(document).on('click', '.modal-edit-user', function() {
 	var id = $(this).attr("data-id");
 	var grandFather = $(this).parent().parent();
 	var loginName = grandFather.find(".user-login-name").html();
@@ -37,7 +37,7 @@ $('.modal-edit-user').bind('click', function() {
 });
 
 /* GROUPS */
-$('.modal-edit-group').bind('click', function() {
+$(document).on('click', '.modal-edit-group', function() {
 	var id = $(this).attr("data-id");
 	var grandFather = $(this).parent().parent();
 	var name = grandFather.find(".group-name").html();
@@ -123,4 +123,27 @@ $(document).on('click', '.modal-edit-menu', function() {
 	if (!isEmpty(permission)) {
 		$("#editModal #inputPermission").val(permission);
 	}
+});
+
+/* TOKEN */
+$(document).on('click', '.modal-edit-token', function() {
+	var grandFather = $(this).parent().parent();
+	var token = grandFather.find(".token").html();
+	var cmtType = grandFather.find(".comment_type").html();
+	var targetDomainsObj = grandFather.find(".target_domains").html();
+	var targetDomains = $.parseJSON(targetDomainsObj);
+
+	$('#editModal #inputToken').attr('value', token);
+	$('#editModal #inputToken').siblings('span').html(token);
+	$('#editModal #inputCommentType').val('0');
+	$('#editModal #inputCommentType').val(cmtType);
+
+	$('#editModal .target-domains input').attr('value', targetDomains[0]);
+	$('#editModal .delete-domain').click();
+	for ( var i = 1; i < targetDomains.length; i++) {
+		$('#editModal .add-domain').click();
+		var inputObj = $('#editModal .target-domains input')[i];
+		$(inputObj).attr('value', targetDomains[i]);
+	}
+
 });
