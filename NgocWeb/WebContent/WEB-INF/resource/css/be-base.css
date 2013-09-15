@@ -117,3 +117,10 @@ a:hover {
 	margin-left: 145px;
 }
 /* ------- END MODAL ---------- */
+
+/** ------ COMMENT -------------*/
+.target-domains {
+	display: block !important;
+	margin-bottom: 5px !important;
+}
+/** ------ END COMMENT -------------*/

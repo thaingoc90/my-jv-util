@@ -34,10 +34,6 @@ public class CommentController extends BaseController {
 	@Autowired
 	private ILikeDao likeDao;
 
-	private String getCurrentUser() {
-		return "Ngoc";
-	}
-
 	/**
 	 * Renders comment view.
 	 * 
@@ -120,7 +116,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> postComment(@ModelAttribute CommentForm form,
 			HttpServletRequest request) {
 		String msg = "Post successfully.";
-		if (!validateForm(form)) {
+		if (!validateCommentForm(form)) {
 			msg = "Error: input's invalid";
 			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
 		}
@@ -147,7 +143,16 @@ public class CommentController extends BaseController {
 
 	/* ---- PRIVATE FUNCTION ------- */
 
-	private boolean validateForm(CommentForm form) {
+	private String getCurrentUser() {
+		return "Ngoc";
+	}
+
+	private boolean validateCommentForm(CommentForm form) {
+		Long targetId = form.getTargetId();
+		String token = form.getToken();
+		if (targetId == null || targetId == 0 || StringUtils.isEmpty(token)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -187,7 +192,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> getComments(@ModelAttribute CommentForm form,
 			HttpServletRequest request) {
 		String msg = "Gets successfully.";
-		if (!validateForm(form)) {
+		if (!validateCommentForm(form)) {
 			msg = "Error: input's invalid";
 			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
 		}
@@ -218,6 +223,11 @@ public class CommentController extends BaseController {
 	@RequestMapping(value = "/comment/countChildComment", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> countChildComment(@ModelAttribute CommentForm form) {
+		if (!validateCommentForm(form)) {
+			String msg = "Error: input's invalid";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
+
 		int result = 0;
 		String token = form.getToken();
 		Long targetId = form.getTargetId();
@@ -235,6 +245,11 @@ public class CommentController extends BaseController {
 	@RequestMapping(value = "/comment/getChildComments", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getChildComments(@ModelAttribute CommentForm form) {
+		if (!validateCommentForm(form)) {
+			String msg = "Error: input's invalid";
+			return createAjaxResult(Constants.AJAX_STATUS_ERROR, msg);
+		}
+
 		Map<String, Object> result = new HashMap<String, Object>();
 		String token = form.getToken();
 		Long targetId = form.getTargetId();

@@ -313,7 +313,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	/* -------------------------------------------------------------------------------- */
 
 	@Override
-	public String createToken(String token, String cmtType, String targetDomains) {
+	public String createToken(String token, int cmtType, String targetDomains) {
 		final String sqlKey = "sql.createToken";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_TOKEN, token);
@@ -345,7 +345,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	}
 
 	@Override
-	public String updateToken(String token, String cmtType, String targetDomains) {
+	public String updateToken(String token, int cmtType, String targetDomains) {
 		final String sqlKey = "sql.updateToken";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_TOKEN, token);
