@@ -16,7 +16,7 @@ public interface ICommentDao {
 	public Long updateComment(Long commentId, Long targetId, String token, String content,
 			String accountUpdate);
 
-	public Long approveComment(Long commentId, Long targetId, String token, String approver,
+	public Long updateCommentStatus(Long commentId, Long targetId, String token, String approver,
 			Integer status);
 
 	public Map<String, Object> getComment(Long commentId, Long targetId, String token);
@@ -31,6 +31,11 @@ public interface ICommentDao {
 			Integer status, Integer page, Integer pageSize);
 
 	public int getNumberOfCommentsByTarget(Long targetId, String token, Integer status);
+
+	public List<Map<String, Object>> getCommentsByToken(String token, Integer status, Integer page,
+			Integer pageSize);
+
+	public int getNumberOfCommentsByToken(String token, Integer status);
 
 	/* ============================================= */
 	/* ============== TARGET ======================= */

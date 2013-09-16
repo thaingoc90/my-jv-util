@@ -93,6 +93,25 @@ public class Utils {
 	}
 
 	/**
+	 * Converts obj to long-type. If not, return default value.
+	 * 
+	 * @param obj
+	 * @param defaultVal
+	 * @return
+	 */
+	public static Long toLong(Object obj, Long defaultVal) {
+		if (obj == null) {
+			return defaultVal;
+		}
+		Long result = defaultVal;
+		try {
+			result = Long.parseLong(obj.toString().trim());
+		} catch (NumberFormatException e) {
+		}
+		return result;
+	}
+
+	/**
 	 * Convert Object to String, if obj is null, return default value.
 	 * 
 	 * @param obj
@@ -243,5 +262,5 @@ public class Utils {
 		long result = timestamp | randomInt;
 		return result;
 	}
-	
+
 }

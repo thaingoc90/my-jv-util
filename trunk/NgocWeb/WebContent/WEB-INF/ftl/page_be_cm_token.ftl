@@ -10,9 +10,9 @@
 		<tr>
 			<th width="20">STT</th>
 			<th width="120" >Token</th>
-			<th width="80" class="ta-cen">Type</th>
+			<th width="100" class="ta-cen">Type</th>
 			<th>Domains</th>
-			<th width="140">Created</th>
+			<th width="160">Created</th>
 			<th width="40"></th>
 		</tr>
 		<#list TOKENS as token>
@@ -24,7 +24,7 @@
 					<#list token.list_domains as domain>
 						<p>${domain}</p>
 					</#list>
-					<span class="target_domains" style="display: none">
+					<span class="target_domains hide">
 						${token.target_domains}
 					</span>
 				</td>

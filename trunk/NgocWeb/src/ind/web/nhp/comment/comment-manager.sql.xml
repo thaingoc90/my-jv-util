@@ -8,7 +8,7 @@
 	<entry key="_cols.comment.select"><![CDATA[comment_id, account_name, CONVERT(content USING utf8) AS content ,target_id ,token ,created ,updated ,status ,approved_by, updated_by ,parent_comment_id ,total_likes  ]]></entry>
 	<entry key="_cols.comment.insert"><![CDATA[(comment_id, account_name, content ,target_id ,token ,created ,updated ,status ,parent_comment_id) VALUES (@{comment_id}, @{account_name}, @{content} ,@{target_id} ,@{token} ,NOW() ,NOW() ,@{status} ,@{parent_comment_id})]]></entry>
 	<entry key="_cols.comment.update"><![CDATA[content=@{content} ,updated=NOW() ,updated_by=@{updated_by}]]></entry>
-	<entry key="_cols.comment.update.approve"><![CDATA[status=@{status} ,updated=NOW() ,approved_by=@{approved_by}]]></entry>
+	<entry key="_cols.comment.update.status"><![CDATA[status=@{status} ,updated=NOW() ,approved_by=@{approved_by}, updated_by=@{updated_by}]]></entry>
 	
 	<entry key="sql.getComment"><![CDATA[
         SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE ${_col.comment.key.where}
@@ -22,8 +22,8 @@
 	<entry key="sql.updateComment"><![CDATA[
         UPDATE ${_tbl.comment} SET ${_cols.comment.update} WHERE ${_col.comment.key.where} 
     ]]></entry>
-    <entry key="sql.approveComment"><![CDATA[
-        UPDATE ${_tbl.comment} SET ${_cols.comment.update.approve} WHERE ${_col.comment.key.where} 
+    <entry key="sql.updateCommentStatus"><![CDATA[
+        UPDATE ${_tbl.comment} SET ${_cols.comment.update.status} WHERE ${_col.comment.key.where} 
     ]]></entry>
     <entry key="sql.getChildComments"><![CDATA[
         SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE parent_comment_id=@{parent_comment_id} AND token=@{token} AND target_id=@{target_id} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC
@@ -36,6 +36,12 @@
     ]]></entry>
     <entry key="sql.getNumberOfCommentsByTarget"><![CDATA[
         SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND target_id=@{target_id} AND parent_comment_id IS NULL AND (@{ignore_status} OR status=@{status})
+    ]]></entry>
+    <entry key="sql.getCommentsByToken"><![CDATA[
+        SELECT ${_cols.comment.select} FROM ${_tbl.comment} WHERE token=@{token} AND (@{ignore_status} OR status=@{status}) ORDER BY created DESC LIMIT @{start_index}, @{page_size}  
+    ]]></entry>
+    <entry key="sql.getNumberOfCommentsByToken"><![CDATA[
+        SELECT COUNT(*) FROM ${_tbl.comment} WHERE token=@{token} AND (@{ignore_status} OR status=@{status})
     ]]></entry>
     
     <!-- ********************************* -->
