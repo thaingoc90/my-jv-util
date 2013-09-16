@@ -3,8 +3,8 @@ package ind.web.nhp.comment;
 public class CommentForm {
 
 	private String token, content;
-	private long targetId, parentCommentId;
-	int limit, page;
+	private long targetId, parentCommentId, commentId;
+	int limit, page, status;
 
 	public String getToken() {
 		return token;
@@ -52,6 +52,22 @@ public class CommentForm {
 
 	public void setParentCommentId(long parentCommentId) {
 		this.parentCommentId = parentCommentId;
+	}
+
+	public long getCommentId() {
+		return commentId;
+	}
+
+	public void setCommentId(long commentId) {
+		this.commentId = commentId;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 }

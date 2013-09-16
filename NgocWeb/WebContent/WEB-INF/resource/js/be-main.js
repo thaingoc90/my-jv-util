@@ -147,3 +147,62 @@ $(document).on('click', '.modal-edit-token', function() {
 	}
 
 });
+
+$(document).on('click', '.modal-edit-comment', function() {
+	var token = $('.body-content').attr('data-token');
+	var grandFather = $(this).parent().parent();
+	var commentId = grandFather.find(".comment_id").html();
+	var targetId = grandFather.find(".target_id").html();
+	var user = grandFather.find(".account-name").html();
+	var status = grandFather.find(".status").html();
+	var content = grandFather.find(".content").html();
+
+	$('#editModal #inputToken').attr('value', token);
+	$('#editModal #inputCommentId').attr('value', commentId);
+	$('#editModal #inputTargetId').attr('value', targetId);
+	$('#editModal #inputUser').html(user);
+
+	$('#editModal #inputStatus').val('0');
+	$('#editModal #inputStatus').val(status);
+	$('#editModal #inputContent').val(content);
+});
+
+$(document).on('click', '.modal-detail-comment', function() {
+	var token = $('.body-content').attr('data-token');
+	var commentId = $(this).attr('data-comment-id');
+	var targetId = $(this).attr('data-target-id');
+
+	$.ajax({
+		url : '/admin/comment/list/detail',
+		type : 'POST',
+		data : {
+			"token" : token,
+			"commentId" : commentId,
+			"targetId" : targetId
+		},
+		dataType : 'json',
+		success : function(data) {
+			if (data.status == 200) {
+				var mapResult = data.message;
+				$('#detailModal #inputUser').html(mapResult.account_name);
+				$('#detailModal #inputApprover').html(mapResult.approved_by);
+				$('#detailModal #inputUpdater').html(mapResult.updated_by);
+				console.log(mapResult.updated_by);
+				if (mapResult.updated_by != null) {
+					var updatedDate = new Date(mapResult.updated);
+					$('#detailModal #inputUpdateTime').html(' (' + updatedDate.format("HH:MM dd-mm-yyyy") + ' )');
+				} else {
+					$('#detailModal #inputUpdateTime').html('');
+				}
+				var createdDate = new Date(mapResult.created);
+				$('#detailModal #inputCreateTime').html(createdDate.format("HH'h':MM 'at' dd-mm-yyyy"));
+				$('#detailModal #inputStatus').html(mapResult.status_str);
+				$('#detailModal #inputContent').html( mapResult.content.replace(/\n/g, '<br />'));
+			}
+		},
+		error : function(content) {
+			console.log("error");
+		}
+	});
+
+});

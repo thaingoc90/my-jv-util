@@ -11,6 +11,7 @@ import ind.web.nhp.utils.JsonUtils;
 import ind.web.nhp.utils.Utils;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,9 @@ public class CommentTokenController extends BaseBackendController {
 		}
 
 		List<Map<String, Object>> listTokens = cmtDao.getAllTokens();
+		if (listTokens == null) {
+			listTokens = new LinkedList<>();
+		}
 		for (Map<String, Object> token : listTokens) {
 			String domainObj = Utils.getString(token, CommentDao.FIELD_TARGET_DOMAINS);
 			List<String> targetDomains = JsonUtils.fromJson(domainObj, List.class);
@@ -95,6 +99,14 @@ public class CommentTokenController extends BaseBackendController {
 		return "redirect:" + URL_MAPPING;
 	}
 
+	/**
+	 * Adds a new token.
+	 * 
+	 * @param form
+	 * @param result
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@RequestMapping(value = URL_MAPPING + "/add", method = RequestMethod.POST)
 	public String addToken(@ModelAttribute TokenBEForm form, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -117,6 +129,14 @@ public class CommentTokenController extends BaseBackendController {
 		return "redirect:" + URL_MAPPING;
 	}
 
+	/**
+	 * Edits a token.
+	 * 
+	 * @param form
+	 * @param result
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@RequestMapping(value = URL_MAPPING + "/edit", method = RequestMethod.POST)
 	public String editToken(@ModelAttribute TokenBEForm form, BindingResult result,
 			RedirectAttributes redirectAttributes) {

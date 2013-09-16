@@ -102,14 +102,16 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	}
 
 	@Override
-	public Long approveComment(Long commentId, Long targetId, String token, String approver,
+	public Long updateCommentStatus(Long commentId, Long targetId, String token, String approver,
 			Integer status) {
-		final String sqlKey = "sql.approveComment";
+		final String sqlKey = "sql.updateCommentStatus";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_COMMENT_ID, commentId);
 		params.put(FIELD_TARGET_ID, targetId);
 		params.put(FIELD_TOKEN, token);
-		params.put(FIELD_APPROVED_BY, approver);
+		params.put(FIELD_APPROVED_BY, status == CommentConstants.COMMENT_STATUS_VALID ? approver
+				: null);
+		params.put(FIELD_UPDATED_BY, approver);
 		params.put(FIELD_UPDATED, new Date());
 		params.put(FIELD_STATUS, status);
 		try {
@@ -206,6 +208,43 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 		int ignoreStatus = status == null ? 1 : 0;
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_TARGET_ID, targetId);
+		params.put(FIELD_TOKEN, token);
+		params.put("ignore_status", ignoreStatus);
+		params.put(FIELD_STATUS, status);
+		try {
+			return (int) executeCount(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getCommentsByToken(String token, Integer status, Integer page,
+			Integer pageSize) {
+		final String sqlKey = "sql.getCommentsByToken";
+		int ignoreStatus = status == null ? 1 : 0;
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(FIELD_TOKEN, token);
+		params.put("ignore_status", ignoreStatus);
+		params.put(FIELD_STATUS, status);
+		params.put(FIELD_START_INDEX, (page - 1) * pageSize);
+		params.put(FIELD_PAGE_SIZE, pageSize);
+		try {
+			return executeSelect(sqlKey, params);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new RuntimeException();
+		} finally {
+		}
+	}
+
+	@Override
+	public int getNumberOfCommentsByToken(String token, Integer status) {
+		final String sqlKey = "sql.getNumberOfCommentsByToken";
+		int ignoreStatus = status == null ? 1 : 0;
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(FIELD_TOKEN, token);
 		params.put("ignore_status", ignoreStatus);
 		params.put(FIELD_STATUS, status);
