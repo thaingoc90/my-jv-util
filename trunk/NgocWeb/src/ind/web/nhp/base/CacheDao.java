@@ -1,18 +1,22 @@
 package ind.web.nhp.base;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ind.web.nhp.cache.ICache;
 import ind.web.nhp.cache.ICacheManager;
 
 public abstract class CacheDao {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CacheDao.class);
 	private ICache cache;
 	private ICacheManager cacheManager;
 	private String cacheName = this.getClass().getName();
 
 	public void init() {
-        cache = getCache();
-    }
-	
+		cache = getCache();
+	}
+
 	protected boolean cacheEnabled() {
 		return cacheManager != null;
 	}
@@ -27,7 +31,11 @@ public abstract class CacheDao {
 
 		ICache cache = getCache();
 		if (cache != null) {
-			cache.clear();
+			try {
+				cache.clear();
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -43,7 +51,11 @@ public abstract class CacheDao {
 
 		ICache cache = getCache();
 		if (cache != null) {
-			cache.delete(key);
+			try {
+				cache.delete(key);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -60,7 +72,11 @@ public abstract class CacheDao {
 		if (value != null) {
 			ICache cache = getCache();
 			if (cache != null) {
-				cache.set(key, value);
+				try {
+					cache.set(key, value);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -75,9 +91,16 @@ public abstract class CacheDao {
 		if (!cacheEnabled()) {
 			return null;
 		}
-
 		ICache cache = getCache();
-		Object value = cache.get(key);
+		if (cache == null) {
+			return null;
+		}
+		Object value = null;
+		try {
+			value = cache.get(key);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
 		return value;
 	}
 

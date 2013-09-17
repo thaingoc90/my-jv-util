@@ -2,7 +2,7 @@
 <@layout.masterTemplate title="Comment" customJsList=["js/date.format"]>
 
 <div class="body-content" style="width: 95%;" data-token="${token}">
-	<header class="title-large">List Tokens </header>
+	<header class="title-large">List Comments of '${token}' </header>
 	<button class="btn btn-info create-btn" onclick="location.reload();"><i class="icon-refresh"></i> Refresh</button>
 	<#include "inc_error_zone.ftl" />	
 	<#if COMMENTS??>

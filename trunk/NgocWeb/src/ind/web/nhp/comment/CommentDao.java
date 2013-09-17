@@ -38,7 +38,7 @@ public class CommentDao extends BaseJdbcDao implements ICommentDao {
 	public final static String FIELD_START_INDEX = "start_index";
 	public final static String FIELD_PAGE_SIZE = "page_size";
 
-	private Logger LOGGER = LoggerFactory.getLogger(CommentDao.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(CommentDao.class);
 
 	@Override
 	public Long addComment(String accountName, String content, Long targetId, String token,

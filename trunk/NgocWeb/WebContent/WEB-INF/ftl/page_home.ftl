@@ -5,7 +5,7 @@
     <meta name="description" content="description" />
     <meta name="keywords" content="contents" />
     <meta name="author" content="SPINNING" />
-    
+    <title>Home page</title>
     <style>
 		.clock {
 		    width: 200px;

@@ -32,6 +32,7 @@
 		<property name="password">
 			<value>root</value>
 		</property>
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
 
 
@@ -52,8 +53,9 @@
 		<property name="password">
 			<value>root</value>
 		</property>
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
-	
+
 	<bean id="configManager" class="ind.web.nhp.base.manager.ConfigManager"
 		scope="singleton" init-method="init" destroy-method="destroy">
 
@@ -71,6 +73,7 @@
 		<property name="password">
 			<value>root</value>
 		</property>
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
 
 </beans>

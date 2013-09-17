@@ -16,7 +16,7 @@ public class LikeDao extends BaseJdbcDao implements ILikeDao {
 	public final static String FIELD_COMMENT_ID = "comment_id";
 	public final static String FIELD_TARGET_ID = "target_id";
 
-	private Logger LOGGER = LoggerFactory.getLogger(LikeDao.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(LikeDao.class);
 
 	@Override
 	public boolean like(String accountName, Long targetId, Long commentId) {

@@ -13,9 +13,8 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * List properties: maxActive(def: 200), testOnReturn(def: true),
- * expireAfterWrite(persit if not), host(required), port(required),
- * name(required)
+ * List properties: maxActive(def: 200), testOnReturn(def: true), expireAfterWrite(persit if not),
+ * host(required), port(required), name(required)
  * 
  * @author ngoctdn
  * 
