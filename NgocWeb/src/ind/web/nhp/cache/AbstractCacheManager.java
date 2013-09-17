@@ -5,11 +5,16 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.MapMaker;
 
 public abstract class AbstractCacheManager implements ICacheManager {
 
 	private ConcurrentMap<String, ICache> caches;
+	private Object cacheConfig;
+	protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Override
 	public void init() {
@@ -64,19 +69,32 @@ public abstract class AbstractCacheManager implements ICacheManager {
 	}
 
 	@Override
-	public abstract ICache createCache(String name);
+	public ICache createCache(String name) {
+		ICache cache = caches.get(name);
+		if (cache != null) {
+			return cache;
+		}
+		Object cacheConfig = getCacheConfig();
+		return createCache(name, cacheConfig);
+	}
 
 	@Override
 	public ICache createCache(String name, Object cacheConfig) {
-		ICache cache = caches.get(name);
-		if (cache == null) {
-			cache = internalCreateCache(name, cacheConfig);
+		ICache cache = internalCreateCache(name, cacheConfig);
+		if (cache != null) {
 			caches.put(name, cache);
 		}
 		return cache;
 	}
 
-	protected abstract ICache internalCreateCache(String name,
-			Object cacheConfig);
+	protected abstract ICache internalCreateCache(String name, Object cacheConfig);
+
+	public Object getCacheConfig() {
+		return cacheConfig;
+	}
+
+	public void setCacheConfig(Object cacheConfig) {
+		this.cacheConfig = cacheConfig;
+	}
 
 }

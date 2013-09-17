@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS nhp_group_permission;
 DROP TABLE IF EXISTS nhp_permission;
 DROP TABLE IF EXISTS nhp_user;
 DROP TABLE IF EXISTS nhp_group;
+DROP TABLE IF EXISTS nhp_logs;
 
 CREATE TABLE nhp_group (
 	gid						INT					NOT NULL AUTO_INCREMENT,
@@ -89,4 +90,14 @@ CREATE TABLE nhp_config (
  	c_key            VARCHAR(32)         	NOT NULL,
     c_value          TEXT,
     PRIMARY KEY (c_key)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE nhp_logs (
+	created			DATETIME,
+		INDEX(created),
+	class			VARCHAR(150),
+		INDEX(class),
+	threshold		VARCHAR(30),
+		INDEX(threshold),
+	message			VARCHAR(3000)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;

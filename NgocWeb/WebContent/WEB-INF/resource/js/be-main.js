@@ -190,12 +190,12 @@ $(document).on('click', '.modal-detail-comment', function() {
 				console.log(mapResult.updated_by);
 				if (mapResult.updated_by != null) {
 					var updatedDate = new Date(mapResult.updated);
-					$('#detailModal #inputUpdateTime').html(' (' + updatedDate.format("HH:MM dd-mm-yyyy") + ' )');
+					$('#detailModal #inputUpdateTime').html(' (' + updatedDate.format("HH'h':MM '-' dd/mm/yyyy") + ' )');
 				} else {
 					$('#detailModal #inputUpdateTime').html('');
 				}
 				var createdDate = new Date(mapResult.created);
-				$('#detailModal #inputCreateTime').html(createdDate.format("HH'h':MM 'at' dd-mm-yyyy"));
+				$('#detailModal #inputCreateTime').html(createdDate.format("HH'h':MM '-' dd/mm/yyyy"));
 				$('#detailModal #inputStatus').html(mapResult.status_str);
 				$('#detailModal #inputContent').html( mapResult.content.replace(/\n/g, '<br />'));
 			}

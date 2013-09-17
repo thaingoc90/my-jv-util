@@ -33,7 +33,7 @@ public class BaseJdbcDao extends CacheDao {
 	public static final String EXC_NOT_CONNECT_DB = "Can not make connection to database!";
 	private final static int NUM_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
-	private Logger LOGGER = LoggerFactory.getLogger(BaseJdbcDao.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(BaseJdbcDao.class);
 	private DataSource ds;
 	public static String PATTERN_PARAM = "\\@\\{([^\\}]+)\\}";
 	public static String PATTERN_TABLE = "\\@\\{_([^\\}]+)\\}";
