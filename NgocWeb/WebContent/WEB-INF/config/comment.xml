@@ -16,10 +16,10 @@
 			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>spinning</value>
 		</property>
 		<property name="password">
-			<value>root</value>
+			<value>ng0cth@i</value>
 		</property>
 	</bean>
 
@@ -35,10 +35,10 @@
 			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>spinning</value>
 		</property>
 		<property name="password">
-			<value>root</value>
+			<value>ng0cth@i</value>
 		</property>
 	</bean>
 </beans>
