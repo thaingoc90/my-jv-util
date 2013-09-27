@@ -27,12 +27,12 @@
 			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>spinning</value>
 		</property>
 		<property name="password">
-			<value>root</value>
+			<value>ng0cth@i</value>
 		</property>
-		<property name="cacheManager" ref="cacheManager" />
+		<!-- <property name="cacheManager" ref="cacheManager" /> -->
 	</bean>
 
 
@@ -48,12 +48,12 @@
 			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>spinning</value>
 		</property>
 		<property name="password">
-			<value>root</value>
+			<value>ng0cth@i</value>
 		</property>
-		<property name="cacheManager" ref="cacheManager" />
+		<!-- <property name="cacheManager" ref="cacheManager" /> -->
 	</bean>
 
 	<bean id="configManager" class="ind.web.nhp.base.manager.ConfigManager"
@@ -68,12 +68,12 @@
 			<value><![CDATA[jdbc:mysql://127.0.0.1:3306/nhp?useUnicode=true&amp;characterEncoding=utf-8]]></value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>spinning</value>
 		</property>
 		<property name="password">
-			<value>root</value>
+			<value>ng0cth@i</value>
 		</property>
-		<property name="cacheManager" ref="cacheManager" />
+		<!-- <property name="cacheManager" ref="cacheManager" /> -->
 	</bean>
 
 </beans>
