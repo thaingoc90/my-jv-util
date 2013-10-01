@@ -3,7 +3,7 @@ var CommentPlugin = {
 		commentBoxKey : ".commentNhp",
 		commentFrame : "/comment",
 		staticResource : "/static/",
-		baseUrl : "127.0.0.1",
+		baseUrl : "14.0.21.51",
 		listLibs : ["js/jquery.base64"],
 		jQueryPath: ["js/jquery-2.0.2.min"],
 	},
