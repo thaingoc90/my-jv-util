@@ -88,9 +88,9 @@
     <script type="text/javascript" src="${staticResourceRoot}js/jquery-2.0.2.min.js" charset="utf-8"></script>
 </head>
 <body>
-	<h1>Spring MVC FreeMarker</h1>
+	<h1>Spinning's HomePage</h1>
  
-	<h2>Hello World</h2> ${locale}
+	<h2>Hello World</h2>
 	
 	<div class="commentNhp" data-target="123" data-token="ngoc" data-width="500px" data-height="auto" data-nums="3"></div>
 	<script src="/static/js/comment-main.js"></script>
