@@ -1,7 +1,7 @@
 package ind.web.nhp.comment;
 
-import ind.web.nhp.base.BaseController;
 import ind.web.nhp.base.Constants;
+import ind.web.nhp.controller.BaseFrontendController;
 import ind.web.nhp.utils.JsonUtils;
 import ind.web.nhp.utils.Utils;
 
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class CommentController extends BaseController {
+public class CommentController extends BaseFrontendController {
 
 	private final static String VIEW_NAME = "cm_frame";
 	private final static String VIEW_NAME_ERROR = "cm_frame_error";
@@ -79,7 +79,7 @@ public class CommentController extends BaseController {
 		}
 
 		int maxPage = rows % limit == 0 ? rows / limit : rows / limit + 1;
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		model.addAttribute("isLogin", StringUtils.isEmpty(accountName) ? 0 : 1);
 		model.addAttribute("url", url);
 		model.addAttribute("limit", limit);
@@ -100,7 +100,7 @@ public class CommentController extends BaseController {
 	@RequestMapping(value = "/comment/checkLogin", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkLogin() {
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		return createAjaxOk(StringUtils.isEmpty(accountName) ? 0 : 1);
 	}
 
@@ -122,7 +122,7 @@ public class CommentController extends BaseController {
 		}
 		String token = form.getToken();
 		Long targetId = form.getTargetId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		Long parentCommentId = form.getParentCommentId();
 		String content = form.getContent();
 		try {
@@ -142,10 +142,6 @@ public class CommentController extends BaseController {
 	}
 
 	/* ---- PRIVATE FUNCTION ------- */
-
-	private String getCurrentUser() {
-		return "Ngoc";
-	}
 
 	private boolean validateCommentForm(CommentForm form) {
 		Long targetId = form.getTargetId();
@@ -281,7 +277,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> countLikes(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			int totalLikes = likeDao.countLikes(targetId, commentId);
@@ -307,7 +303,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> like(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		boolean result = likeDao.like(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);
@@ -327,7 +323,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> unlike(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		boolean result = likeDao.unlike(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);
@@ -347,7 +343,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> countDislikes(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			int totalDislikes = likeDao.countDislikes(targetId, commentId);
@@ -373,7 +369,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> dislike(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		boolean result = likeDao.dislike(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);
@@ -393,7 +389,7 @@ public class CommentController extends BaseController {
 	public Map<String, Object> unDislike(@ModelAttribute LikeForm form) {
 		Long targetId = form.getTargetId();
 		Long commentId = form.getCommentId();
-		String accountName = getCurrentUser();
+		String accountName = getCurrentUsername();
 		boolean result = likeDao.unDislike(accountName, targetId, commentId);
 		if (result) {
 			return createAjaxOk(result);

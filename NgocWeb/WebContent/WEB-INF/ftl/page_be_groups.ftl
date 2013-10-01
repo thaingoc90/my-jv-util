@@ -16,13 +16,13 @@
 			<th width="80"></th>
 		</tr>
 		<#list GROUPS as group>
-			<tr <#if group.getId() == 1>class="info"</#if>>
+			<tr <#if group.getId() == 1 || group.getId() == 2>class="info"</#if>>
 				<td>${group_index + 1}</td>
 				<td><span class="group-name">${group.getName()}</span></td>
 				<td><span class="group-desc">${group.getDesc()}</span></td>
 				<td class="ta-cen"><span class="group-system"><#if group.isSystem()><i class="icon-ok"></i></#if></span></td>
 				<td>
-					<#if group.getId() != 1>
+					<#if group.getId() != 1 && group.getId() != 2>
 						<a href="#editModal" class="modal-edit-group" data-toggle="modal" data-id="${group.getId()}" title="Edit"><i class="icon-pencil"></i></a>
 						<a href="#permMappingModel" class="modal-permission-mapping" data-toggle="modal" data-id="${group.getId()}" data-group-name="${group.getName()}" title="Permission"><i class="icon-list"> </i></a>
 						<a href="#deleteModal" class="modal-delete-open" data-toggle="modal" data-href="${baseUrl}manage/groups/delete/${group.getId()}" title="Delete"><i class="icon-trash"></i></a>
