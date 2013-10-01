@@ -16,13 +16,13 @@ public class LogoutController extends BaseBackendController {
 
 	@RequestMapping("/admin/logout")
 	public String put(HttpServletRequest request, HttpServletResponse response,
-	        RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes) {
 		HttpSession session = request.getSession(false);
 		if (session != null) {
 			session.removeAttribute(Constants.NHP_USER_ID);
 		}
-		Cookie cookie = new Cookie(Constants.NHP_USER_ID, null);
-		cookie.setMaxAge(3600);
+		Cookie cookie = new Cookie(Constants.NHP_USER_ID, "");
+		cookie.setMaxAge(0);
 		response.addCookie(cookie);
 		return "redirect:/admin/login";
 	}

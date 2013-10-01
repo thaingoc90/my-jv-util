@@ -4,12 +4,16 @@ var CommentPlugin = {
 		commentFrame : "/comment",
 		staticResource : "/static/",
 		baseUrl : "14.0.21.51",
+		devBaseUrl: "127.0.0.1:8888",
 		listLibs : ["js/jquery.base64"],
 		jQueryPath: ["js/jquery-2.0.2.min"],
 	},
 
 	init : function() {
 		var url = document.location.href;
+		if (url.indexOf('127.0.0.1') != -1 || url.indexOf('localhost') != -1) {
+			CommentPlugin.constants.baseUrl = CommentPlugin.constants.devBaseUrl;
+		}
 		var target_url = $.base64.encode(this.getReducedUrl(url));
 		var commentField = this.constants.commentBoxKey;
 		var width = this.getAttribute(commentField, 'data-width', '');

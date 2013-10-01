@@ -63,7 +63,7 @@ public class LoginController extends BaseBackendController {
 		session.setAttribute(Constants.NHP_USER_ID, user.getId());
 		if (form.getRemember() == 1) {
 			Cookie cookie = new Cookie(Constants.NHP_USER_ID, String.valueOf(user.getId()));
-			cookie.setMaxAge(360000);
+			cookie.setMaxAge(3600 * 24 * 30);
 			response.addCookie(cookie);
 		}
 
