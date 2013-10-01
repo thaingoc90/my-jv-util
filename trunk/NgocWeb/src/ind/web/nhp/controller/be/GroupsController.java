@@ -91,7 +91,7 @@ public class GroupsController extends BaseBackendController {
 		}
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
-		        buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
+				buildErrorObject(ErrorConstants.CREATE_ERROR, errMsg, succMsg));
 		return "redirect:/admin/manage/groups";
 	}
 
@@ -112,7 +112,7 @@ public class GroupsController extends BaseBackendController {
 		GroupBo group = (GroupBo) usManager.getGroup(groupId);
 		if (group == null) {
 			errMsg = this.lang.getMessage("error.group.notExist");
-		} else if (group.getId() == 1) {
+		} else if (group.getId() == 1 || group.getId() == Constants.GROUP_NORMAL_USER) {
 			errMsg = this.lang.getMessage("error.group.notModify");
 		} else if (!groupName.equals(group.getName()) && usManager.getGroup(groupName) != null) {
 			errMsg = this.lang.getMessage("error.group.name.existed");
@@ -126,7 +126,7 @@ public class GroupsController extends BaseBackendController {
 		}
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
-		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
+				buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
 		return "redirect:/admin/manage/groups";
 	}
 
@@ -144,7 +144,7 @@ public class GroupsController extends BaseBackendController {
 		IGroup group = usManager.getGroup(groupId);
 		if (group == null) {
 			errMsg = this.lang.getMessage("error.group.notExist");
-		} else if (group.getId() == 1) {
+		} else if (group.getId() == 1 || group.getId() == Constants.GROUP_NORMAL_USER) {
 			errMsg = this.lang.getMessage("error.group.notModify");
 		}
 
@@ -153,13 +153,13 @@ public class GroupsController extends BaseBackendController {
 		}
 
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
-		        buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
+				buildErrorObject(ErrorConstants.DELETE_ERROR, errMsg, succMsg));
 		return "redirect:/admin/manage/groups";
 	}
 
 	@RequestMapping(value = "/admin/manage/groups/permission", method = RequestMethod.POST)
 	public String editPermission(@ModelAttribute GroupBEForm form,
-	        RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes) {
 		String succMsg = this.lang.getMessage("msg.group.edit.success");
 		String errMsg = null;
 		int groupId = form.getId();
@@ -167,7 +167,7 @@ public class GroupsController extends BaseBackendController {
 		IGroup group = usManager.getGroup(groupId);
 		if (group == null) {
 			errMsg = this.lang.getMessage("error.group.notExist");
-		} else if (group.getId() == 1) {
+		} else if (group.getId() == 1 || group.getId() == Constants.GROUP_NORMAL_USER) {
 			errMsg = this.lang.getMessage("error.group.notModify");
 		}
 
@@ -186,7 +186,7 @@ public class GroupsController extends BaseBackendController {
 			usManager.addMultiPermisionsForGroup(group, listPerms.toArray(new PermissionBo[0]));
 		}
 		redirectAttributes.addFlashAttribute(Constants.ERROR_PARAM,
-		        buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
+				buildErrorObject(ErrorConstants.EDIT_ERROR, errMsg, succMsg));
 		return "redirect:/admin/manage/groups";
 	}
 }

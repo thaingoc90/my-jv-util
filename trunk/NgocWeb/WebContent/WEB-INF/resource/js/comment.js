@@ -99,6 +99,38 @@ var Comment = {
 			var disliked = $(this).attr('data-dislike');
 			Comment.DislikeComment(cmtEle, parseInt(disliked));
 		});
+		
+		/* Login */
+		$(document).on('submit', '.cmt-login-form form', function() {
+			var userField = $(this).find('#login-user');
+			var passwordField = $(this).find('#login-pass');
+			var errorField = $(this).find('.login-error');
+			if (isBlank(userField.val()) || isBlank(passwordField.val())) {
+				return;
+			}
+			$.ajax({
+				url : '/login',
+				type : 'POST',
+				data : $(this).serialize(),
+				dataType : 'json',
+				success : function(data) {
+					if (data.status == 200) {
+						$('.cmt-new-post').show();
+						$('.cmt-login-form').hide();
+					} else {
+						$(errorField).html(data.message);
+						$(userField).val('');
+						$(passwordField).val('');
+						setTimeout(function() {
+							$(errorField).html('');
+						}, 4000);
+					} 
+				},
+				error : function(content) {
+					console.log("error");
+				}
+			});
+		});
 	},
 
 	showErrorPostCmt : function(msg) {

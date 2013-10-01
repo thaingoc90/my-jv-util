@@ -32,7 +32,7 @@
 		<property name="password">
 			<value>ng0cth@i</value>
 		</property>
-		<!-- <property name="cacheManager" ref="cacheManager" /> -->
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
 
 
@@ -53,7 +53,7 @@
 		<property name="password">
 			<value>ng0cth@i</value>
 		</property>
-		<!-- <property name="cacheManager" ref="cacheManager" /> -->
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
 
 	<bean id="configManager" class="ind.web.nhp.base.manager.ConfigManager"
@@ -73,7 +73,7 @@
 		<property name="password">
 			<value>ng0cth@i</value>
 		</property>
-		<!-- <property name="cacheManager" ref="cacheManager" /> -->
+		<property name="cacheManager" ref="cacheManager" />
 	</bean>
 
 </beans>

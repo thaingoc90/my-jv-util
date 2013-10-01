@@ -48,9 +48,9 @@ public class LoginController extends BaseBackendController {
 
 	@RequestMapping(value = "/admin/login", method = RequestMethod.POST)
 	public String post(@ModelAttribute LoginBEForm form,
-	        @RequestParam(value = "url", required = false) String urlRedirect, Model model,
-	        HttpServletRequest request, HttpServletResponse response,
-	        RedirectAttributes redirectAttributes) {
+			@RequestParam(value = "url", required = false) String urlRedirect, Model model,
+			HttpServletRequest request, HttpServletResponse response,
+			RedirectAttributes redirectAttributes) {
 		ErrorModel errorObj = new ErrorModel();
 		errorObj.setErrorCode(ErrorConstants.ERROR_CODE_DEFAULT);
 		validate(form, errorObj);
@@ -93,6 +93,11 @@ public class LoginController extends BaseBackendController {
 			return false;
 		} else if (user.isLocked()) {
 			errorObj.addMsgError(this.lang.getMessage("error.admin.disabled", user.getEmail()));
+			return false;
+		}
+
+		if (user.getGroupId() == Constants.GROUP_NORMAL_USER) {
+			errorObj.addMsgError(this.lang.getMessage("error.admin.login"));
 			return false;
 		}
 

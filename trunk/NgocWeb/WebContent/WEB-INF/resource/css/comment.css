@@ -55,7 +55,7 @@ section#comment article {
 
 /*COMMENT - header*/
 .cmt-header {
-	padding: 3px 0px 5px 20px;
+	padding: 7px 0px 7px 20px;
 }
 
 .cmt-header .totals {
@@ -251,8 +251,8 @@ section#comment article {
 
 /* COMMENT-LOGIN-BOX */
 .cmt-login-form {
-	padding: 5px 20px 8px;
-	border-bottom: 1px dotted #CCC;
+	padding: 5px 20px 0px;
+	/*border-bottom: 1px dotted #CCC;*/
 	border-top: 1px dotted #CCC;
 }
 
@@ -281,10 +281,18 @@ section#comment article {
 	line-height: 20px;
 	margin-bottom: 3px;
 	font-weight: bold;
+	color: #6A6A6A;
 }
 
 .login-required {
 	color: red;
 	height: 20px;
+}
+
+.login-error {
+	color: red;
+	font-weight: bold;
+	margin: 3px 10px 0;
+	height: 15px;
 }
 /*END - COMMENT*/
