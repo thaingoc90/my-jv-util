@@ -8,6 +8,7 @@ public class UserFEForm {
 	private String password, confirmPassword, newPassword, oldPassword;
 	private boolean locked;
 	private Date birthday;
+	private int remember;
 
 	public int getId() {
 		return id;
@@ -95,6 +96,14 @@ public class UserFEForm {
 
 	public void setOldPassword(String oldPassword) {
 		this.oldPassword = oldPassword;
+	}
+
+	public int getRemember() {
+		return remember;
+	}
+
+	public void setRemember(int remember) {
+		this.remember = remember;
 	}
 
 }

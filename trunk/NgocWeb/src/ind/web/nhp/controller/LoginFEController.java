@@ -9,7 +9,9 @@ import ind.web.nhp.us.SimpleAuthenticationAgent;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +30,11 @@ public class LoginFEController extends BaseFrontendController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> post(@ModelAttribute UserFEForm form, HttpServletRequest request) {
+	public Map<String, Object> post(@ModelAttribute UserFEForm form, HttpServletRequest request,
+			HttpServletResponse response) {
 		ErrorModel errorObj = new ErrorModel();
 		errorObj.setErrorCode(ErrorConstants.ERROR_CODE_DEFAULT);
-		boolean isLogin = doLogin(form, errorObj, request);
+		boolean isLogin = doLogin(form, errorObj, request, response);
 		if (isLogin) {
 			return createAjaxOk("Login successful!");
 		} else {
@@ -39,7 +42,8 @@ public class LoginFEController extends BaseFrontendController {
 		}
 	}
 
-	private boolean doLogin(UserFEForm form, ErrorModel errorObj, HttpServletRequest request) {
+	private boolean doLogin(UserFEForm form, ErrorModel errorObj, HttpServletRequest request,
+			HttpServletResponse response) {
 		String email = form.getEmail();
 		String rawPassword = form.getPassword();
 
@@ -69,6 +73,11 @@ public class LoginFEController extends BaseFrontendController {
 
 		HttpSession session = request.getSession(true);
 		session.setAttribute(Constants.NHP_FE_USER_ID, user.getId());
+		if (form.getRemember() == 1) {
+			Cookie cookie = new Cookie(Constants.NHP_FE_USER_ID, String.valueOf(user.getId()));
+			cookie.setMaxAge(3600 * 24 * 30);
+			response.addCookie(cookie);
+		}
 		return true;
 	}
 }

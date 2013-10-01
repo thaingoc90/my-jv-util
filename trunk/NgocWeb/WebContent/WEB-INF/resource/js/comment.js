@@ -105,6 +105,7 @@ var Comment = {
 			var userField = $(this).find('#login-user');
 			var passwordField = $(this).find('#login-pass');
 			var errorField = $(this).find('.login-error');
+			var infoField = $(this).find('.login-info');
 			if (isBlank(userField.val()) || isBlank(passwordField.val())) {
 				return;
 			}
@@ -119,12 +120,41 @@ var Comment = {
 						$('.cmt-login-form').hide();
 					} else {
 						$(errorField).html(data.message);
-						$(userField).val('');
-						$(passwordField).val('');
+						$(errorField).show();
+						$(infoField).hide();
 						setTimeout(function() {
 							$(errorField).html('');
+							$(errorField).hide();
+							$(infoField).show();
 						}, 4000);
-					} 
+					}
+					$(userField).val('');
+					$(passwordField).val('');
+					$('.cmt-login-form form input[type="checkbox"]').prop('checked', false);
+				},
+				error : function(content) {
+					console.log("error");
+				}
+			});
+		});
+		
+		/* Log out */
+		$(document).on('click', '.cmt-new-post .logout-link', function() {
+			$.ajax({
+				url : '/logout',
+				type : 'POST',
+				data : {},
+				dataType : 'json',
+				success : function(data) {
+					if (data.status == 200) {
+						$('.cmt-new-post').hide();
+						$('.cmt-login-form').show();
+					} else {
+						if (Comment.CheckLogin() != 0) {
+							$('.cmt-new-post').hide();
+							$('.cmt-login-form').show();
+						}
+					}
 				},
 				error : function(content) {
 					console.log("error");

@@ -46,7 +46,12 @@
 			<form method="post" onsubmit="return false;">
 				<input type="text" id="login-user" maxlength="32" spellcheck="false" name="email" placeholder="Account">
 				<input type="password" id="login-pass" maxlength="32" spellcheck="false" name="password" placeholder="Password">
+				<input type="checkbox" name="remember" value=1> Remember
 				<button type="submit" name="submit">Login</button>
+				<div class="login-info">
+					<a href="${baseUrl}/register" target="_blank">Register</a>
+					/ <a href="${baseUrl}/forgot/password" target="_blank">Forgot Password</a>
+				</div>
 				<div class="login-error"></div>
 			</form>
 		</div>

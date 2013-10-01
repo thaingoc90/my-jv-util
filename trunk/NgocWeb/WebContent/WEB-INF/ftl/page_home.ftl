@@ -92,7 +92,7 @@
  
 	<h2>Hello World</h2>
 	
-	<div class="commentNhp" data-target="123" data-token="ngoc" data-width="500px" data-height="auto" data-nums="3"></div>
+	<div class="commentNhp" data-target="123" data-token="ngoc" data-width="500px" data-height="auto" data-nums="5"></div>
 	<script src="/static/js/comment-main.js"></script>
  
  	<div class="clock">
