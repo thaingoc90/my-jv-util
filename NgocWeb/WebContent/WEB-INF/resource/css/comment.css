@@ -91,7 +91,8 @@ section#comment article {
 	margin-left: 50px;
 }
 
-.cmt-user-name,.cmt-content,.cmt-dislike,.cmt-like,.cmt-reply,.cmt-time{
+.cmt-user-name,.cmt-content,.cmt-dislike,.cmt-like,.cmt-reply,.cmt-time
+	{
 	line-height: 20px;
 }
 
@@ -263,6 +264,20 @@ section#comment article {
 	border: 1px solid #CCC;
 }
 
+.cmt-login-form input[type='text'] {
+	width: 120px;
+}
+
+.cmt-login-form input[type='password'] {
+	width: 120px;
+}
+
+.cmt-login-form input[type='checkbox'] {
+	height: 12px;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
 .cmt-login-form form button {
 	cursor: pointer;
 	color: white;
@@ -293,6 +308,12 @@ section#comment article {
 	color: red;
 	font-weight: bold;
 	margin: 3px 10px 0;
+	height: 15px;
+	display: none;
+}
+
+.login-info {
+	margin: 3px 0px 0;
 	height: 15px;
 }
 /*END - COMMENT*/
