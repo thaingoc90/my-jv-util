@@ -1,0 +1,74 @@
+html {
+	margin: 0;
+	padding: 0px;
+	height: 100%;
+}
+
+body {
+	padding: 0;
+}
+
+form header {
+	font-weight: bold;
+	font-size: 20px;
+	margin: 10px 0px 15px 10px;
+	padding: 0px 0px 5px 10px;
+	border-bottom: 2px solid #D1D4A5;
+}
+
+.register-form {
+	background: #fff;
+	width: 420px;
+	margin: 50px auto;
+	padding: 20px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border: 1px solid #ddd;
+}
+
+.register-form input[type="submit"] {
+	margin: 5px 0 0 70px;
+	padding: 3px 10px;
+}
+
+.register-form #field-dob-day {
+	width: 70px;
+}
+
+.register-form #field-dob-month {
+	width: 80px;
+}
+
+.register-form #field-dob-year {
+	width: 70px;
+}
+
+.form-row {
+	margin-bottom: 10px;
+}
+
+.form-row label {
+	display: inline-block;
+	width: 140px;
+	text-align: right;
+	padding-right: 10px;
+}
+
+.form-row input, .form-row select {
+	margin-bottom: 0px;
+}
+
+.required-label {
+	display: inline-block;
+	background-color: #FF9B00;
+	padding: 1px;
+	font-weight: bold;
+	text-align: right;
+	color: #ffffff;
+	cursor: default;
+	line-height: 20px;
+	margin-top: 5px;
+	font-size: 14px;
+	vertical-align: top;
+}

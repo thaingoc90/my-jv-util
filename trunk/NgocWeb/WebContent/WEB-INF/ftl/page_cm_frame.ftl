@@ -44,8 +44,8 @@
 		<div class="cmt-login-form" style="display: <#if isLogin &gt; 0> none <#else> block</#if>">
 			<div class="login-desc">Login to comment</div>
 			<form method="post" onsubmit="return false;">
-				<input type="text" id="login-user" maxlength="32" spellcheck="false" name="email" placeholder="Account">
-				<input type="password" id="login-pass" maxlength="32" spellcheck="false" name="password" placeholder="Password">
+				<input type="text" id="login-user" maxlength="60" spellcheck="false" name="email" placeholder="Account">
+				<input type="password" id="login-pass" maxlength="60" spellcheck="false" name="password" placeholder="Password">
 				<input type="checkbox" name="remember" value=1> Remember
 				<button type="submit" name="submit">Login</button>
 				<div class="login-info">
