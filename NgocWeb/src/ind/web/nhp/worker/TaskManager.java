@@ -51,10 +51,17 @@ public class TaskManager implements ITaskManager {
 
 		try {
 			TaskThread taskThread = new TaskThread(task);
+			ScheduledFuture<?> schFulture = null;
 			switch (type) {
 			case REPEATED:
-				ScheduledFuture<?> schFulture = threadExecutor.scheduleAtFixedRate(taskThread,
-						initialDelay, period, unit);
+				schFulture = threadExecutor.scheduleAtFixedRate(taskThread, initialDelay, period,
+						unit);
+				scheduledTasks.put(task.getId(), task);
+				scheduledPointer.put(task.getId(), schFulture);
+				break;
+			case REPEATED_AFTER_FINISH:
+				schFulture = threadExecutor.scheduleWithFixedDelay(taskThread, initialDelay,
+						period, unit);
 				scheduledTasks.put(task.getId(), task);
 				scheduledPointer.put(task.getId(), schFulture);
 				break;
