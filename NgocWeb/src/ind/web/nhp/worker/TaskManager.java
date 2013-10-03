@@ -2,6 +2,7 @@ package ind.web.nhp.worker;
 
 import ind.web.nhp.utils.Utils;
 
+import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -68,6 +69,14 @@ public class TaskManager implements ITaskManager {
 			case RUNONCE:
 				threadExecutor.schedule(taskThread, initialDelay, unit);
 				break;
+			case RUN_AT_SPECIFICED_TIME:
+				int[] startTime = taskInfo.getStartTime();
+				long initDelay = calcInitialDelay(startTime);
+				schFulture = threadExecutor
+						.scheduleAtFixedRate(taskThread, initDelay, period, unit);
+				scheduledTasks.put(task.getId(), task);
+				scheduledPointer.put(task.getId(), schFulture);
+				break;
 			default:
 				break;
 			}
@@ -75,6 +84,143 @@ public class TaskManager implements ITaskManager {
 			return false;
 		}
 		return true;
+	}
+
+	private static long calcInitialDelay(int[] startTime) {
+		int month = startTime[0] > 0 ? startTime[0] : 0;
+		int week = startTime[1] > 0 ? startTime[1] : 0;
+		switch (week) {
+		case 2:
+			week = Calendar.MONDAY;
+			break;
+		case 3:
+			week = Calendar.TUESDAY;
+			break;
+		case 4:
+			week = Calendar.WEDNESDAY;
+			break;
+		case 5:
+			week = Calendar.THURSDAY;
+			break;
+		case 6:
+			week = Calendar.FRIDAY;
+			break;
+		case 7:
+			week = Calendar.SATURDAY;
+			break;
+		case 0:
+			break;
+		default:
+			week = Calendar.SUNDAY;
+			break;
+		}
+		int day = startTime[2] > 0 ? startTime[2] : 0;
+		int hour = startTime[3] > 0 ? startTime[3] : 0;
+		int minute = startTime[4] > 0 ? startTime[4] : 0;
+		if (month <= 0 && week <= 0 && day <= 0 && hour <= 0 && minute <= 0) {
+			return 0l;
+		}
+		Calendar cal = Calendar.getInstance();
+		long curTime = cal.getTimeInMillis();
+		int curMonth = cal.get(Calendar.MONTH) + 1;
+		int curWeek = cal.get(Calendar.DAY_OF_WEEK);
+		int curDay = cal.get(Calendar.DAY_OF_MONTH);
+		int curHour = cal.get(Calendar.HOUR_OF_DAY);
+		int curMinute = cal.get(Calendar.MINUTE);
+
+		int nextMonth = month, nextDay = day, nextHour = hour;
+
+		if (week != 0) {
+			boolean notCurrent = false;
+			// Set time.
+			if (month != 0) {
+				cal.set(Calendar.MONTH, month - 1);
+			} else {
+				nextMonth = curMonth;
+			}
+			nextHour = curHour;
+			cal.set(Calendar.HOUR_OF_DAY, hour);
+			cal.set(Calendar.MINUTE, minute);
+
+			// Change if time went by.
+			if (minute < curMinute) {
+				nextHour--;
+			}
+			if (nextHour < curHour) {
+				notCurrent = true;
+			}
+			int dayAdd = 0;
+			if (notCurrent && curWeek == week) {
+				dayAdd = 7;
+			} else if (curWeek != week) {
+				dayAdd = week > curWeek ? week - curWeek : week - curWeek + 7;
+			}
+			cal.add(Calendar.DATE, dayAdd);
+			// if (nextDay < curDay) {
+			// nextMonth--;
+			// }
+			// if (nextMonth < curMonth) {
+			// if (month == 0) {
+			// cal.add(Calendar.MONTH, 1);
+			// } else {
+			// cal.add(Calendar.YEAR, 1);
+			// }
+			// }
+			long nextTime = cal.getTimeInMillis();
+			return (nextTime - curTime) / 1000;
+		}
+
+		// Set time.
+		if (month != 0) {
+			cal.set(Calendar.MONTH, month - 1);
+		} else {
+			nextMonth = curMonth;
+		}
+		if (day != 0 || month != 0) {
+			cal.set(Calendar.DAY_OF_MONTH, day == 0 ? 1 : day);
+		} else {
+			nextDay = curDay;
+		}
+		if (hour != 0 || month != 0 || day != 0) {
+			cal.set(Calendar.HOUR_OF_DAY, hour);
+		} else {
+			nextHour = curHour;
+		}
+		cal.set(Calendar.MINUTE, minute);
+
+		// Change if time went by.
+		if (minute < curMinute) {
+			nextHour--;
+		}
+		if (nextHour < curHour) {
+			if (hour == 0 && month == 0 && day == 0) {
+				cal.add(Calendar.HOUR_OF_DAY, 1);
+			} else {
+				nextDay--;
+			}
+		}
+		if (nextDay < curDay) {
+			if (day == 0 && month == 0) {
+				cal.add(Calendar.DATE, 1);
+			} else {
+				nextMonth--;
+			}
+		}
+		if (nextMonth < curMonth) {
+			if (month == 0) {
+				cal.add(Calendar.MONTH, 1);
+			} else {
+				cal.add(Calendar.YEAR, 1);
+			}
+		}
+
+		long nextTime = cal.getTimeInMillis();
+		return (nextTime - curTime) / 1000;
+	}
+
+	public static void main(String[] args) {
+		int[] startTime = new int[] { 0, 6, 3, 18, 24 };
+		System.out.println(calcInitialDelay(startTime));
 	}
 
 	@Override

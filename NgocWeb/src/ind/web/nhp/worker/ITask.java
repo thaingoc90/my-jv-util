@@ -11,6 +11,7 @@ public interface ITask {
 		RUNONCE, // task runs only once
 		REPEATED, // task runs repeatedly at a fixed rate
 		REPEATED_AFTER_FINISH, // task runs repeatedly with a fixed delay
+		RUN_AT_SPECIFICED_TIME, // task runs at specified time (ex: every 8h Sunday)
 	};
 
 	/**
