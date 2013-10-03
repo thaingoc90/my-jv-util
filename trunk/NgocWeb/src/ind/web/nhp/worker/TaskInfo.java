@@ -8,6 +8,12 @@ public class TaskInfo {
 	private TimeUnit timeUnit;
 	private ITask.Scheduling scheduling;
 	private Object params;
+	/**
+	 * startTime have 5 elements, represent for periods. Just use for type RUN_AT_SPECIFICED_TIME.
+	 * 
+	 * 1 -> month, 2 -> week, 3 -> day, 4 -> hour. 5 -> minute.
+	 */
+	private int[] startTime;
 
 	public TaskInfo() {
 		timeUnit = TimeUnit.SECONDS;
@@ -28,6 +34,13 @@ public class TaskInfo {
 		this.initialDelay = initialDelay;
 		this.fixedRateDelay = fixedRateDelay;
 		this.timeUnit = timeUnit;
+	}
+
+	public TaskInfo(ITask.Scheduling scheduling, Object params, long fixedRateDelay,
+			TimeUnit timeUnit, int[] startTime) {
+		this(scheduling, params, fixedRateDelay);
+		this.timeUnit = timeUnit;
+		this.startTime = startTime;
 	}
 
 	public long getInitialDelay() {
@@ -68,6 +81,14 @@ public class TaskInfo {
 
 	public void setParams(Object params) {
 		this.params = params;
+	}
+
+	public int[] getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(int[] startTime) {
+		this.startTime = startTime;
 	}
 
 }
