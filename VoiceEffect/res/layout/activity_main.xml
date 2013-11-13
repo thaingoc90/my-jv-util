@@ -24,8 +24,7 @@
         android:layout_marginTop="40dp"
         android:text="@string/btn_record"
         android:textSize="15sp"
-        android:width="200dp" 
-        android:onClick="recordVoice"/>
+        android:width="200dp" />
 
     <Button
         android:id="@+id/btn_baby_voice"
@@ -34,6 +33,7 @@
         android:layout_alignLeft="@+id/btn_record"
         android:layout_below="@+id/btn_record"
         android:layout_marginTop="40dp"
+        android:clickable="false"
         android:text="@string/btn_baby_voice"
         android:textSize="15sp"
         android:width="100dp" />
@@ -46,8 +46,33 @@
         android:layout_alignBottom="@+id/btn_baby_voice"
         android:layout_alignParentRight="true"
         android:layout_marginRight="50dp"
+        android:clickable="false"
         android:text="@string/btn_old_voice"
         android:textSize="15sp"
         android:width="100dp" />
+
+    <EditText
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_baby_voice"
+        android:layout_below="@+id/btn_baby_voice"
+        android:layout_marginTop="38dp"
+        android:ems="10"
+        android:hint="Number of seconds"
+        android:inputType="numberDecimal" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/time"
+        android:layout_below="@+id/time"
+        android:layout_marginTop="32dp"
+        android:onClick="startAlert"
+        android:text="Start Counter" />
 
 </RelativeLayout>
