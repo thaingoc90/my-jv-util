@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Voice Effects</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="btn_record">Record</string>
+    <string name="welcome_app">Welcome</string>
+    <string name="btn_baby_voice">Baby voice</string>
+    <string name="btn_old_voice">Old voice</string>
+
+</resources>
