@@ -9,5 +9,7 @@
     <string name="welcome_app">Welcome</string>
     <string name="btn_baby_voice">Baby voice</string>
     <string name="btn_old_voice">Old voice</string>
-
+    
+    <string name="txt_recording">Recording</string>
+    
 </resources>
