@@ -21,25 +21,22 @@
         android:layout_below="@+id/btn_normal_voice"
         android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:onClick="startAlert"
-            android:text="Start Counter" />
-
         <EditText
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:ems="10"
             android:hint="Number of seconds"
-            android:inputType="numberDecimal" >
+            android:inputType="numberDecimal" />
 
-            <requestFocus />
-        </EditText>
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="startAlert"
+            android:text="Start Counter" />
     </LinearLayout>
 
     <Button
