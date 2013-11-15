@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,18 +28,19 @@ public class MainActivity extends Activity {
 	boolean mStartPlaying = true;
 	private MediaPlayer mPlayer = null;
 	private MediaRecorder mRecorder = null;
+	private Handler mHandler = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		initRecordingVariable();
-		initPlayingVariable();
 
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 		mFileName += "/TestAudio.mp3";
+		mHandler = new Handler();
 
 		recordBtn = (Button) findViewById(R.id.btn_record);
+		initRecordingVariable();
 		recordBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -54,20 +56,24 @@ public class MainActivity extends Activity {
 		});
 
 		playBtn = (Button) findViewById(R.id.btn_normal_voice);
+		initPlayingVariable();
 		playBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (mStartPlaying) {
 					startPlaying();
-					playBtn.setText("Stop");
 				} else {
 					stopPlaying();
-					playBtn.setText("Play");
 				}
-				mStartPlaying = !mStartPlaying;
-
 			}
 		});
+	}
+
+	@Override
+	protected void onDestroy() {
+		stopPlaying();
+		stopRecording();
+		super.onDestroy();
 	}
 
 	public void initRecordingVariable() {
@@ -93,6 +99,13 @@ public class MainActivity extends Activity {
 		try {
 			mRecorder.prepare();
 			mRecorder.start();
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					stopRecording();
+					initRecordingVariable();
+				}
+			}, 5000);
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Recording failed");
 		}
@@ -119,7 +132,8 @@ public class MainActivity extends Activity {
 		try {
 			File file = new File(mFileName);
 			if (!file.exists()) {
-				Log.i(LOG_TAG, "File not exist");
+				Toast.makeText(this, "Please record your voice.",
+						Toast.LENGTH_LONG).show();
 			} else {
 				mPlayer.setDataSource(mFileName);
 				mPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -131,6 +145,8 @@ public class MainActivity extends Activity {
 				});
 				mPlayer.prepare();
 				mPlayer.start();
+				mStartPlaying = false;
+				playBtn.setText("Stop");
 			}
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Playing failed");
@@ -142,6 +158,7 @@ public class MainActivity extends Activity {
 	 * Stop playing
 	 */
 	public void stopPlaying() {
+		initPlayingVariable();
 		Log.d(LOG_TAG, "stop playing");
 		if (mPlayer != null) {
 			mPlayer.release();
@@ -149,9 +166,19 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/* -----------------------TEST ALERT------------------------ */
+	/**
+	 * 
+	 * @param view
+	 */
 	public void startAlert(View view) {
 		EditText text = (EditText) findViewById(R.id.time);
-		int i = Integer.parseInt(text.getText().toString());
+		int i;
+		try {
+			i = Integer.parseInt(text.getText().toString());
+		} catch (Exception e) {
+			i = 0;
+		}
 		Intent intent = new Intent(this, MyBroadcastReceiver.class);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(
 				this.getApplicationContext(), 12345, intent, 0);
