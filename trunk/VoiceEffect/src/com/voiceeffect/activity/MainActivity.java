@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
 			}
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Playing failed");
-			initPlayingVariable();
+			stopPlaying();
 		}
 	}
 
