@@ -35,11 +35,11 @@ public class MainActivity extends Activity {
 
 	int RECORDER_SAMPLERATE = 44100;
 	private final int RECORDER_BPP = 16;
-	int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+	int channelConfig = AudioFormat.CHANNEL_IN_STEREO;
 	int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-	int bufferSizeInByte = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
-			channelConfig, audioFormat);
-	byte[] bufferData = new byte[bufferSizeInByte];
+	int bufferSize = AudioRecord.getMinBufferSize(8000, channelConfig,
+			audioFormat);
+	byte[] bufferData = new byte[bufferSize];
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 		try {
 			isRecording = true;
 			mRecorder = new AudioRecord(AudioSource.MIC, RECORDER_SAMPLERATE,
-					channelConfig, audioFormat, bufferSizeInByte);
+					channelConfig, audioFormat, bufferSize);
 			mRecorder.startRecording();
 			threadRecord = new Thread(new Runnable() {
 				@Override
@@ -252,7 +252,7 @@ public class MainActivity extends Activity {
 		int channels = 2;
 		long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
 
-		byte[] data = new byte[8];
+		byte[] data = new byte[bufferSize];
 
 		try {
 			in = new FileInputStream(inFilename);
@@ -268,14 +268,12 @@ public class MainActivity extends Activity {
 			while (in.read(data) != -1) {
 				out.write(data);
 			}
-			
-			Log.d(LOG_TAG, "3");
 
 			in.close();
 			out.close();
 		} catch (FileNotFoundException e) {
 			Log.d(LOG_TAG, e.getMessage());
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			Log.d(LOG_TAG, e.getMessage());
