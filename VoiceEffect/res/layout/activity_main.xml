@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:text="@string/welcome_app" />
 
+    <!-- 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
@@ -38,6 +39,7 @@
             android:onClick="startAlert"
             android:text="Start Counter" />
     </LinearLayout>
+     -->
 
     <Button
         android:id="@+id/btn_record"
@@ -55,7 +57,6 @@
         android:id="@+id/btn_normal_voice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout1"
         android:layout_below="@+id/btn_record"
         android:layout_marginTop="24dp"
         android:height="50dp"
@@ -64,28 +65,27 @@
         android:width="70dp" />
 
     <Button
-        android:id="@+id/btn_baby_voice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout1"
-        android:layout_marginLeft="14dp"
-        android:layout_toRightOf="@+id/btn_normal_voice"
-        android:clickable="false"
-        android:height="50dp"
-        android:text="@string/btn_baby_voice"
-        android:textSize="15sp"
-        android:width="70dp" />
-
-    <Button
         android:id="@+id/btn_old_voice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout1"
-        android:layout_marginLeft="14dp"
+        android:layout_alignBaseline="@+id/btn_baby_voice"
+        android:layout_alignBottom="@+id/btn_baby_voice"
         android:layout_toRightOf="@+id/btn_baby_voice"
         android:clickable="false"
         android:height="50dp"
         android:text="@string/btn_old_voice"
+        android:textSize="15sp"
+        android:width="70dp" />
+
+    <Button
+        android:id="@+id/btn_baby_voice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btn_normal_voice"
+        android:layout_toRightOf="@+id/btn_normal_voice"
+        android:clickable="false"
+        android:height="50dp"
+        android:text="@string/btn_baby_voice"
         android:textSize="15sp"
         android:width="70dp" />
 
