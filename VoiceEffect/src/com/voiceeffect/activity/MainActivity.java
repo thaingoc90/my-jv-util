@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/TestAudio.mp3";
+		mFileName += "/TestAudio.wav";
 		mHandler = new Handler();
 
 		recordBtn = (Button) findViewById(R.id.btn_record);
