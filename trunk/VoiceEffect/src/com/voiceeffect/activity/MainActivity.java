@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,9 +13,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
-import android.media.MediaPlayer.OnCompletionListener;
 
 public class MainActivity extends Activity {
 
@@ -29,6 +25,7 @@ public class MainActivity extends Activity {
 	private MediaPlayer mPlayer = null;
 	private MediaRecorder mRecorder = null;
 	private Handler mHandler = null;
+	private final static int TIME_RECORD = 5; // second
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +102,7 @@ public class MainActivity extends Activity {
 					stopRecording();
 					initRecordingVariable();
 				}
-			}, 5000);
+			}, TIME_RECORD * 1000);
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Recording failed");
 		}
@@ -171,21 +168,22 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param view
 	 */
-	public void startAlert(View view) {
-		EditText text = (EditText) findViewById(R.id.time);
-		int i;
-		try {
-			i = Integer.parseInt(text.getText().toString());
-		} catch (Exception e) {
-			i = 0;
-		}
-		Intent intent = new Intent(this, MyBroadcastReceiver.class);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(
-				this.getApplicationContext(), 12345, intent, 0);
-		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-				+ (i * 1000), pendingIntent);
-		Toast.makeText(this, "Alarm set in " + i + " seconds",
-				Toast.LENGTH_LONG).show();
-	}
+	// public void startAlert(View view) {
+	// EditText text = (EditText) findViewById(R.id.time);
+	// int i;
+	// try {
+	// i = Integer.parseInt(text.getText().toString());
+	// } catch (Exception e) {
+	// i = 0;
+	// }
+	// Intent intent = new Intent(this, MyBroadcastReceiver.class);
+	// PendingIntent pendingIntent = PendingIntent.getBroadcast(
+	// this.getApplicationContext(), 12345, intent, 0);
+	// AlarmManager alarmManager = (AlarmManager)
+	// getSystemService(ALARM_SERVICE);
+	// alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+	// + (i * 1000), pendingIntent);
+	// Toast.makeText(this, "Alarm set in " + i + " seconds",
+	// Toast.LENGTH_LONG).show();
+	// }
 }
