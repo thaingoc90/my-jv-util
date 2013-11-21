@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 		InfoType info = infoService.getInfo(name);
 		if (info != null) {
 			mUIAddress.setText(info.getAddress());
-			mUISalary.setText(info.getSalary());
+			mUISalary.setText(String.valueOf(info.getSalary()));
 		} else {
 			displayError("Don't exist name.");
 		}
