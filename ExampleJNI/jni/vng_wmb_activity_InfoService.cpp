@@ -14,8 +14,9 @@ jobject Java_vng_wmb_activity_InfoService_getInfo(JNIEnv* pEnv, jobject pThis,
 	jclass infoClass = pEnv->FindClass("vng/wmb/activity/InfoType");
 	jmethodID constructor = pEnv->GetMethodID(infoClass, "<init>",
 			"(Ljava/lang/String;Ljava/lang/String;I)V");
-	jobject infoObj = pEnv->NewObject(infoClass, constructor, info->mName,
-			info->mAddress, info->mSalary);
+	jstring address = pEnv->NewStringUTF(info->mAddress);
+	jobject infoObj = pEnv->NewObject(infoClass, constructor, name, address,
+			info->mSalary);
 	return infoObj;
 }
 
