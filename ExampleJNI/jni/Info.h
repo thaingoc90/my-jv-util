@@ -22,6 +22,8 @@ InfoType* findEntry(JNIEnv* pEnv, InfoStore* pInfoStore, jstring name,
 
 InfoType* allocateEntry(JNIEnv* pEnv, InfoStore* pInfoStore, jstring name);
 
+void deleteEntry(JNIEnv* pEnv, InfoStore* pInfoStore, jstring name);
+
 void releaseEntry(JNIEnv* pEnv, InfoType* pInfo);
 
 #endif

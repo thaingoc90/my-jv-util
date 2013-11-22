@@ -42,6 +42,10 @@ public class MainActivity extends Activity {
 		if (name.length() <= 0) {
 			return;
 		}
+		if (address.length() <= 0 || salary <= 0) {
+			displayError("Input Value is invalid");
+			return;
+		}
 		InfoType info = new InfoType(name, address, salary);
 		try {
 			infoService.setInfo(name, info);
@@ -72,6 +76,16 @@ public class MainActivity extends Activity {
 		infoService.deleteInfo(name);
 		mUIAddress.setText("");
 		mUISalary.setText("");
+		displayError("Remove successfully");
+	}
+
+	public void onBackup(View view) {
+		int error = infoService.writeFile();
+		if (error != 0) {
+			displayError("Error when processing");
+		} else {
+			displayError("Backup successfully");
+		}
 	}
 
 	private void displayError(String pError) {
