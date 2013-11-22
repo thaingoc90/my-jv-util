@@ -29,6 +29,8 @@ void Java_vng_wmb_activity_InfoService_setInfo(JNIEnv *, jobject, jstring,
  */
 void Java_vng_wmb_activity_InfoService_deleteInfo(JNIEnv *, jobject, jstring);
 
+jint Java_vng_wmb_activity_InfoService_writeFile(JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

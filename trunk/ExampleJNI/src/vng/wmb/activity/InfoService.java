@@ -12,4 +12,5 @@ public class InfoService {
 
 	public native void deleteInfo(String name);
 
+	public native int writeFile();
 }

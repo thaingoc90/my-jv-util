@@ -2,6 +2,7 @@
 #include "Info.h"
 #include "string.h"
 #include <stdint.h>
+#include <stdio.h>
 
 static InfoStore infoStore = { { }, 0 };
 
@@ -43,5 +44,24 @@ void Java_vng_wmb_activity_InfoService_setInfo(JNIEnv* pEnv, jobject pThis,
 
 void Java_vng_wmb_activity_InfoService_deleteInfo(JNIEnv* pEnv, jobject pThis,
 		jstring name) {
-
+	deleteEntry(pEnv, &infoStore, name);
 }
+
+jint Java_vng_wmb_activity_InfoService_writeFile(JNIEnv* pEnv, jobject pThis) {
+	FILE* file = fopen("/sdcard/info.txt", "w");
+	if (file == NULL) {
+		return 1;
+	}
+	InfoType info;
+	for (int i = 0; i < infoStore.length; i++) {
+		info = infoStore.infoList[i];
+		fprintf(file, "Name: %s\r\n", info.mName);
+		fprintf(file, "Address: %s\r\n", info.mAddress);
+		fprintf(file, "Salary: %d\r\n", info.mSalary);
+		fprintf(file, "---------------\r\n");
+	}
+	fflush(file);
+	fclose(file);
+	return 0;
+}
+

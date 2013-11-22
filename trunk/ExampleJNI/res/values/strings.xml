@@ -11,5 +11,6 @@
     <string name="get">Get</string>
     <string name="delete">Delete</string>
     <string name="getAll">Get All</string>
+    <string name="backup">Backup</string>
 
 </resources>

@@ -121,7 +121,7 @@
             android:text="@string/get"
             android:textSize="15sp"
             android:width="80dp" />
-        
+
         <Button
             android:id="@+id/btn_del"
             android:layout_width="wrap_content"
@@ -131,6 +131,23 @@
             android:height="40dp"
             android:onClick="onDeleteValue"
             android:text="@string/delete"
+            android:textSize="15sp"
+            android:width="80dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="90dp" >
+
+        <Button
+            android:id="@+id/btn_backup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:height="40dp"
+            android:onClick="onBackup"
+            android:text="@string/backup"
             android:textSize="15sp"
             android:width="80dp" />
     </RelativeLayout>

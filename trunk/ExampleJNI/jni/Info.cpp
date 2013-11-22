@@ -44,6 +44,20 @@ InfoType* allocateEntry(JNIEnv* pEnv, InfoStore* pInfoStore, jstring name) {
 	return info;
 }
 
+void deleteEntry(JNIEnv* pEnv, InfoStore* pInfoStore, jstring name) {
+	InfoType* info = findEntry(pEnv, pInfoStore, name, NULL);
+	if (info != NULL) {
+		InfoType* lastInfo = pInfoStore->infoList + (pInfoStore->length - 1);
+		strcpy(info->mName, lastInfo->mName);
+		strcpy(info->mAddress, lastInfo->mAddress);
+		info->mSalary = lastInfo->mSalary;
+		delete[] lastInfo->mName;
+		delete[] lastInfo->mAddress;
+		lastInfo->mSalary = 0;
+		pInfoStore->length--;
+	}
+}
+
 void releaseEntry(JNIEnv* pEnv, InfoType* pInfo) {
 	delete[] pInfo->mAddress;
 }
