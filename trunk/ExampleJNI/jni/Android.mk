@@ -18,6 +18,6 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS    := -DHAVE_INTTYPES_H
 LOCAL_MODULE    := infoManage
-LOCAL_SRC_FILES := vng_wmb_activity_InfoService.cpp Info.cpp
+LOCAL_SRC_FILES := InfoService.cpp Info.cpp
 
 include $(BUILD_SHARED_LIBRARY)
