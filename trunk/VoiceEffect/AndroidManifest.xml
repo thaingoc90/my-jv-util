@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACTION_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -19,8 +19,22 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <!--
+        RECORD BY ANDROID 
         <activity
             android:name="com.voiceeffect.activity.MainActivity"
+            android:label="@string/app_name" >
+        </activity>
+
+        <receiver android:name="MyBroadcastReceiver" >
+        </receiver>
+        -->
+
+
+        <!-- RECORD BY OPENSL -->
+        <activity
+            android:name="com.voiceeffect.activity.RecordActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,13 +42,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.voiceeffect.activity.RecordVoiceActivity"
-            android:label="@string/app_name" >
-        </activity>
-
-        <receiver android:name="MyBroadcastReceiver" >
-        </receiver>
     </application>
 
 </manifest>
