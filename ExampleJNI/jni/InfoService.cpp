@@ -1,4 +1,4 @@
-#include "vng_wmb_activity_InfoService.h"
+#include "InfoService.h"
 #include "Info.h"
 #include "string.h"
 #include <stdint.h>
