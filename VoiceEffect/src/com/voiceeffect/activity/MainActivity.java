@@ -29,8 +29,6 @@ public class MainActivity extends Activity {
 	boolean mStartPlaying = true;
 	private MediaPlayer mPlayer = null;
 	private AudioRecord mRecorder = null;
-	private Handler mHandler = null;
-	private final static int TIME_RECORD = 5; // second
 	private Thread threadRecord = null;
 
 	int RECORDER_SAMPLERATE = 44100;
@@ -49,8 +47,7 @@ public class MainActivity extends Activity {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 		mTempFileName = mFileName + "/TempAudio.raw";
 		mFileName += "/TestAudio.wav";
-
-		mHandler = new Handler();
+		Log.w(LOG_TAG, mFileName);
 
 		recordBtn = (Button) findViewById(R.id.btn_record);
 		initRecordingVariable();
