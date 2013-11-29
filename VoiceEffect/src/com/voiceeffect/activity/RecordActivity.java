@@ -26,7 +26,7 @@ public class RecordActivity extends Activity {
 
 	public void startPlay(View view) {
 		Log.w(LOG_PREFIX, "Play");
-		voiceSer.stopRecord();
+		voiceSer.playMusic();
 	}
 
 	@Override
