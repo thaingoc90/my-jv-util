@@ -2,14 +2,17 @@
 #include "Log.h"
 #include <stdio.h>
 #include <assert.h>
-const int TIME_RECORD = 3;
+const int TIME_RECORD = 5;
+const int SAMPE_RATE = 8000;
+int32_t mRecordSize = SAMPE_RATE * TIME_RECORD;
+int16_t* mRecordBuffer = new int16_t[mRecordSize];
 
 status checkError(SLresult);
 void write_wav(const char *, unsigned int, unsigned int, unsigned int,
-		SLAndroidSimpleBufferQueueItf);
+		int16_t*);
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
-void callback_player(SLBufferQueueItf, void *);
+void callback_player(SLAndroidSimpleBufferQueueItf, void *);
 
 RecordService::RecordService() :
 		mEngine(NULL), mEngineObj(NULL), mRecorderObj(NULL), mRecorder(NULL), mRecorderQueue(
@@ -102,11 +105,9 @@ status RecordService::initEngineObj() {
 }
 
 void RecordService::recordSound() {
-	Log::info("Start record %d", sizeof(short));
+	Log::info("Start record");
 	SLresult res;
 	SLuint32 state;
-	int32_t mRecordSize = 8000 * TIME_RECORD;
-	int16_t* mRecordBuffer = new int16_t[mRecordSize];
 	(*mRecorderObj)->GetState(mRecorderObj, &state);
 	if (state == SL_OBJECT_STATE_REALIZED ) {
 		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
@@ -126,16 +127,21 @@ void RecordService::recordSound() {
 
 void RecordService::stopRecord() {
 	Log::info("Stop Record");
+	time_t nowTime = time(0);
+	tm* now = localtime(&nowTime);
+	SLint32 duration = now->tm_sec - startTime;
+	Log::info("Duration %d", duration);
+	int32_t mRecordSize = SAMPE_RATE * TIME_RECORD;
+	(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
+	write_wav("/sdcard/voice.wav", SAMPE_RATE, 16, 1, mRecordBuffer);
+	(*mPlayerQueue)->Enqueue(mPlayerQueue, mRecordBuffer,
+			mRecordSize * sizeof(int16_t));
+	//(*mRecorderQueue)->Clear(mRecorderQueue);
 }
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	RecordService* recordSer = (RecordService*) pContext;
-	time_t nowTime = time(0);
-	tm* now = localtime(&nowTime);
-	SLint32 duration = now->tm_sec - recordSer->startTime;
-	Log::info("Duration %d", duration);
-	int32_t mRecordSize = 8000 * TIME_RECORD;
-	write_wav("/sdcard/test.wav", 8000, 16, 1, slBuffer);
+	recordSer->stopRecord();
 }
 
 void RecordService::destroyEngineObj() {
@@ -144,6 +150,12 @@ void RecordService::destroyEngineObj() {
 		mRecorderObj = NULL;
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
+	}
+	if (mPlayerObj != NULL) {
+		(*mPlayerObj)->Destroy(mPlayerObj);
+		mPlayerObj = NULL;
+		mPlayer = NULL;
+		mPlayerQueue = NULL;
 	}
 	if (mEngineObj != NULL) {
 		(*mEngineObj)->Destroy(mEngineObj);
@@ -200,8 +212,8 @@ status RecordService::initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_BUFFERQUEUE,
-			&mPlayerQueue);
+	res = (*mPlayerObj)->GetInterface(mPlayerObj,
+			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mPlayerQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -234,6 +246,8 @@ void RecordService::startPlayer() {
 		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
 		if (checkError(lRes) != STATUS_OK)
 			return;
+		(*mPlayerQueue)->Enqueue(mPlayerQueue, mRecordBuffer,
+				mRecordSize * sizeof(int16_t));
 	}
 	return;
 }
@@ -242,7 +256,8 @@ void RecordService::stopPlayer() {
 	Log::info("Stop Player");
 }
 
-void callback_player(SLBufferQueueItf pBufferQueue, void *context) {
+void callback_player(SLAndroidSimpleBufferQueueItf pBufferQueue,
+		void *context) {
 	RecordService& lService = *(RecordService*) context;
 	Log::info("Callback player stop");
 }
@@ -267,7 +282,7 @@ void write_little_endian(unsigned int word, int num_bytes, FILE *wav_file) {
 
 void write_wav(const char * filename, unsigned int num_samples,
 		unsigned int bits_per_sample, unsigned int num_channels,
-		SLAndroidSimpleBufferQueueItf data) {
+		int16_t* data) {
 	unsigned int bytes_per_sample = bits_per_sample / 8;
 	unsigned int byte_rate = num_samples * num_channels * bytes_per_sample;
 	unsigned long i; /* counter for samples */

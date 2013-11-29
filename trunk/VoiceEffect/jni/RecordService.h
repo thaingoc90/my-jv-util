@@ -20,8 +20,6 @@ public:
 	status initPlayer();
 	void startPlayer();
 	void stopPlayer();
-	int32_t startTime;
-	SLAndroidSimpleBufferQueueItf mRecorderQueue;
 
 private:
 	SLObjectItf mEngineObj;
@@ -31,12 +29,14 @@ private:
 	// RECORDER
 	SLObjectItf mRecorderObj;
 	SLRecordItf mRecorder;
+	SLAndroidSimpleBufferQueueItf mRecorderQueue;
+	int32_t startTime;
 
 	// PLAYER
 	SLObjectItf mOutputMixObj;
 	SLObjectItf mPlayerObj;
 	SLPlayItf mPlayer;
-	SLBufferQueueItf mPlayerQueue;
+	SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
 };
 
