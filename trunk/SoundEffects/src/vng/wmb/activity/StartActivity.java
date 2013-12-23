@@ -1,83 +1,103 @@
 package vng.wmb.activity;
 
 import vng.wmb.service.AudioService;
-import vng.wmb.service.SoundTouchEffect;
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class StartActivity extends Activity {
 
 	static {
+		System.loadLibrary("soundTouch");
 		System.loadLibrary("soundEffect");
 	}
 
-	private Button recordBtn, normalBtn, speedBtn;
-	public static boolean recordedFlag = false;
-	public static AudioService audioServices = new AudioService();
-	public SoundTouchEffect soundTouchService;
+	private Button recordBtn, stopBtn;
+	private TextView messageRecord;
+	public static boolean isRecording = false;
+	public static AudioService audioServices;
+	private Handler mHandler;
+	private static final int TIME_RECORD = 10000; // ms
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
 
+		audioServices = new AudioService();
 		audioServices.init();
-		audioServices.initPlayer();
-		soundTouchService = new SoundTouchEffect();
-		// soundTouchService.init();
+		// audioServices.initPlayer();
 
-		normalBtn = (Button) findViewById(R.id.btn_effect_normal);
-		normalBtn.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// audioServices.playMusic();
-			}
-		});
-
-		speedBtn = (Button) findViewById(R.id.btn_effect_speed);
-		speedBtn.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// audioServices.playMusic();
-			}
-		});
+		mHandler = new Handler();
 
 		recordBtn = (Button) findViewById(R.id.btn_record);
 		recordBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(),
-						RecordingActivity.class);
-				startActivity(intent);
+				audioServices.startRecord();
+				isRecording = true;
+				mHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						stopRecording();
+					}
+				}, TIME_RECORD);
+				checkInterface();
 			}
 		});
 
+		stopBtn = (Button) findViewById(R.id.btn_stop_record);
+		stopBtn.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.i("JAVA_JNI_SE", "StopActivity");
+				stopRecording();
+			}
+		});
+
+		messageRecord = (TextView) findViewById(R.id.text_recording);
+
+	}
+
+	private synchronized void stopRecording() {
+		if (isRecording) {
+			audioServices.stopRecord();
+			isRecording = false;
+			Intent intent = new Intent(getApplicationContext(),
+					EffectActivity.class);
+			startActivity(intent);
+		}
+	}
+
+	private void checkInterface() {
+		if (isRecording) {
+			messageRecord.setVisibility(View.VISIBLE);
+			stopBtn.setVisibility(View.VISIBLE);
+			recordBtn.setVisibility(View.INVISIBLE);
+		} else {
+			messageRecord.setVisibility(View.INVISIBLE);
+			stopBtn.setVisibility(View.INVISIBLE);
+			recordBtn.setVisibility(View.VISIBLE);
+		}
 	}
 
 	@Override
-	protected void onStart() {
-		if (recordedFlag) {
-			normalBtn.setVisibility(View.VISIBLE);
-			speedBtn.setVisibility(View.VISIBLE);
-			recordBtn.setText(R.string.btn_record_again);
-		} else {
-			normalBtn.setVisibility(View.INVISIBLE);
-			speedBtn.setVisibility(View.INVISIBLE);
-			recordBtn.setText(R.string.btn_record);
-		}
-		super.onStart();
+	protected void onResume() {
+		checkInterface();
+		super.onResume();
 	}
 
 	@Override
 	protected void onDestroy() {
+		Log.i("JNI_VE", "destroy");
 		audioServices.destroy();
-		// soundTouchService.destroy();
 		super.onDestroy();
 	}
 

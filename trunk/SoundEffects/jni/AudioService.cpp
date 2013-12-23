@@ -5,32 +5,37 @@
 #include <SLES/OpenSLES_AndroidConfiguration.h>
 #include <stdio.h>
 #include <assert.h>
+#include <ctime>
+#include <pthread.h>
 
 const int STATUS_OK = 0;
 const int STATUS_KO = -1;
-const int TIME_RECORD = 5;
 
-SLObjectItf mEngineObj;
+static SLObjectItf mEngineObj = NULL;
 SLEngineItf mEngine;
 SLDataFormat_PCM lDataFormat;
 
 // RECORDER
-SLObjectItf mRecorderObj;
+static SLObjectItf mRecorderObj = NULL;
 SLRecordItf mRecorder;
-SLAndroidSimpleBufferQueueItf mRecorderQueue;
+static SLAndroidSimpleBufferQueueItf mRecorderQueue;
 int32_t startTime;
 
 // PLAYER
 SLObjectItf mOutputMixObj;
-SLObjectItf mPlayerObj;
+SLObjectItf mPlayerObj = NULL;
 SLPlayItf mPlayer;
-SLAndroidSimpleBufferQueueItf mPlayerQueue;
+static SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
-jobject pRecordObj;
-JNIEnv * pRecordEnv;
+static bool isRecording = false;
+
+const int MAX_TIME_RECORD = 10;
+const int SAMPE_RATE = 44100;
+int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD;
+int16_t* mRecordBuffer = new int16_t[mRecordSize];
 
 void write_wav(const char *, unsigned int, unsigned int, unsigned int,
-		int16_t*);
+		unsigned int, int16_t*);
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 void callback_player(SLAndroidSimpleBufferQueueItf, void *);
 int checkError(SLresult);
@@ -64,7 +69,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	lDataLocatorOut.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
 	lDataLocatorOut.numBuffers = 2;
 	lDataFormat.channelMask = SL_SPEAKER_FRONT_CENTER;
-	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_8;
+	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
 	lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.formatType = SL_DATAFORMAT_PCM;
@@ -102,7 +107,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mRecorderQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
-//CHÚ Ý
+
 	res = (*mRecorderQueue)->RegisterCallback(mRecorderQueue, callback_recorder,
 			NULL);
 	if (checkError(res) != STATUS_OK)
@@ -119,12 +124,9 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 		jobject pThis) {
 	Log::info("Start record");
-	pRecordObj = pThis;
-	pRecordEnv = pEnv;
+	isRecording = true;
 	SLresult res;
 	SLuint32 state;
-	int32_t mRecordSize = 8000 * 10;
-	int16_t* mRecordBuffer = new int16_t[mRecordSize];
 	(*mRecorderObj)->GetState(mRecorderObj, &state);
 	if (state == SL_OBJECT_STATE_REALIZED ) {
 		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
@@ -135,21 +137,30 @@ void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 		if (checkError(res) != STATUS_OK)
 			return;
 		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_RECORDING );
+		time_t nowTime = time(0);
+		tm* now = localtime(&nowTime);
+		startTime = now->tm_sec;
 	}
 }
 
 void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Stop Record");
-	(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
-//	int32_t mRecordSize = 8000 * 10;
+	if (isRecording) {
+		isRecording = false;
+		time_t nowTime = time(0);
+		tm* now = localtime(&nowTime);
+		SLint32 duration = now->tm_sec - startTime;
+		Log::info("Duration %d", duration);
+		int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD;
+		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
+		write_wav("/sdcard/voice.wav", SAMPE_RATE, 16, 1, duration,
+				mRecordBuffer);
+	}
+}
 
-//	(*mPlayerQueue)->Enqueue(mPlayerQueue, mRecorderQueue,
-//			mRecordSize * sizeof(int16_t));
-
-	jclass infoClass = pEnv->FindClass("vng/wmb/activity/RecordingActivity");
-	jmethodID stopActivity = pEnv->GetMethodID(infoClass, "stopActivity",
-			"(V)V");
-	pEnv->CallStaticVoidMethod(infoClass, stopActivity);
+void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+	Log::info("callback record");
+	Java_vng_wmb_service_AudioService_stopRecord(NULL, NULL);
 }
 
 jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
@@ -164,12 +175,11 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	Log::debug("1");
 	res = (*mOutputMixObj)->Realize(mOutputMixObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	// Set-up sound audio source.
+// Set-up sound audio source.
 	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn;
 	lDataLocatorIn.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
 	lDataLocatorIn.numBuffers = 1;
@@ -193,7 +203,6 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	Log::debug("2");
 	res = (*mPlayerObj)->Realize(mPlayerObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
@@ -202,21 +211,20 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_BUFFERQUEUE,
-			&mPlayerQueue);
+	res = (*mPlayerObj)->GetInterface(mPlayerObj,
+			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mPlayerQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	Log::debug("3");
-	// Registers a callback called when sound is finished.
-	res = (*mPlayerQueue)->RegisterCallback(mPlayerQueue, callback_player,
-			pEnv);
-	if (checkError(res) != STATUS_OK)
-		return checkError(res);
-
-	res = (*mPlayer)->SetCallbackEventsMask(mPlayer, SL_PLAYEVENT_HEADATEND );
-	if (checkError(res) != STATUS_OK)
-		return checkError(res);
+// Registers a callback called when sound is finished.
+//	res = (*mPlayerQueue)->RegisterCallback(mPlayerQueue, callback_player,
+//			NULL);
+//	if (checkError(res) != STATUS_OK)
+//		return checkError(res);
+//
+//	res = (*mPlayer)->SetCallbackEventsMask(mPlayer, SL_PLAYEVENT_HEADATEND );
+//	if (checkError(res) != STATUS_OK)
+//		return checkError(res);
 
 	res = (*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
 	if (checkError(res) != STATUS_OK)
@@ -237,22 +245,22 @@ void Java_vng_wmb_service_AudioService_playMusic(JNIEnv* pEnv, jobject pThis) {
 		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
 		if (checkError(lRes) != STATUS_OK)
 			return;
-
-//		int16_t* lBuffer = (int16_t*) soundTest->getBuffer();
-//		off_t lLength = soundTest->getLength();
-
-//		lRes = (*mPlayerQueue)->Enqueue(mPlayerQueue, lBuffer, lLength);
-
-//		time_t nowTime = time(0);
-//		tm* now = localtime(&nowTime);
-//		startPlayTime = now->tm_sec;
 	}
+	return;
 }
 
 void Java_vng_wmb_service_AudioService_stopMusic(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Stop Player");
-//	SLint32 duration = now->tm_sec - startPlayTime;
-//	Log::info("Player Duration %d", duration);
+}
+
+void writePlayerBuffer(const void *pBuffer, jint size) {
+	SLuint32 lPlayerState;
+	if (mPlayerObj != NULL && mPlayerQueue != NULL) {
+		(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
+		if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
+			(*mPlayerQueue)->Enqueue(mPlayerQueue, pBuffer, size);
+		}
+	}
 }
 
 void Java_vng_wmb_service_AudioService_pauseMusic(JNIEnv* pEnv, jobject pThis) {
@@ -266,19 +274,22 @@ void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
 	}
+	if (mPlayerObj != NULL) {
+		(*mPlayerObj)->Destroy(mPlayerObj);
+		mPlayerObj = NULL;
+		mPlayer = NULL;
+		mPlayerQueue = NULL;
+	}
 	if (mEngineObj != NULL) {
 		(*mEngineObj)->Destroy(mEngineObj);
 		mEngineObj = NULL;
 		mEngine = NULL;
 	}
-	delete pEnv;
-}
-
-void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	Java_vng_wmb_service_AudioService_stopRecord(pRecordEnv, pRecordObj);
+//	delete pEnv;
 }
 
 void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+	Log::info("callback player");
 	JNIEnv* pEnv = (JNIEnv *) pContext;
 	Java_vng_wmb_service_AudioService_stopMusic(pEnv, NULL);
 }
@@ -303,7 +314,7 @@ void write_little_endian(unsigned int word, int num_bytes, FILE *wav_file) {
 
 void write_wav(const char * filename, unsigned int num_samples,
 		unsigned int bits_per_sample, unsigned int num_channels,
-		int16_t* data) {
+		unsigned int time_record, int16_t* data) {
 	unsigned int bytes_per_sample = bits_per_sample / 8;
 	unsigned int byte_rate = num_samples * num_channels * bytes_per_sample;
 	unsigned long i; /* counter for samples */
@@ -315,7 +326,7 @@ void write_wav(const char * filename, unsigned int num_samples,
 	/* write RIFF header */
 	fwrite("RIFF", 1, 4, wav_file);
 	write_little_endian(
-			36 + bytes_per_sample * num_samples * num_channels * TIME_RECORD, 4,
+			36 + bytes_per_sample * num_samples * num_channels * time_record, 4,
 			wav_file);
 	fwrite("WAVE", 1, 4, wav_file);
 
@@ -331,8 +342,8 @@ void write_wav(const char * filename, unsigned int num_samples,
 
 	/* write data subchunk */
 	fwrite("data", 1, 4, wav_file);
-	write_little_endian(byte_rate * TIME_RECORD, 4, wav_file);
-	fwrite(data, byte_rate * TIME_RECORD, 1, wav_file);
+	write_little_endian(byte_rate * time_record, 4, wav_file);
+	fwrite(data, byte_rate * time_record, 1, wav_file);
 
 	fflush(wav_file);
 	fclose(wav_file);
