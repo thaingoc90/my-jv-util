@@ -10,7 +10,10 @@
     <string name="recording">Recording in 10s..</string>
     <string name="btn_stop_record">Stop</string>
     <string name="btn_record_again">ReRecord</string>
-    <string name="btn_effect_normal">Normal</string>
-    <string name="btn_effect_speed">Speed</string>
+    <string name="btn_effect_cat">Cat</string>
+    <string name="btn_effect_cow">Cow</string>
+    <string name="btn_effect_bird">Bird</string>
+    <string name="btn_effect_fast">Fast</string>
+    
 
 </resources>

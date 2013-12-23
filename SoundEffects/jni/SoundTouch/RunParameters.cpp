@@ -243,7 +243,7 @@ void RunParameters::parseSwitchParam(const string &str)
     upS = _toLowerCase(str[1]);
 
     // interpret the switch name & operate accordingly
-    /*switch (upS)
+    /*switch (upS) 
     {
         case 't' :
             // switch '-tempo=xx'
@@ -267,7 +267,7 @@ void RunParameters::parseSwitchParam(const string &str)
             {
                 goalBPM = parseSwitchValue(str);
             } 
-            catch (std::exception &e)
+            catch (const runtime_error)
             {
                 // illegal or missing bpm value => just calculate bpm
                 goalBPM = 0;

@@ -1,63 +1,53 @@
-////////////////////////////////////////////////////////////////////////////////
-///
-/// SoundStretch main routine.
-///
-/// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai 'at' iki.fi
-/// SoundTouch WWW: http://www.surina.net/soundtouch
-///
-////////////////////////////////////////////////////////////////////////////////
-//
-// Last changed  : $Date: 2012-04-04 22:47:28 +0300 (Wed, 04 Apr 2012) $
-// File revision : $Revision: 4 $
-//
-// $Id: main.cpp 141 2012-04-04 19:47:28Z oparviai $
-//
-////////////////////////////////////////////////////////////////////////////////
-//
-// License :
-//
-//  SoundTouch audio processing library
-//  Copyright (c) Olli Parviainen
-//
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License, or (at your option) any later version.
-//
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
-//
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-////////////////////////////////////////////////////////////////////////////////
-
+#include <SoundTouchWrapper.h>
 #include <stdexcept>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <Log.h>
 #include "SoundTouch/WavFile.h"
 #include "SoundTouch/SoundTouch.h"
 #include "SoundTouch/BPMDetect.h"
+#include "AudioService.h"
 
 using namespace soundtouch;
 using namespace std;
 
 // Processing chunk size
 #define BUFF_SIZE           2048
-#define SET_STREAM_TO_BIN_MODE(f) {}
 
-static void openFiles(WavInFile **inFile, WavOutFile **outFile,
-		const char* inFilePath, const char* outFilePath) {
+WavInFile *inFile;
+WavOutFile *outFile;
+static SoundTouch *pSoundTouch;
+
+void openFiles(WavInFile **, WavOutFile **, const char*, const char*);
+void setupSoundTouch();
+
+jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis,
+		jstring inPath, jstring outPath) {
+	Log::info("SoundTouch_init");
+	const char* inFilePath = pEnv->GetStringUTFChars(inPath, NULL);
+	const char* outFilePath = pEnv->GetStringUTFChars(outPath, NULL);
+	openFiles(&inFile, &outFile, inFilePath, outFilePath);
+	pSoundTouch = new SoundTouch();
+	setupSoundTouch();
+
+	pEnv->ReleaseStringUTFChars(inPath, inFilePath);
+	pEnv->ReleaseStringUTFChars(inPath, outFilePath);
+	return 0;
+}
+
+void Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv* pEnv,
+		jobject pThis) {
+	delete inFile;
+	delete outFile;
+	delete pSoundTouch;
+}
+
+void openFiles(WavInFile **inFile, WavOutFile **outFile, const char* inFilePath,
+		const char* outFilePath) {
 	int bits, samplerate, channels;
 
 	*inFile = new WavInFile(inFilePath);
-
-	// ... open output file with same sound parameters
 	bits = (int) (*inFile)->getNumBits();
 	samplerate = (int) (*inFile)->getSampleRate();
 	channels = (int) (*inFile)->getNumChannels();
@@ -69,9 +59,7 @@ static void openFiles(WavInFile **inFile, WavOutFile **outFile,
 	}
 }
 
-// Sets the 'SoundTouch' object up according to input file sound format &
-// command line parameters
-static void setup(SoundTouch *pSoundTouch, const WavInFile *inFile) {
+void setupSoundTouch() {
 	int sampleRate;
 	int channels;
 
@@ -79,10 +67,6 @@ static void setup(SoundTouch *pSoundTouch, const WavInFile *inFile) {
 	channels = (int) inFile->getNumChannels();
 	pSoundTouch->setSampleRate(sampleRate);
 	pSoundTouch->setChannels(channels);
-
-	/*pSoundTouch->setTempoChange(params->tempoDelta);
-	 pSoundTouch->setPitchSemiTones(params->pitchDelta);
-	 pSoundTouch->setRateChange(params->rateDelta);*/
 
 	pSoundTouch->setSetting(SETTING_USE_QUICKSEEK, 0);
 	pSoundTouch->setSetting(SETTING_USE_AA_FILTER, 1);
@@ -94,21 +78,24 @@ static void setup(SoundTouch *pSoundTouch, const WavInFile *inFile) {
 
 }
 
-void changeTempo(SoundTouch *pSoundTouch, float tempo) {
-	pSoundTouch->setTempo(tempo);
+void Java_vng_wmb_service_SoundTouchEffect_changeTempo(JNIEnv* pEnv,
+		jobject pThis, jdouble tempo) {
+	pSoundTouch->setTempoChange(tempo);
 }
 
-void changePitch(SoundTouch *pSoundTouch, float pitch) {
-	pSoundTouch->setPitch(pitch);
+void Java_vng_wmb_service_SoundTouchEffect_changePitch(JNIEnv* pEnv,
+		jobject pThis, jdouble pitch) {
+	pSoundTouch->setPitchSemiTones((float) pitch);
 }
 
-void changeRate(SoundTouch *pSoundTouch, float rate) {
-	pSoundTouch->setRate(rate);
+void Java_vng_wmb_service_SoundTouchEffect_changeRate(JNIEnv* pEnv,
+		jobject pThis, jdouble rate) {
+	pSoundTouch->setRateChange(rate);
 }
 
 // Processes the sound
-static void process(SoundTouch *pSoundTouch, WavInFile *inFile,
-		WavOutFile *outFile) {
+void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
+		jint writeFile) {
 	int nSamples;
 	int nChannels;
 	int buffSizeSamples;
@@ -122,14 +109,15 @@ static void process(SoundTouch *pSoundTouch, WavInFile *inFile,
 	buffSizeSamples = BUFF_SIZE / nChannels;
 
 	// Process samples read from the input file
+	int inSample = 0, outSample = 0;
 	while (inFile->eof() == 0) {
 		int num;
 
-		// Read a chunk of samples from the input file
+		int i = 1;
 		num = inFile->read(sampleBuffer, BUFF_SIZE);
 		nSamples = num / (int) inFile->getNumChannels();
+		inSample += nSamples;
 
-		// Feed the samples into SoundTouch processor
 		pSoundTouch->putSamples(sampleBuffer, nSamples);
 
 		// Read ready samples from SoundTouch processor & write them output file.
@@ -143,7 +131,12 @@ static void process(SoundTouch *pSoundTouch, WavInFile *inFile,
 		do {
 			nSamples = pSoundTouch->receiveSamples(sampleBuffer,
 					buffSizeSamples);
-			outFile->write(sampleBuffer, nSamples * nChannels);
+			outSample += nSamples;
+			if (writeFile == 1) {
+				outFile->write(sampleBuffer, nSamples * nChannels);
+			} else {
+				writePlayerBuffer(sampleBuffer, nSamples * sizeof(int16_t));
+			}
 		} while (nSamples != 0);
 	}
 
@@ -152,30 +145,16 @@ static void process(SoundTouch *pSoundTouch, WavInFile *inFile,
 	pSoundTouch->flush();
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
+		outSample += nSamples;
+		if (writeFile == 1) {
+			outFile->write(sampleBuffer, nSamples * nChannels);
+		} else {
+			writePlayerBuffer(sampleBuffer, nSamples * sizeof(int16_t));
+		}
 		outFile->write(sampleBuffer, nSamples * nChannels);
 	} while (nSamples != 0);
-}
 
-int mainABC(const int nParams, const char * const paramStr[], char * inFilePath,
-		char* outFilePath) {
-	WavInFile *inFile;
-	WavOutFile *outFile;
-	SoundTouch soundTouch;
+	Log::info("In %d - Out: %d", inSample, outSample);
 
-	// Open input & output files
-	openFiles(&inFile, &outFile, inFilePath, outFilePath);
-
-	// Setup the 'SoundTouch' object for processing the sound
-	setup(&soundTouch, inFile);
-
-	// clock_t cs = clock();    // for benchmarking processing duration
-	// Process the sound
-	process(&soundTouch, inFile, outFile);
-	// clock_t ce = clock();    // for benchmarking processing duration
-	// printf("duration: %lf\n", (double)(ce-cs)/CLOCKS_PER_SEC);
-
-	// Close WAV file handles & dispose of the objects
-	delete inFile;
-	delete outFile;
-	return 0;
+	Log::info("SoundTouch - Process finish");
 }

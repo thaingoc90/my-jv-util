@@ -23,6 +23,8 @@ void Java_vng_wmb_service_AudioService_pauseMusic(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv *, jobject);
 
+void writePlayerBuffer(const void *pBuffer, jint size);
+
 #ifdef __cplusplus
 }
 #endif
