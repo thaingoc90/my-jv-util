@@ -30,7 +30,7 @@ static SLAndroidSimpleBufferQueueItf mPlayerQueue;
 static bool isRecording = false;
 
 const int MAX_TIME_RECORD = 10;
-const int SAMPE_RATE = 44100;
+const int SAMPE_RATE = 8000;
 int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD;
 int16_t* mRecordBuffer = new int16_t[mRecordSize];
 
@@ -69,7 +69,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	lDataLocatorOut.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
 	lDataLocatorOut.numBuffers = 2;
 	lDataFormat.channelMask = SL_SPEAKER_FRONT_CENTER;
-	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_8;
 	lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.formatType = SL_DATAFORMAT_PCM;
@@ -285,7 +285,6 @@ void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 		mEngineObj = NULL;
 		mEngine = NULL;
 	}
-//	delete pEnv;
 }
 
 void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {

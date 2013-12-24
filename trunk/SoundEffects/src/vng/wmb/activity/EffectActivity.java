@@ -15,7 +15,7 @@ public class EffectActivity extends Activity {
 	private static String inFilePath, outFilePath, storagePath;
 	public SoundTouchEffect soundTouchService;
 	public static AudioService audioServices = StartActivity.audioServices;
-	private static int WRITE_EFFECT_TO_FILE = 0;
+	private static int WRITE_EFFECT_TO_FILE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,6 @@ public class EffectActivity extends Activity {
 				.getAbsolutePath();
 		inFilePath = storagePath + "/voice.wav";
 		outFilePath = storagePath + "/effect.wav";
-		soundTouchService.init(inFilePath, outFilePath);
 
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
 		catBtn.setOnClickListener(new View.OnClickListener() {
@@ -42,10 +41,12 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cat Effect");
+				soundTouchService.init(inFilePath, outFilePath);
 				soundTouchService.changeTempo(0);
 				soundTouchService.changePitch(6);
 				soundTouchService.changeRate(15);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
+				soundTouchService.destroy();
 			}
 		});
 
@@ -55,10 +56,12 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cow Effect");
+				soundTouchService.init(inFilePath, outFilePath);
 				soundTouchService.changeTempo(0);
 				soundTouchService.changePitch(0);
 				soundTouchService.changeRate(-4);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
+				soundTouchService.destroy();
 			}
 		});
 
@@ -68,10 +71,12 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Bird Effect");
+				soundTouchService.init(inFilePath, outFilePath);
 				soundTouchService.changeTempo(0);
 				soundTouchService.changePitch(7);
 				soundTouchService.changeRate(25);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
+				soundTouchService.destroy();
 			}
 		});
 
@@ -81,19 +86,15 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Fast Effect");
-				soundTouchService.changeTempo(0);
-				soundTouchService.changePitch(7);
-				soundTouchService.changeRate(25);
+				soundTouchService.init(inFilePath, outFilePath);
+				soundTouchService.changeTempo(60);
+				soundTouchService.changePitch(0);
+				soundTouchService.changeRate(0);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
+				soundTouchService.destroy();
 			}
 		});
 
-	}
-
-	@Override
-	protected void onDestroy() {
-		soundTouchService.destroy();
-		super.onDestroy();
 	}
 
 }

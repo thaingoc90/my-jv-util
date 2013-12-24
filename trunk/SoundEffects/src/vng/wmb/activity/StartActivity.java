@@ -31,7 +31,6 @@ public class StartActivity extends Activity {
 
 		audioServices = new AudioService();
 		audioServices.init();
-		// audioServices.initPlayer();
 
 		mHandler = new Handler();
 
@@ -40,15 +39,18 @@ public class StartActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				audioServices.startRecord();
-				isRecording = true;
-				mHandler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						stopRecording();
-					}
-				}, TIME_RECORD);
-				checkInterface();
+				Intent intent = new Intent(getApplicationContext(),
+						EffectActivity.class);
+				startActivity(intent);
+//				audioServices.startRecord();
+//				isRecording = true;
+//				mHandler.postDelayed(new Runnable() {
+//					@Override
+//					public void run() {
+//						stopRecording();
+//					}
+//				}, TIME_RECORD);
+//				checkInterface();
 			}
 		});
 
