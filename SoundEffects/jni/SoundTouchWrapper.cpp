@@ -13,7 +13,7 @@ using namespace soundtouch;
 using namespace std;
 
 // Processing chunk size
-#define BUFF_SIZE    4096      //2048
+#define BUFF_SIZE    8000 * 5      //2048
 WavInFile *inFile;
 WavOutFile *outFile;
 static SoundTouch *pSoundTouch;
@@ -92,6 +92,15 @@ void Java_vng_wmb_service_SoundTouchEffect_changeRate(JNIEnv* pEnv,
 	pSoundTouch->setRateChange(rate);
 }
 
+int saturate(float fvalue, float minval, float maxval) {
+	if (fvalue > maxval) {
+		fvalue = maxval;
+	} else if (fvalue < minval) {
+		fvalue = minval;
+	}
+	return (int) fvalue;
+}
+
 // Processes the sound
 void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 		jint writeFile) {
@@ -123,9 +132,15 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 					buffSizeSamples);
 			outSample += nSamples;
 			if (writeFile == 1) {
-				outFile->write(sampleBuffer, nSamples * nChannels);
-			} else {
-				writePlayerBuffer(sampleBuffer, nSamples * sizeof(short));
+				short *temp = (short*) new char[nSamples * 2];
+				short *temp2 = (short *) temp;
+				for (int i = 0; i < nSamples; i++) {
+					short value = (short) saturate(sampleBuffer[i] * 32768.0f,
+							-32768.0f, 32767.0f);
+					temp2[i] = value;
+				}
+				writePlayerBuffer(temp, nSamples * 2);
+				//outFile->write(sampleBuffer, nSamples * nChannels);
 			}
 		} while (nSamples != 0);
 	}
@@ -136,8 +151,6 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 		outSample += nSamples;
 		if (writeFile == 1) {
 			outFile->write(sampleBuffer, nSamples * nChannels);
-		} else {
-			writePlayerBuffer(sampleBuffer, nSamples * sizeof(short));
 		}
 	} while (nSamples != 0);
 
