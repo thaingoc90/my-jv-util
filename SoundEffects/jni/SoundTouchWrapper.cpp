@@ -4,7 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <Log.h>
-#include "SoundTouch/WavFile.h"
+#include "WavFile.h"
 #include "SoundTouch/SoundTouch.h"
 #include "SoundTouch/BPMDetect.h"
 #include "AudioService.h"
@@ -13,8 +13,7 @@ using namespace soundtouch;
 using namespace std;
 
 // Processing chunk size
-#define BUFF_SIZE           2048
-
+#define BUFF_SIZE    4096      //2048
 WavInFile *inFile;
 WavOutFile *outFile;
 static SoundTouch *pSoundTouch;
@@ -119,15 +118,6 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 		inSample += nSamples;
 
 		pSoundTouch->putSamples(sampleBuffer, nSamples);
-
-		// Read ready samples from SoundTouch processor & write them output file.
-		// NOTES:
-		// - 'receiveSamples' doesn't necessarily return any samples at all
-		//   during some rounds!
-		// - On the other hand, during some round 'receiveSamples' may have more
-		//   ready samples than would fit into 'sampleBuffer', and for this reason
-		//   the 'receiveSamples' call is iterated for as many times as it
-		//   outputs samples.
 		do {
 			nSamples = pSoundTouch->receiveSamples(sampleBuffer,
 					buffSizeSamples);
@@ -135,13 +125,11 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 			if (writeFile == 1) {
 				outFile->write(sampleBuffer, nSamples * nChannels);
 			} else {
-				writePlayerBuffer(sampleBuffer, nSamples * sizeof(int16_t));
+				writePlayerBuffer(sampleBuffer, nSamples * sizeof(short));
 			}
 		} while (nSamples != 0);
 	}
 
-	// Now the input file is processed, yet 'flush' few last samples that are
-	// hiding in the SoundTouch's internal processing pipeline.
 	pSoundTouch->flush();
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
@@ -149,9 +137,8 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 		if (writeFile == 1) {
 			outFile->write(sampleBuffer, nSamples * nChannels);
 		} else {
-			writePlayerBuffer(sampleBuffer, nSamples * sizeof(int16_t));
+			writePlayerBuffer(sampleBuffer, nSamples * sizeof(short));
 		}
-		outFile->write(sampleBuffer, nSamples * nChannels);
 	} while (nSamples != 0);
 
 	Log::info("In %d - Out: %d", inSample, outSample);

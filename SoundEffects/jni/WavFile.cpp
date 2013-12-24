@@ -53,7 +53,7 @@
 #include <limits.h>
 
 #include "WavFile.h"
-#include "STTypes.h"
+#include "SoundTouch/STTypes.h"
 
 using namespace std;
 
