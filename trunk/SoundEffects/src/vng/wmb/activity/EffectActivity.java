@@ -47,6 +47,7 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(15);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
+				// audioServices.playWaveFile(outFilePath);
 			}
 		});
 
@@ -62,6 +63,7 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(-4);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
+				// audioServices.playWaveFile(outFilePath);
 			}
 		});
 
@@ -77,6 +79,7 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(25);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
+				audioServices.playWaveFile(outFilePath);
 			}
 		});
 
@@ -92,9 +95,16 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(0);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
+				audioServices.playWaveFile(outFilePath);
 			}
 		});
 
+	}
+
+	@Override
+	protected void onStop() {
+		audioServices.stopMusic();
+		super.onStop();
 	}
 
 }

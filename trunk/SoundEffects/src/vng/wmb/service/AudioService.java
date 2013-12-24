@@ -14,7 +14,7 @@ public class AudioService {
 
 	public native void stopMusic();
 
-	public native void pauseMusic();
-
 	public native void destroy();
+	
+	public native void playWaveFile(String path);
 }

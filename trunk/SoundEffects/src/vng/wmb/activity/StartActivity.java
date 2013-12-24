@@ -23,6 +23,7 @@ public class StartActivity extends Activity {
 	public static AudioService audioServices;
 	private Handler mHandler;
 	private static final int TIME_RECORD = 10000; // ms
+	private Runnable stopThreads = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +43,16 @@ public class StartActivity extends Activity {
 				Intent intent = new Intent(getApplicationContext(),
 						EffectActivity.class);
 				startActivity(intent);
-//				audioServices.startRecord();
-//				isRecording = true;
-//				mHandler.postDelayed(new Runnable() {
-//					@Override
-//					public void run() {
-//						stopRecording();
-//					}
-//				}, TIME_RECORD);
-//				checkInterface();
+				// audioServices.startRecord();
+				// isRecording = true;
+				// stopThreads = new Runnable() {
+				// @Override
+				// public void run() {
+				// stopRecording();
+				// }
+				// };
+				// mHandler.postDelayed(stopThreads, TIME_RECORD);
+				// checkInterface();
 			}
 		});
 
@@ -75,6 +77,10 @@ public class StartActivity extends Activity {
 			Intent intent = new Intent(getApplicationContext(),
 					EffectActivity.class);
 			startActivity(intent);
+			if (stopThreads != null) {
+				mHandler.removeCallbacks(stopThreads);
+				stopThreads = null;
+			}
 		}
 	}
 
