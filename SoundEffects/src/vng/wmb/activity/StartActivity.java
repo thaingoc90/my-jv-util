@@ -22,7 +22,7 @@ public class StartActivity extends Activity {
 	public static boolean isRecording = false;
 	public static AudioService audioServices;
 	private Handler mHandler;
-	private static final int TIME_RECORD = 10000; // ms
+	private static final int TIME_RECORD = 20000; // ms
 	private Runnable stopThreads = null;
 
 	@Override
@@ -40,19 +40,16 @@ public class StartActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(),
-						EffectActivity.class);
-				startActivity(intent);
-				// audioServices.startRecord();
-				// isRecording = true;
-				// stopThreads = new Runnable() {
-				// @Override
-				// public void run() {
-				// stopRecording();
-				// }
-				// };
-				// mHandler.postDelayed(stopThreads, TIME_RECORD);
-				// checkInterface();
+				audioServices.startRecord();
+				isRecording = true;
+				stopThreads = new Runnable() {
+					@Override
+					public void run() {
+						stopRecording();
+					}
+				};
+				mHandler.postDelayed(stopThreads, TIME_RECORD);
+				checkInterface();
 			}
 		});
 
@@ -61,7 +58,6 @@ public class StartActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Log.i("JAVA_JNI_SE", "StopActivity");
 				stopRecording();
 			}
 		});
@@ -104,7 +100,6 @@ public class StartActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		Log.i("JNI_VE", "destroy");
 		audioServices.destroy();
 		super.onDestroy();
 	}
