@@ -12,7 +12,6 @@ import android.widget.TextView;
 public class StartActivity extends Activity {
 
 	static {
-		System.loadLibrary("soundTouch");
 		System.loadLibrary("soundEffect");
 	}
 
