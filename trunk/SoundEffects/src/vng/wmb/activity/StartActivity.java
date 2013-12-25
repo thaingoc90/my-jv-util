@@ -20,7 +20,7 @@ public class StartActivity extends Activity {
 	public static boolean isRecording = false;
 	public static AudioService audioServices;
 	private Handler mHandler;
-	private static final int TIME_RECORD = 20000; // ms
+	private static final int TIME_RECORD = 10000; // ms
 	private Runnable stopThreads = null;
 
 	@Override

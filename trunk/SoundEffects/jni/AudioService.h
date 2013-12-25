@@ -15,13 +15,13 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv *, jobject);
 
 jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv *, jobject);
 
-void Java_vng_wmb_service_AudioService_playMusic(JNIEnv *, jobject);
+void Java_vng_wmb_service_AudioService_playEffect(JNIEnv *, jobject);
 
-void Java_vng_wmb_service_AudioService_stopMusic(JNIEnv *, jobject);
+void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv *, jobject);
+
+void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv *, jobject);
-
-void writePlayerBuffer(const void *pBuffer, jint size);
 
 #ifdef __cplusplus
 }

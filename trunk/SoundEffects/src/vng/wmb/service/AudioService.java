@@ -10,9 +10,11 @@ public class AudioService {
 
 	public native int initPlayer();
 
-	public native void playMusic();
+	public native void playEffect();
 
-	public native void stopMusic();
+	public native void startPlayer();
+
+	public native void stopPlayer();
 
 	public native void destroy();
 

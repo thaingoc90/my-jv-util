@@ -47,8 +47,8 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_changeRate(
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv *,
-		jobject, jint writeFile);
+JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_writeToFile(
+		JNIEnv *, jobject);
 
 /*
  * Class:     vng_wmb_service_SoundTouchEffect
@@ -58,6 +58,17 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv *,
 
 JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv *,
 		jobject);
+
+/*
+ * Class:     vng_wmb_service_SoundTouchEffect
+ * Method:    createSoundTouch
+ * Signature: ()V
+ */
+
+JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(
+		JNIEnv *, jobject, jdouble, jdouble, jdouble);
+
+int processBlock(short** playerBuffer);
 
 #ifdef __cplusplus
 }
