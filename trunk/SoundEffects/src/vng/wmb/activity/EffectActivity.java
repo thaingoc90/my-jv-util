@@ -15,7 +15,10 @@ public class EffectActivity extends Activity {
 	private static String inFilePath, outFilePath, storagePath;
 	public SoundTouchEffect soundTouchService;
 	public static AudioService audioServices = StartActivity.audioServices;
-	private static int WRITE_EFFECT_TO_FILE = 1;
+
+	// IF WRITE_EFFECT_TO_FILE = 1, processing of effect will write to file
+	// effect.wav. Else, it will play this effect.
+	private static int WRITE_EFFECT_TO_FILE = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class EffectActivity extends Activity {
 		inFilePath = storagePath + "/voice.wav";
 		outFilePath = storagePath + "/effect.wav";
 
+		/* CAT EFFECT */
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
 		catBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -47,10 +51,10 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(15);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
-				// audioServices.playWaveFile(outFilePath);
 			}
 		});
 
+		/* COW EFFECT */
 		cowBtn = (Button) findViewById(R.id.btn_effect_cow);
 		cowBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -63,10 +67,10 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(-4);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
-				// audioServices.playWaveFile(outFilePath);
 			}
 		});
 
+		/* BIRD EFFECT */
 		birdBtn = (Button) findViewById(R.id.btn_effect_bird);
 		birdBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -79,10 +83,10 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(25);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
-				audioServices.playWaveFile(outFilePath);
 			}
 		});
 
+		/* FAST EFFECT */
 		fastBtn = (Button) findViewById(R.id.btn_effect_fast);
 		fastBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -95,7 +99,6 @@ public class EffectActivity extends Activity {
 				soundTouchService.changeRate(0);
 				soundTouchService.process(WRITE_EFFECT_TO_FILE);
 				soundTouchService.destroy();
-				audioServices.playWaveFile(outFilePath);
 			}
 		});
 
