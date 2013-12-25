@@ -12,26 +12,29 @@
 using namespace soundtouch;
 using namespace std;
 
-#define BUFF_SIZE 4096
+#define BUFF_SIZE 10000
 WavInFile *inFile;
 WavOutFile *outFile;
 SoundTouch *pSoundTouch;
-short* tempPlayerBuffer = NULL;
-int sizePlayerBuffer = 0;
-
-void openFiles(WavInFile **, WavOutFile **, const char*, const char*);
-void setupSoundTouch();
+const char* inFilePath;
+const char* outFilePath;
 
 jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis,
 		jstring inPath, jstring outPath) {
-	const char* inFilePath = pEnv->GetStringUTFChars(inPath, NULL);
-	const char* outFilePath = pEnv->GetStringUTFChars(outPath, NULL);
-	openFiles(&inFile, &outFile, inFilePath, outFilePath);
-	pSoundTouch = new SoundTouch();
-	setupSoundTouch();
+	inFilePath = pEnv->GetStringUTFChars(inPath, NULL);
+	outFilePath = pEnv->GetStringUTFChars(outPath, NULL);
+	int bits, samplerate, channels;
 
-	pEnv->ReleaseStringUTFChars(inPath, inFilePath);
-	pEnv->ReleaseStringUTFChars(inPath, outFilePath);
+	inFile = new WavInFile(inFilePath);
+	bits = (int) (inFile)->getNumBits();
+	samplerate = (int) (inFile)->getSampleRate();
+	channels = (int) (inFile)->getNumChannels();
+
+	if (outFilePath) {
+		outFile = new WavOutFile(outFilePath, samplerate, bits, channels);
+	} else {
+		outFile = NULL;
+	}
 	return 0;
 }
 
@@ -42,30 +45,23 @@ void Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv* pEnv,
 	delete pSoundTouch;
 }
 
-void openFiles(WavInFile **inFile, WavOutFile **outFile, const char* inFilePath,
-		const char* outFilePath) {
-	int bits, samplerate, channels;
+void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
+		jobject pThis, jdouble tempo, jdouble pitch, jdouble rate) {
 
-	*inFile = new WavInFile(inFilePath);
-	bits = (int) (*inFile)->getNumBits();
-	samplerate = (int) (*inFile)->getSampleRate();
-	channels = (int) (*inFile)->getNumChannels();
+	Log::info("createSoundTouch");
 
-	if (outFilePath) {
-		*outFile = new WavOutFile(outFilePath, samplerate, bits, channels);
-	} else {
-		*outFile = NULL;
+	if (pSoundTouch != NULL) {
+		delete pSoundTouch;
+		pSoundTouch = NULL;
 	}
-}
+	if (inFile != NULL) {
+		delete inFile;
+		inFile = NULL;
+	}
+	inFile = new WavInFile(inFilePath);
+	pSoundTouch = new SoundTouch();
 
-void setupSoundTouch() {
-	int sampleRate;
-	int channels;
-
-	sampleRate = (int) inFile->getSampleRate();
-	channels = (int) inFile->getNumChannels();
-	pSoundTouch->setSampleRate(sampleRate);
-	pSoundTouch->setChannels(channels);
+	int sampleRate, channels;
 
 	pSoundTouch->setSetting(SETTING_USE_QUICKSEEK, 0);
 	pSoundTouch->setSetting(SETTING_USE_AA_FILTER, 1);
@@ -74,6 +70,15 @@ void setupSoundTouch() {
 	pSoundTouch->setSetting(SETTING_SEQUENCE_MS, 40);
 	pSoundTouch->setSetting(SETTING_SEEKWINDOW_MS, 15);
 	pSoundTouch->setSetting(SETTING_OVERLAP_MS, 8);
+
+	sampleRate = (int) inFile->getSampleRate();
+	channels = (int) inFile->getNumChannels();
+	pSoundTouch->setSampleRate(sampleRate);
+	pSoundTouch->setChannels(channels);
+
+	pSoundTouch->setTempoChange(tempo);
+	pSoundTouch->setPitchSemiTones((float) pitch);
+	pSoundTouch->setRateChange(rate);
 
 }
 
@@ -120,24 +125,9 @@ short* convertToShortBuffer(short* buffer, int numSample) {
 	return shortBuffer;
 }
 
-//Buffer the output of effect. When finish processing of effect, send this buffer to PlayerAudio.
-void writeToTempPlayerBuffer(short * buffer, int numSample) {
-	if (tempPlayerBuffer == NULL) {
-		tempPlayerBuffer = buffer;
-	} else {
-		short * temp = new short[sizePlayerBuffer + numSample];
-		memcpy(temp, tempPlayerBuffer, sizePlayerBuffer * 2);
-		memcpy(temp + sizePlayerBuffer, buffer, numSample * 2);
-		delete buffer;
-		delete tempPlayerBuffer;
-		tempPlayerBuffer = temp;
-	}
-	sizePlayerBuffer += numSample;
-}
-
 // Processes the sound. If writeFile = 1, write to file effect. Else processing normal.
-void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
-		jint writeFile) {
+void Java_vng_wmb_service_SoundTouchEffect_writeToFile(JNIEnv* pEnv,
+		jobject pThis) {
 	int nSamples;
 	int nChannels;
 	// Note: SAMPLE is float if PC, else is short for mobile.
@@ -147,20 +137,15 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 		return;
 
 	int inSample = 0, outSample = 0;
+
 	while (inFile->eof() == 0) {
 		nSamples = inFile->read(sampleBuffer, BUFF_SIZE);
 		inSample += nSamples;
 		pSoundTouch->putSamples(sampleBuffer, nSamples);
-
 		do {
 			nSamples = pSoundTouch->receiveSamples(sampleBuffer, BUFF_SIZE);
 			outSample += nSamples;
-			if (writeFile == 0) {
-				short *temp = convertToShortBuffer(sampleBuffer, nSamples);
-				writeToTempPlayerBuffer(temp, nSamples);
-			} else {
-				outFile->write(sampleBuffer, nSamples * nChannels);
-			}
+			outFile->write(sampleBuffer, nSamples * nChannels);
 		} while (nSamples != 0);
 	}
 
@@ -168,22 +153,45 @@ void Java_vng_wmb_service_SoundTouchEffect_process(JNIEnv* pEnv, jobject pThis,
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, BUFF_SIZE);
 		outSample += nSamples;
-		if (writeFile == 1) {
-			outFile->write(sampleBuffer, nSamples * nChannels);
-		} else {
-			short *temp = convertToShortBuffer(sampleBuffer, nSamples);
-			writeToTempPlayerBuffer(temp, nSamples);
-		}
+		outFile->write(sampleBuffer, nSamples * nChannels);
 	} while (nSamples != 0);
-
-	// Write to buffer of AudioPlayer when finish.
-	if (writeFile == 0) {
-		writePlayerBuffer(tempPlayerBuffer, sizePlayerBuffer * sizeof(short));
-		delete tempPlayerBuffer;
-		tempPlayerBuffer = NULL;
-		sizePlayerBuffer = 0;
-	}
 
 	Log::info("Sample In %d - Sample Out: %d", inSample, outSample);
 	Log::info("SoundTouch - Process finish");
+}
+
+int processBlock(short** playerBuffer) {
+	int nSamples, result = 0;
+	if (inFile->eof() == 0) {
+		SAMPLETYPE sampleBuffer[BUFF_SIZE];
+		nSamples = inFile->read(sampleBuffer, BUFF_SIZE);
+		pSoundTouch->putSamples(sampleBuffer, nSamples);
+		short* tempPlayerBuffer = NULL;
+		int sizePlayerBuffer = 0;
+
+		do {
+			nSamples = pSoundTouch->receiveSamples(sampleBuffer, BUFF_SIZE);
+			short *buffer = convertToShortBuffer(sampleBuffer, nSamples);
+
+			if (tempPlayerBuffer == NULL) {
+				tempPlayerBuffer = buffer;
+			} else {
+				short * temp = new short[sizePlayerBuffer + nSamples];
+				memcpy(temp, tempPlayerBuffer, sizePlayerBuffer * 2);
+				memcpy(temp + sizePlayerBuffer, buffer, nSamples * 2);
+				delete buffer;
+				delete tempPlayerBuffer;
+				tempPlayerBuffer = temp;
+			}
+			sizePlayerBuffer += nSamples;
+
+		} while (nSamples != 0);
+
+		if (*playerBuffer != NULL) {
+			delete (*playerBuffer);
+		}
+		(*playerBuffer) = tempPlayerBuffer;
+		result = sizePlayerBuffer;
+	}
+	return result;
 }
