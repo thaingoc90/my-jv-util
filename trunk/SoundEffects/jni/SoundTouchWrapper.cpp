@@ -15,9 +15,9 @@ using namespace std;
 #define BUFF_SIZE 4096
 WavInFile *inFile;
 WavOutFile *outFile;
-static SoundTouch *pSoundTouch;
-static short* tempPlayerBuffer = NULL;
-static int sizePlayerBuffer = 0;
+SoundTouch *pSoundTouch;
+short* tempPlayerBuffer = NULL;
+int sizePlayerBuffer = 0;
 
 void openFiles(WavInFile **, WavOutFile **, const char*, const char*);
 void setupSoundTouch();
