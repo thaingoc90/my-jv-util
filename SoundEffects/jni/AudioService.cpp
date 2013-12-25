@@ -12,23 +12,23 @@
 const int STATUS_OK = 0;
 const int STATUS_KO = -1;
 
-static SLObjectItf mEngineObj = NULL;
+SLObjectItf mEngineObj = NULL;
 SLEngineItf mEngine;
 SLDataFormat_PCM lDataFormat;
 
 // RECORDER
-static SLObjectItf mRecorderObj = NULL;
+SLObjectItf mRecorderObj = NULL;
 SLRecordItf mRecorder;
-static SLAndroidSimpleBufferQueueItf mRecorderQueue;
+SLAndroidSimpleBufferQueueItf mRecorderQueue;
 int32_t startTime;
 
 // PLAYER
 SLObjectItf mOutputMixObj;
 SLObjectItf mPlayerObj = NULL;
 SLPlayItf mPlayer;
-static SLAndroidSimpleBufferQueueItf mPlayerQueue;
+SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
-static bool isRecording = false;
+bool isRecording = false;
 
 const int MAX_TIME_RECORD = 21;
 const int SAMPE_RATE = 16000;
@@ -39,7 +39,7 @@ const char* pathFileTemp = "/sdcard/voice.wav";
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 int checkError(SLresult);
-static int numRecord = 0;
+int numRecord = 0;
 
 jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Init Audio Service");
