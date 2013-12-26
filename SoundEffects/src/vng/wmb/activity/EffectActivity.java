@@ -52,7 +52,7 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cow Effect");
-				soundTouchService.createSoundTouch(0, -4.5, 0);
+				soundTouchService.createSoundTouch(0, -4, 0);
 				audioServices.playEffect();
 			}
 		});
@@ -74,7 +74,7 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Fast Effect");
-				soundTouchService.createSoundTouch(50, 0, 0);
+				soundTouchService.createSoundTouch(60, 0, 0);
 				audioServices.playEffect();
 			}
 		});
