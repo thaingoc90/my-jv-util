@@ -19,6 +19,7 @@ SoundTouch *pSoundTouch;
 const char* inFilePath;
 const char* outFilePath;
 bool playFirst = true;
+pthread_mutex_t isProcessingBlock;
 
 jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis,
 		jstring inPath, jstring outPath) {
@@ -64,7 +65,9 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 		pthread_kill(playerThread, SIGUSR1);
 	}
 
+	pthread_mutex_lock(&isProcessingBlock);
 	inFile->rewind();
+	pthread_mutex_unlock(&isProcessingBlock);
 	if (playFirst || pSoundTouch == NULL) {
 		pSoundTouch = new SoundTouch();
 		playFirst = false;
@@ -171,12 +174,10 @@ void Java_vng_wmb_service_SoundTouchEffect_writeToFile(JNIEnv* pEnv,
 	Log::info("SoundTouch - Process finish");
 }
 
-bool isProcessingBlock = false;
-
 int processBlock(short** playerBuffer) {
 	int nSamples, result = 0;
+	pthread_mutex_lock(&isProcessingBlock);
 	if (inFile != NULL && inFile->eof() == 0) {
-		isProcessingBlock = true;
 		SAMPLETYPE sampleBuffer[BUFF_SIZE];
 		nSamples = inFile->read(sampleBuffer, BUFF_SIZE);
 		pSoundTouch->putSamples(sampleBuffer, nSamples);
@@ -206,7 +207,7 @@ int processBlock(short** playerBuffer) {
 		}
 		(*playerBuffer) = tempPlayerBuffer;
 		result = sizePlayerBuffer;
-		isProcessingBlock = false;
 	}
+	pthread_mutex_unlock(&isProcessingBlock);
 	return result;
 }
