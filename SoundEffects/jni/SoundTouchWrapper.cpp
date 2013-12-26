@@ -58,21 +58,15 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 		jobject pThis, jdouble tempo, jdouble pitch, jdouble rate) {
 
 	Log::info("createSoundTouch");
-
 	if (!thread_done) {
 		pthread_kill(playerThread, SIGUSR1);
 	}
 
-	if (inFile != NULL) {
-		delete inFile;
-		inFile = NULL;
-	}
+	inFile->rewind();
 	if (pSoundTouch != NULL) {
 		delete pSoundTouch;
 		pSoundTouch = NULL;
 	}
-	inFile = new WavInFile(inFilePath);
-
 	pSoundTouch = new SoundTouch();
 
 	int sampleRate, channels;
