@@ -132,10 +132,10 @@ void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 	isRecording = true;
 	SLresult res;
 	res = (*mRecorderQueue)->Clear(mRecorderQueue);
-	memset(mRecordBuffer1, 0, mRecordSize * sizeof(short));
-	memset(mRecordBuffer2, 0, mRecordSize * sizeof(short));
 	if (checkError(res) != STATUS_OK)
 		return;
+	memset(mRecordBuffer1, 0, mRecordSize * sizeof(short));
+	memset(mRecordBuffer2, 0, mRecordSize * sizeof(short));
 	if (numRecord == 0) {
 		res = (*mRecorderQueue)->Enqueue(mRecorderQueue, mActiveRecordBuffer,
 				mRecordSize * sizeof(int16_t));
@@ -358,7 +358,6 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Destroy Audio Service");
-	delete mRecordBuffer1;
 	if (mRecorderObj != NULL) {
 		(*mRecorderObj)->Destroy(mRecorderObj);
 		mRecorderObj = NULL;
