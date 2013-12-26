@@ -3,11 +3,15 @@
 #ifndef _AUDIOSERVICE_H_
 #define _AUDIOSERVICE_H_
 
+#include <pthread.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 static const int SAMPE_RATE = 44100;
+static bool thread_done = true;
+static pthread_t playerThread;
 
 jint Java_vng_wmb_service_AudioService_init(JNIEnv *, jobject);
 
