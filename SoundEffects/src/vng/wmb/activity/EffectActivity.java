@@ -16,9 +16,6 @@ public class EffectActivity extends Activity {
 	public SoundTouchEffect soundTouchService;
 	public static AudioService audioServices = StartActivity.audioServices;
 
-	// IF WRITE_EFFECT_TO_FILE = 1, processing of effect will write to file
-	// effect.wav. Else, it will play this effect.
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,7 +26,7 @@ public class EffectActivity extends Activity {
 			audioServices.init();
 		}
 		audioServices.initPlayer();
-		// audioServices.startPlayer();
+		audioServices.startPlayer();
 
 		soundTouchService = new SoundTouchEffect();
 		storagePath = Environment.getExternalStorageDirectory()
@@ -44,8 +41,6 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cat Effect");
-				audioServices.stopPlayer();
-				audioServices.startPlayer();
 				soundTouchService.createSoundTouch(0, 6, 15);
 				audioServices.playEffect();
 			}
@@ -57,9 +52,7 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cow Effect");
-				audioServices.stopPlayer();
-				audioServices.startPlayer();
-				soundTouchService.createSoundTouch(0, -4, -10);
+				soundTouchService.createSoundTouch(0, -4.5, 0);
 				audioServices.playEffect();
 			}
 		});
@@ -70,8 +63,6 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Bird Effect");
-				audioServices.stopPlayer();
-				audioServices.startPlayer();
 				soundTouchService.createSoundTouch(0, 7, 25);
 				audioServices.playEffect();
 			}
@@ -83,9 +74,7 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Fast Effect");
-				audioServices.stopPlayer();
-				audioServices.startPlayer();
-				soundTouchService.createSoundTouch(60, 0, 0);
+				soundTouchService.createSoundTouch(50, 0, 0);
 				audioServices.playEffect();
 			}
 		});
@@ -95,7 +84,7 @@ public class EffectActivity extends Activity {
 	@Override
 	protected void onStop() {
 		soundTouchService.destroy();
-		// audioServices.stopPlayer();
+		audioServices.stopPlayer();
 		super.onStop();
 	}
 
