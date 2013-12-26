@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+static const int SAMPE_RATE = 44100;
+
 jint Java_vng_wmb_service_AudioService_init(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv *, jobject);

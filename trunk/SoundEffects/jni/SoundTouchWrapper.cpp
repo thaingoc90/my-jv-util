@@ -40,9 +40,18 @@ jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis,
 
 void Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv* pEnv,
 		jobject pThis) {
-	delete inFile;
-	delete outFile;
-	delete pSoundTouch;
+	if (inFile != NULL) {
+		delete inFile;
+		inFile = NULL;
+	}
+	if (outFile != NULL) {
+		delete outFile;
+		outFile = NULL;
+	}
+	if (pSoundTouch != NULL) {
+		delete pSoundTouch;
+		pSoundTouch = NULL;
+	}
 }
 
 void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
@@ -50,13 +59,13 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 
 	Log::info("createSoundTouch");
 
-	if (pSoundTouch != NULL) {
-		delete pSoundTouch;
-		pSoundTouch = NULL;
-	}
 	if (inFile != NULL) {
 		delete inFile;
 		inFile = NULL;
+	}
+	if (pSoundTouch != NULL) {
+		delete pSoundTouch;
+		pSoundTouch = NULL;
 	}
 	inFile = new WavInFile(inFilePath);
 	pSoundTouch = new SoundTouch();
@@ -71,12 +80,12 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pSoundTouch->setSetting(SETTING_SEEKWINDOW_MS, 15);
 	pSoundTouch->setSetting(SETTING_OVERLAP_MS, 8);
 
-	sampleRate = (int) inFile->getSampleRate();
-	channels = (int) inFile->getNumChannels();
+	sampleRate = SAMPE_RATE;
+	channels = 1;
 	pSoundTouch->setSampleRate(sampleRate);
 	pSoundTouch->setChannels(channels);
 
-	pSoundTouch->setTempoChange(tempo);
+	pSoundTouch->setTempoChange((float) tempo);
 	pSoundTouch->setPitchSemiTones((float) pitch);
 	pSoundTouch->setRateChange(rate);
 
@@ -160,9 +169,12 @@ void Java_vng_wmb_service_SoundTouchEffect_writeToFile(JNIEnv* pEnv,
 	Log::info("SoundTouch - Process finish");
 }
 
+bool isProcessingBlock = false;
+
 int processBlock(short** playerBuffer) {
 	int nSamples, result = 0;
-	if (inFile->eof() == 0) {
+	if (inFile != NULL && inFile->eof() == 0) {
+		isProcessingBlock = true;
 		SAMPLETYPE sampleBuffer[BUFF_SIZE];
 		nSamples = inFile->read(sampleBuffer, BUFF_SIZE);
 		pSoundTouch->putSamples(sampleBuffer, nSamples);
@@ -192,6 +204,7 @@ int processBlock(short** playerBuffer) {
 		}
 		(*playerBuffer) = tempPlayerBuffer;
 		result = sizePlayerBuffer;
+		isProcessingBlock = false;
 	}
 	return result;
 }

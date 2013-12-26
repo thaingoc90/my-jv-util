@@ -20,7 +20,7 @@ public class StartActivity extends Activity {
 	public static boolean isRecording = false;
 	public static AudioService audioServices;
 	private Handler mHandler;
-	private static final int TIME_RECORD = 10000; // ms
+	private static final int TIME_RECORD = 20000; // ms
 	private Runnable stopThreads = null;
 
 	@Override
@@ -35,7 +35,6 @@ public class StartActivity extends Activity {
 
 		recordBtn = (Button) findViewById(R.id.btn_record);
 		recordBtn.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				audioServices.startRecord();
@@ -53,7 +52,6 @@ public class StartActivity extends Activity {
 
 		stopBtn = (Button) findViewById(R.id.btn_stop_record);
 		stopBtn.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				stopRecording();
