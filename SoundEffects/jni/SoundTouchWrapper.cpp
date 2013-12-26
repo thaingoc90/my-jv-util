@@ -18,11 +18,13 @@ WavOutFile *outFile;
 SoundTouch *pSoundTouch;
 const char* inFilePath;
 const char* outFilePath;
+bool playFirst = true;
 
 jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis,
 		jstring inPath, jstring outPath) {
 	inFilePath = pEnv->GetStringUTFChars(inPath, NULL);
 	outFilePath = pEnv->GetStringUTFChars(outPath, NULL);
+	playFirst = true;
 	int bits, samplerate, channels;
 
 	inFile = new WavInFile(inFilePath);
@@ -63,11 +65,12 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	}
 
 	inFile->rewind();
-	if (pSoundTouch != NULL) {
-		delete pSoundTouch;
-		pSoundTouch = NULL;
+	if (playFirst || pSoundTouch == NULL) {
+		pSoundTouch = new SoundTouch();
+		playFirst = false;
+	} else {
+		pSoundTouch->reset();
 	}
-	pSoundTouch = new SoundTouch();
 
 	int sampleRate, channels;
 

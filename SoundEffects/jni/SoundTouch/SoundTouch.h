@@ -180,6 +180,8 @@ public:
     SoundTouch();
     virtual ~SoundTouch();
 
+    void reset();
+
     /// Get SoundTouch library version string
     static const char *getVersionString();
 
