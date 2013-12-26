@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <ctime>
-#include <pthread.h>
 #include "WavFile.h"
 #include "SoundTouchWrapper.h"
 
@@ -283,21 +282,19 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis) {
 	SLuint32 lPlayerState;
 	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
 	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
+		(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
+		(*mPlayerQueue)->Clear(mPlayerQueue);
+		(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
 		if (mPlayerBuffer1 != NULL) {
 			delete mPlayerBuffer1;
-			mPlayerBuffer1 = NULL;
 			mPlayerBuffer1 = new short[1];
 		}
 		if (mPlayerBuffer2 != NULL) {
 			delete mPlayerBuffer2;
-			mPlayerBuffer2 = NULL;
 			mPlayerBuffer2 = new short[1];
 		}
 		int size = processBlock(&mPlayerBuffer1);
 		mActivePlayerBuffer = mPlayerBuffer1;
-		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
-		if (checkError(lRes) != STATUS_OK)
-			return;
 		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 				size * sizeof(short));
 		tempSize = processBlock(&mPlayerBuffer2);
@@ -322,12 +319,8 @@ void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv* pEnv,
 	return;
 }
 
-void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	if (mActivePlayerBuffer == mPlayerBuffer1) {
-		mActivePlayerBuffer = mPlayerBuffer2;
-	} else {
-		mActivePlayerBuffer = mPlayerBuffer1;
-	}
+void * playbackFile(void * param) {
+	thread_done = false;
 	if (tempSize != 0) {
 		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 				tempSize * sizeof(short));
@@ -337,7 +330,20 @@ void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 			tempSize = processBlock(&mPlayerBuffer1);
 		}
 	}
+	thread_done = true;
+	return NULL;
+}
 
+void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+	if (mActivePlayerBuffer == mPlayerBuffer1) {
+		mActivePlayerBuffer = mPlayerBuffer2;
+	} else {
+		mActivePlayerBuffer = mPlayerBuffer1;
+	}
+	if (!thread_done) {
+		pthread_kill(playerThread, SIGUSR1);
+	}
+	pthread_create(&playerThread, NULL, playbackFile, NULL);
 }
 
 void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
