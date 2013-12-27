@@ -31,8 +31,8 @@ SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
 bool isRecording = false;
 
-const int MAX_TIME_RECORD = 11;
-int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD;
+const int MAX_TIME_RECORD = 500; // ms
+int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
 int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
 int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
 int16_t* mActiveRecordBuffer = mRecordBuffer1;
@@ -49,6 +49,9 @@ void callback_player(SLAndroidSimpleBufferQueueItf, void*);
 int checkError(SLresult);
 int numRecord = 0;
 bool isPlaying = false;
+jobject javaStartObject;
+jobject javaStartClass;
+JavaVM * jvm;
 
 jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Init Audio Service");
@@ -123,12 +126,32 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
+	//SAVE ENVIROMENT
+
+	jclass activityClass = pEnv->FindClass("vng/wmb/service/AudioService");
+	if (activityClass == NULL) {
+		Log::info("ERROR - cant get class");
+	}
+	javaStartClass = pEnv->NewGlobalRef(activityClass);
+	javaStartObject = pEnv->NewGlobalRef(pThis);
+
+	// SET VARIABLE
+	stopTime = 0;
+	numRecord = 0;
+
 	return STATUS_OK;
+}
+
+jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
+	Log::info("JNI_ONLOAD");
+	jvm = aVm;
+	return JNI_VERSION_1_6;
 }
 
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 		jobject pThis) {
 	Log::info("Start record");
+
 	isRecording = true;
 	SLresult res;
 	res = (*mRecorderQueue)->Clear(mRecorderQueue);
@@ -158,7 +181,11 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		// Write to file temp
 		int32_t size = (duration * SAMPE_RATE) / 1000;
 		if (stopTime == 0) {
-			outFileTemp->write(mActiveRecordBuffer, size);
+			int16_t * temp = new int16_t[size];
+			memcpy(temp, mActiveRecordBuffer, size * 2);
+			callback_to_writeBuffer_withEnv(pEnv, temp, size);
+			outFileTemp->write(temp, size);
+			delete temp;
 		} else {
 			int16_t * temp = new int16_t[size];
 			if (mActiveRecordBuffer == mRecordBuffer1) {
@@ -169,6 +196,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 						size * 2);
 			}
 
+			callback_to_writeBuffer_withEnv(pEnv, temp, size);
 			outFileTemp->write(temp, size);
 			delete temp;
 		}
@@ -176,6 +204,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		stopTime = (stopTime == 0) ? duration : stopTime + duration;
 		(*mRecorderQueue)->Clear(mRecorderQueue);
 	}
+	Log::info("Stop Record 4");
 }
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
@@ -196,14 +225,35 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	int32_t size = (callbackTime * SAMPE_RATE) / 1000;
 	int16_t * temp = new int16_t[size];
 	if (mActiveRecordBuffer == mRecordBuffer1) {
-		memcpy(temp, mRecordBuffer2 + (MAX_TIME_RECORD * SAMPE_RATE - size),
-				size * 2);
+		memcpy(temp, mRecordBuffer2 + (mRecordSize - size), size * 2);
 	} else {
-		memcpy(temp, mRecordBuffer1 + (MAX_TIME_RECORD * SAMPE_RATE - size),
-				size * 2);
+		memcpy(temp, mRecordBuffer1 + (mRecordSize - size), size * 2);
 	}
+	callback_to_writeBuffer(temp, size);
 	outFileTemp->write(temp, size);
 	delete temp;
+}
+
+void callback_to_writeBuffer_withEnv(JNIEnv* pEnv, short* temp, int size) {
+	jshortArray buffer = pEnv->NewShortArray(size);
+	pEnv->SetShortArrayRegion(buffer, 0, size, temp);
+
+	jmethodID method = pEnv->GetMethodID((jclass) javaStartClass, "setBuffer",
+			"([S)V");
+	pEnv->CallVoidMethod(javaStartObject, method, buffer);
+}
+
+void callback_to_writeBuffer(short* temp, int size) {
+	JNIEnv* pEnv;
+	jvm->AttachCurrentThread(&pEnv, 0);
+
+	jshortArray buffer = pEnv->NewShortArray(size);
+	pEnv->SetShortArrayRegion(buffer, 0, size, temp);
+
+	jmethodID method = pEnv->GetMethodID((jclass) javaStartClass, "setBuffer",
+			"([S)V");
+	pEnv->CallVoidMethod(javaStartObject, method, buffer);
+	jvm->DetachCurrentThread();
 }
 
 jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
@@ -279,26 +329,22 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis) {
 	Log::info("playEffect");
 	SLresult lRes;
-	SLuint32 lPlayerState;
-	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
-	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
-		(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
-		(*mPlayerQueue)->Clear(mPlayerQueue);
-		(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
-		if (mPlayerBuffer1 != NULL) {
-			delete mPlayerBuffer1;
-			mPlayerBuffer1 = new short[1];
-		}
-		if (mPlayerBuffer2 != NULL) {
-			delete mPlayerBuffer2;
-			mPlayerBuffer2 = new short[1];
-		}
-		int size = processBlock(&mPlayerBuffer1);
-		mActivePlayerBuffer = mPlayerBuffer1;
-		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
-				size * sizeof(short));
-		tempSize = processBlock(&mPlayerBuffer2);
+	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
+	(*mPlayerQueue)->Clear(mPlayerQueue);
+	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
+	if (mPlayerBuffer1 != NULL) {
+		delete mPlayerBuffer1;
+		mPlayerBuffer1 = new short[1];
 	}
+	if (mPlayerBuffer2 != NULL) {
+		delete mPlayerBuffer2;
+		mPlayerBuffer2 = new short[1];
+	}
+	int size = processBlock(&mPlayerBuffer1);
+	mActivePlayerBuffer = mPlayerBuffer1;
+	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
+			size * sizeof(short));
+	tempSize = processBlock(&mPlayerBuffer2);
 	return;
 }
 
@@ -349,36 +395,40 @@ void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Stop Player");
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
-	SLuint32 lPlayerState;
-	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
-	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
-		(*mPlayerQueue)->Clear(mPlayerQueue);
-	}
+	(*mPlayerQueue)->Clear(mPlayerQueue);
 }
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Destroy Audio Service");
+	pEnv->DeleteGlobalRef(javaStartClass);
+	pEnv->NewGlobalRef(javaStartObject);
+
+	Log::info("Destroy Audio Service1");
 	if (mRecorderObj != NULL) {
 		(*mRecorderObj)->Destroy(mRecorderObj);
 		mRecorderObj = NULL;
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
 	}
+	Log::info("Destroy Audio Service2");
 	if (mPlayerObj != NULL) {
 		(*mPlayerObj)->Destroy(mPlayerObj);
 		mPlayerObj = NULL;
 		mPlayer = NULL;
 		mPlayerQueue = NULL;
 	}
+	Log::info("Destroy Audio Service3");
 	if (mOutputMixObj != NULL) {
 		(*mOutputMixObj)->Destroy(mOutputMixObj);
 		mOutputMixObj = NULL;
 	}
+	Log::info("Destroy Audio Service4");
 	if (mEngineObj != NULL) {
 		(*mEngineObj)->Destroy(mEngineObj);
 		mEngineObj = NULL;
 		mEngine = NULL;
 	}
+	Log::info("Destroy Audio Service5");
 }
 
 int checkError(SLresult res) {

@@ -29,6 +29,10 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv *, jobject);
 
+void callback_to_writeBuffer_withEnv(JNIEnv* pEnv, short* temp, int size);
+
+void callback_to_writeBuffer(short* temp, int size);
+
 #ifdef __cplusplus
 }
 #endif
