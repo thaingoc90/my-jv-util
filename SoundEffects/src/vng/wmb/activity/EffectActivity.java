@@ -21,10 +21,6 @@ public class EffectActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_effect);
 
-		if (audioServices == null) {
-			audioServices = new AudioService();
-			audioServices.init();
-		}
 		audioServices.initPlayer();
 		audioServices.startPlayer();
 

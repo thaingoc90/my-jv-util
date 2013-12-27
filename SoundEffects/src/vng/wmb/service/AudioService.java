@@ -1,6 +1,18 @@
 package vng.wmb.service;
 
+import vng.wmb.activity.StartActivity;
+
 public class AudioService {
+
+	public AudioService(StartActivity activity) {
+		mActivity = activity;
+	}
+
+	private StartActivity mActivity;
+
+	public void setBuffer(short[] paramArrayOfShort) {
+		mActivity.setBuffer(paramArrayOfShort);
+	}
 
 	public native int init();
 
