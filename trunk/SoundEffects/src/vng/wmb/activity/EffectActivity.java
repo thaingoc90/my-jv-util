@@ -81,6 +81,7 @@ public class EffectActivity extends Activity {
 	protected void onStop() {
 		soundTouchService.destroy();
 		audioServices.stopPlayer();
+		audioServices.destroyPlayer();
 		super.onStop();
 	}
 

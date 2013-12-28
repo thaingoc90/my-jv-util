@@ -22,6 +22,8 @@ public class AudioService {
 
 	public native int initPlayer();
 
+	public native void destroyPlayer();
+
 	public native void playEffect();
 
 	public native void startPlayer();
