@@ -21,6 +21,8 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv *, jobject);
 
 jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv *, jobject);
 
+void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv*, jobject);
+
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv *, jobject);

@@ -212,7 +212,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 }
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	Log::info("callback record");
+//	Log::info("callback record");
 	std::clock_t endTime;
 	long callbackTime;
 	if (stopTime == 0) {
@@ -351,6 +351,20 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	return STATUS_OK;
 }
 
+void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
+		jobject pThis) {
+	if (mPlayerObj != NULL) {
+		(*mPlayerObj)->Destroy(mPlayerObj);
+		mPlayerObj = NULL;
+		mPlayer = NULL;
+		mPlayerQueue = NULL;
+	}
+	if (mOutputMixObj != NULL) {
+		(*mOutputMixObj)->Destroy(mOutputMixObj);
+		mOutputMixObj = NULL;
+	}
+}
+
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis) {
 	Log::info("playEffect");
 	SLresult lRes;
@@ -434,23 +448,11 @@ void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
 	}
-	if (mPlayerObj != NULL) {
-		(*mPlayerObj)->Destroy(mPlayerObj);
-		mPlayerObj = NULL;
-		mPlayer = NULL;
-		mPlayerQueue = NULL;
-	}
-	if (mOutputMixObj != NULL) {
-		(*mOutputMixObj)->Destroy(mOutputMixObj);
-		mOutputMixObj = NULL;
-	}
-	Log::info("Destroy Audio Service4");
 	if (mEngineObj != NULL) {
 		(*mEngineObj)->Destroy(mEngineObj);
 		mEngineObj = NULL;
 		mEngine = NULL;
 	}
-	Log::info("Destroy Audio Service5");
 }
 
 int checkError(SLresult res) {
