@@ -1,7 +1,6 @@
 package vng.wmb.activity;
 
 import vng.wmb.service.AudioService;
-import vng.wmb.util.Utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +31,6 @@ public class StartActivity extends Activity {
 	// FOR SOUND WAVE
 	private WaveDrawer.DrawThread mDrawThread;
 	private WaveDrawer mdrawer;
-	private SoundSampler sampler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,37 +71,6 @@ public class StartActivity extends Activity {
 	protected void onResume() {
 		Log.i(LOG_TAG, "onResume");
 		checkInterface();
-		// int i = 0;
-		// while (true) {
-		// if ((sampler.GetDead2()) && (mdrawer.GetDead2())) {
-		// Log.i(LOG_TAG, sampler.GetDead2() + ", " + mdrawer.GetDead2());
-		// sampler.Restart();
-		// if (!m_bStart) {
-		// mdrawer.Restart(true);
-		// }
-		// sampler.SetSleeping(false);
-		// mDrawThread.SetSleeping(false);
-		// m_bStart = false;
-		// super.onResume();
-		// return;
-		// }
-		// try {
-		// Thread.sleep(500L);
-		// Log.i(LOG_TAG, "Hang on..");
-		// i++;
-		// if (!sampler.GetDead2())
-		// Log.i(LOG_TAG, "sampler not DEAD!!!");
-		// if (!mdrawer.GetDead2()) {
-		// Log.i(LOG_TAG, "mDrawer not DeAD!!");
-		// mdrawer.setRun(false);
-		// }
-		// if (i <= 4)
-		// continue;
-		// mDrawThread.SetDead2(true);
-		// } catch (InterruptedException localInterruptedException) {
-		// localInterruptedException.printStackTrace();
-		// }
-		// }
 		super.onResume();
 	}
 
@@ -131,9 +98,6 @@ public class StartActivity extends Activity {
 	private void startRecording() {
 		audioServices.startRecord();
 		mDrawThread = mdrawer.getThread();
-		// runSoundWave();
-		// Log.i(LOG_TAG, "mDrawThread NOT NULL");
-		// Log.i(LOG_TAG, "recorder NOT NULL");
 		startCountTimer();
 		isRecording = true;
 		stopThreads = new Runnable() {
@@ -163,6 +127,7 @@ public class StartActivity extends Activity {
 				mHandler.removeCallbacks(stopThreads);
 				stopThreads = null;
 			}
+			mDrawThread = mdrawer.getThread();
 			mDrawThread.setRun(false);
 			mDrawThread.SetSleeping(true);
 		}
@@ -216,28 +181,4 @@ public class StartActivity extends Activity {
 		mDrawThread.setBuffer(paramArrayOfShort);
 	}
 
-	/**
-	 * Called by OnCreate to get everything up and running
-	 */
-	public void runSoundWave() {
-		try {
-			if (mDrawThread == null) {
-				mDrawThread = mdrawer.getThread();
-			}
-			if (sampler == null) {
-				sampler = new SoundSampler(this);
-			}
-			try {
-				sampler.Init();
-			} catch (Exception e) {
-				Utils.showMsg(this,
-						"Could not instance the sampler. Could not access the device audio-drivers");
-				return;
-			}
-			sampler.StartRecording();
-			sampler.StartSampling();
-		} catch (NullPointerException e) {
-			Log.e(LOG_TAG, "NullPointer: " + e.getMessage());
-		}
-	}
 }
