@@ -31,7 +31,7 @@ SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
 bool isRecording = false;
 
-const int MAX_TIME_RECORD = 500; // ms
+const int MAX_TIME_RECORD = 100; // ms
 int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
 int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
 int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
@@ -181,11 +181,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		// Write to file temp
 		int32_t size = (duration * SAMPE_RATE) / 1000;
 		if (stopTime == 0) {
-			int16_t * temp = new int16_t[size];
-			memcpy(temp, mActiveRecordBuffer, size * 2);
-			callback_to_writeBuffer_withEnv(pEnv, temp, size);
-			outFileTemp->write(temp, size);
-			delete temp;
+			outFileTemp->write(mActiveRecordBuffer, size);
 		} else {
 			int16_t * temp = new int16_t[size];
 			if (mActiveRecordBuffer == mRecordBuffer1) {
@@ -196,7 +192,6 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 						size * 2);
 			}
 
-			callback_to_writeBuffer_withEnv(pEnv, temp, size);
 			outFileTemp->write(temp, size);
 			delete temp;
 		}
@@ -230,7 +225,7 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 		memcpy(temp, mRecordBuffer1 + (mRecordSize - size), size * 2);
 	}
 	callback_to_writeBuffer(temp, size);
-	outFileTemp->write(temp, size);
+//	outFileTemp->write(temp, size);
 	delete temp;
 }
 
@@ -403,21 +398,18 @@ void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 	pEnv->DeleteGlobalRef(javaStartClass);
 	pEnv->NewGlobalRef(javaStartObject);
 
-	Log::info("Destroy Audio Service1");
 	if (mRecorderObj != NULL) {
 		(*mRecorderObj)->Destroy(mRecorderObj);
 		mRecorderObj = NULL;
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
 	}
-	Log::info("Destroy Audio Service2");
 	if (mPlayerObj != NULL) {
 		(*mPlayerObj)->Destroy(mPlayerObj);
 		mPlayerObj = NULL;
 		mPlayer = NULL;
 		mPlayerQueue = NULL;
 	}
-	Log::info("Destroy Audio Service3");
 	if (mOutputMixObj != NULL) {
 		(*mOutputMixObj)->Destroy(mOutputMixObj);
 		mOutputMixObj = NULL;
