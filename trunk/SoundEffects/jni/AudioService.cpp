@@ -32,7 +32,7 @@ SLAndroidSimpleBufferQueueItf mPlayerQueue;
 bool isRecording = false;
 
 const int MAX_TIME_RECORD = 100; // ms
-int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
+const int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
 int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
 int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
 int16_t* mActiveRecordBuffer = mRecordBuffer1;
@@ -47,6 +47,13 @@ WavOutFile* outFileTemp;
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 void callback_player(SLAndroidSimpleBufferQueueItf, void*);
 int checkError(SLresult);
+void writeFile(short* temp, int size, bool isStopping);
+
+// Use to write File after 1000s (more performance to access IO). Now, not use.
+const int32_t mBufferWriteFileSize = 1000 * SAMPE_RATE / 1000;
+int16_t* mBufferWriteFile = new int16_t[mBufferWriteFileSize];
+int32_t currentBufferSize = 0;
+
 int numRecord = 0;
 bool isPlaying = false;
 jobject javaStartObject;
@@ -164,6 +171,7 @@ void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 				mRecordSize * sizeof(int16_t));
 		numRecord++;
 	}
+	currentBufferSize = 0;
 
 	res = (*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_RECORDING );
 	if (checkError(res) != STATUS_OK)
@@ -182,6 +190,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		int32_t size = (duration * SAMPE_RATE) / 1000;
 		if (stopTime == 0) {
 			outFileTemp->write(mActiveRecordBuffer, size);
+//			writeFile(mActiveRecordBuffer, size, true);
 		} else {
 			int16_t * temp = new int16_t[size];
 			if (mActiveRecordBuffer == mRecordBuffer1) {
@@ -193,6 +202,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 			}
 
 			outFileTemp->write(temp, size);
+//			writeFile(temp, size, true);
 			delete temp;
 		}
 		delete outFileTemp;
@@ -204,9 +214,17 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	Log::info("callback record");
-	std::clock_t endTime = std::clock();
-	long callbackTime = (endTime - startTime) / 1000;
-	startTime = endTime;
+	std::clock_t endTime;
+	long callbackTime;
+	if (stopTime == 0) {
+		callbackTime = MAX_TIME_RECORD;
+		startTime += MAX_TIME_RECORD * 1000;
+	} else {
+		endTime = std::clock();
+		callbackTime = (endTime - startTime) / 1000;
+		startTime = endTime;
+	}
+
 	stopTime = 0;
 
 	if (mActiveRecordBuffer == mRecordBuffer1) {
@@ -225,8 +243,24 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 		memcpy(temp, mRecordBuffer1 + (mRecordSize - size), size * 2);
 	}
 	callback_to_writeBuffer(temp, size);
-//	outFileTemp->write(temp, size);
+	outFileTemp->write(temp, size);
+//	writeFile(temp, size, false);
 	delete temp;
+}
+
+void writeFile(short* temp, int size, bool isStopping) {
+	Log::info("writeFile  %d", currentBufferSize);
+	if (currentBufferSize + size > mBufferWriteFileSize) {
+		outFileTemp->write(mBufferWriteFile, currentBufferSize);
+		Log::info("writeFile 1");
+		currentBufferSize = 0;
+	}
+	memcpy(mBufferWriteFile + currentBufferSize, temp, size * 2);
+	currentBufferSize += size;
+	if (isStopping) {
+		outFileTemp->write(mBufferWriteFile, currentBufferSize);
+		Log::info("writeFile 2");
+	}
 }
 
 void callback_to_writeBuffer_withEnv(JNIEnv* pEnv, short* temp, int size) {
