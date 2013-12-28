@@ -34,6 +34,25 @@ struct Reverb_priv_t {
 	} chan[2];
 };
 
+EffectReverb::EffectReverb() {
+	setParam(0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+void EffectReverb::setParam(double mRoomSize, double mDelay,
+		double mReverberance, double mHfDamping, double mToneLow,
+		double mToneHigh, double mWetGain, double mDryGain) {
+	mParams.mRoomSize = mRoomSize;
+	mParams.mDelay = mDelay;
+	mParams.mReverberance = mReverberance;
+	mParams.mHfDamping = mHfDamping;
+	mParams.mToneLow = mToneLow;
+	mParams.mToneHigh = mToneHigh;
+	mParams.mWetGain = mWetGain;
+	mParams.mDryGain = mDryGain;
+	mParams.mWetOnly = false;
+	mParams.mStereoWidth = 0;
+}
+
 void EffectReverb::Create(double rate, bool isStereo) {
 	mP = (Reverb_priv_t *) calloc(sizeof *mP, 1);
 	size_t i;

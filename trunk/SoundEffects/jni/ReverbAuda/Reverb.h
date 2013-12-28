@@ -17,6 +17,19 @@ class WaveTrack;
 
 struct Reverb_priv_t;
 
+struct Params {
+	double mRoomSize;
+	double mDelay;
+	double mReverberance;
+	double mHfDamping;
+	double mToneLow;
+	double mToneHigh;
+	double mWetGain;
+	double mDryGain;
+	double mStereoWidth;
+	bool mWetOnly;
+};
+
 class EffectReverb {
 public:
 	EffectReverb();
@@ -24,28 +37,21 @@ public:
 	}
 	;
 
-protected:
+	void setParam(double mRoomSize, double mDelay, double mReverberance,
+			double mHfDamping, double mToneLow, double mToneHigh,
+			double mWetGain, double mDryGain);
 
 	// Processing:
 	void Create(double rate, bool isStereo);
 	bool ProcessOneBlock(long len, float * const * chans);
 	void Delete();
+
+protected:
 	double mCurT0, mCurT1;
 	Reverb_priv_t * mP;
 
-	struct Params {
-		double mRoomSize;
-		double mDelay;
-		double mReverberance;
-		double mHfDamping;
-		double mToneLow;
-		double mToneHigh;
-		double mWetGain;
-		double mDryGain;
-		double mStereoWidth;
-		bool mWetOnly;
-	};
 	Params mParams;
+
 };
 
 #endif
