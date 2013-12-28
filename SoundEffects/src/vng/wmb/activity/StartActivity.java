@@ -96,21 +96,18 @@ public class StartActivity extends Activity {
 	 * Start recording & stop when press button 'stop' or after TIME_RECORD.
 	 */
 	private void startRecording() {
-		Intent intent = new Intent(getApplicationContext(),
-				EffectActivity.class);
-		startActivity(intent);
-//		audioServices.startRecord();
-//		mDrawThread = mdrawer.getThread();
-//		startCountTimer();
-//		isRecording = true;
-//		stopThreads = new Runnable() {
-//			@Override
-//			public void run() {
-//				stopRecording();
-//			}
-//		};
-//		mHandler.postDelayed(stopThreads, TIME_RECORD);
-//		checkInterface();
+		audioServices.startRecord();
+		mDrawThread = mdrawer.getThread();
+		startCountTimer();
+		isRecording = true;
+		stopThreads = new Runnable() {
+			@Override
+			public void run() {
+				stopRecording();
+			}
+		};
+		mHandler.postDelayed(stopThreads, TIME_RECORD);
+		checkInterface();
 	}
 
 	/**
