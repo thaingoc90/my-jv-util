@@ -41,14 +41,6 @@ int16_t* mPlayerBuffer2;
 int16_t* mActivePlayerBuffer;
 int32_t tempSize = 0;
 
-const char* pathFileTemp = "/sdcard/voice.wav";
-WavOutFile* outFileTemp;
-
-void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
-void callback_player(SLAndroidSimpleBufferQueueItf, void*);
-int checkError(SLresult);
-void writeFile(short* temp, int size, bool isStopping);
-
 // Use to write File after 1000s (more performance to access IO). Now, not use.
 const int32_t mBufferWriteFileSize = 1000 * SAMPE_RATE / 1000;
 int16_t* mBufferWriteFile = new int16_t[mBufferWriteFileSize];
@@ -59,6 +51,20 @@ bool isPlaying = false;
 jobject javaStartObject;
 jobject javaStartClass;
 JavaVM * jvm;
+
+const char* pathFileTemp = "/sdcard/voice.wav";
+WavOutFile* outFileTemp;
+
+void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
+void callback_player(SLAndroidSimpleBufferQueueItf, void*);
+int checkError(SLresult);
+void writeFile(short* temp, int size, bool isStopping);
+
+jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
+	Log::info("JNI_ONLOAD");
+	jvm = aVm;
+	return JNI_VERSION_1_6;
+}
 
 jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Init Audio Service");
@@ -147,12 +153,6 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	numRecord = 0;
 
 	return STATUS_OK;
-}
-
-jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
-	Log::info("JNI_ONLOAD");
-	jvm = aVm;
-	return JNI_VERSION_1_6;
 }
 
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
@@ -247,6 +247,7 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	delete temp;
 }
 
+// Use to write buffer to file when bufferWriteFile full or isStopping is true.
 void writeFile(short* temp, int size, bool isStopping) {
 	if (currentBufferSize + size > mBufferWriteFileSize) {
 		outFileTemp->write(mBufferWriteFile, currentBufferSize);
@@ -353,6 +354,7 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 
 void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 		jobject pThis) {
+	Log::info("Destroy Player");
 	if (mPlayerObj != NULL) {
 		(*mPlayerObj)->Destroy(mPlayerObj);
 		mPlayerObj = NULL;
