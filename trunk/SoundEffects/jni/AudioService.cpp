@@ -31,7 +31,7 @@ SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
 bool isRecording = false;
 
-const int MAX_TIME_RECORD = 100; // ms
+const int MAX_TIME_RECORD = 50; // ms
 const int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
 int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
 int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
@@ -209,7 +209,6 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		stopTime = (stopTime == 0) ? duration : stopTime + duration;
 		(*mRecorderQueue)->Clear(mRecorderQueue);
 	}
-	Log::info("Stop Record 4");
 }
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
@@ -249,17 +248,14 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 }
 
 void writeFile(short* temp, int size, bool isStopping) {
-	Log::info("writeFile  %d", currentBufferSize);
 	if (currentBufferSize + size > mBufferWriteFileSize) {
 		outFileTemp->write(mBufferWriteFile, currentBufferSize);
-		Log::info("writeFile 1");
 		currentBufferSize = 0;
 	}
 	memcpy(mBufferWriteFile + currentBufferSize, temp, size * 2);
 	currentBufferSize += size;
 	if (isStopping) {
 		outFileTemp->write(mBufferWriteFile, currentBufferSize);
-		Log::info("writeFile 2");
 	}
 }
 

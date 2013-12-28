@@ -176,7 +176,6 @@ public class StartActivity extends Activity {
 	 * @param buffer
 	 */
 	public void setBuffer(short[] paramArrayOfShort) {
-		Log.i(LOG_TAG, "Buffer");
 		mDrawThread = mdrawer.getThread();
 		mDrawThread.setBuffer(paramArrayOfShort);
 	}

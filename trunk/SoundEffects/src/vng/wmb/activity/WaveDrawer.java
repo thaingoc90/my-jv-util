@@ -92,15 +92,12 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder paramSurfaceHolder) {
 		Log.i(LOG_TAG, "surfaceCreated");
 		if (mDrawThread.getRun()) {
-			Log.i(LOG_TAG, "Start thread");
 			isCreated = true;
 			mDrawThread.start();
 			return;
 		}
 		while (true) {
-			Log.i(LOG_TAG, "new Thread");
 			Restart(false);
-			Log.i(LOG_TAG, "new Thread2");
 			return;
 		}
 	}
