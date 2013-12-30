@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class vng_wmb_service_ReverbEffect */
 
-#ifndef _Included_vng_wmb_service_ReverbEffect
-#define _Included_vng_wmb_service_ReverbEffect
+#ifndef _REVERBEFFECT_H_
+#define _REVERBEFFECT_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,8 +13,18 @@ extern "C" {
  * Signature: (DDDDDDDD)V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_init(JNIEnv *, jobject,
-		jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble);
+JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_init(JNIEnv *,
+		jobject);
+
+/*
+ * Class:     vng_wmb_service_ReverbEffect
+ * Method:    initProcess
+ * Signature: ()V
+ */
+
+JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_initProcess(JNIEnv *,
+		jobject, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble,
+		jdouble);
 
 /*
  * Class:     vng_wmb_service_ReverbEffect
@@ -25,7 +35,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_init(JNIEnv *, jobject,
 JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_destroy(JNIEnv *,
 		jobject);
 
-int processBlock(short** playerBuffer, int nSamples);
+int processBlockForReverb(short** playerBuffer, int size);
 
 #ifdef __cplusplus
 }

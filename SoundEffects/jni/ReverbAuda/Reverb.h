@@ -42,7 +42,7 @@ public:
 			double mWetGain, double mDryGain);
 
 	// Processing:
-	void Create(double rate, bool isStereo);
+	void InitProcess(double rate, bool isStereo);
 	bool ProcessOneBlock(long len, float * const * chans);
 	void Delete();
 

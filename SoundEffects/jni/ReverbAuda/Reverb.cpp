@@ -22,6 +22,7 @@
 #include "Reverb.h"
 #include "Reverb_libSoX.h"
 
+#define BLOCK 0x5000u
 //
 // EffectReverb
 //
@@ -35,6 +36,7 @@ struct Reverb_priv_t {
 };
 
 EffectReverb::EffectReverb() {
+	mP = (Reverb_priv_t *) calloc(sizeof *mP, 1);
 	setParam(0, 0, 0, 0, 0, 0, 0, 0);
 }
 
@@ -53,11 +55,8 @@ void EffectReverb::setParam(double mRoomSize, double mDelay,
 	mParams.mStereoWidth = 0;
 }
 
-void EffectReverb::Create(double rate, bool isStereo) {
-	mP = (Reverb_priv_t *) calloc(sizeof *mP, 1);
+void EffectReverb::InitProcess(double rate, bool isStereo) {
 	size_t i;
-
-#define BLOCK 0x4000u
 	mP->ichannels = mP->ochannels = 1 + isStereo;
 	for (i = 0; i < mP->ichannels; ++i)
 		reverb_create(&mP->chan[i].reverb, rate, mParams.mWetGain,

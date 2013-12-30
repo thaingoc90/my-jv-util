@@ -8,6 +8,7 @@
 #include <ctime>
 #include "WavFile.h"
 #include "SoundTouchWrapper.h"
+#include "ReverbWrapper.h"
 
 const int STATUS_OK = 0;
 const int STATUS_KO = -1;
@@ -51,6 +52,8 @@ bool isPlaying = false;
 jobject javaStartObject;
 jobject javaStartClass;
 JavaVM * jvm;
+
+bool mHasReverb = false;
 
 const char* pathFileTemp = "/sdcard/voice.wav";
 WavOutFile* outFileTemp;
@@ -151,8 +154,27 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	// SET VARIABLE
 	stopTime = 0;
 	numRecord = 0;
+	mHasReverb = false;
 
 	return STATUS_OK;
+}
+
+void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
+	Log::info("Destroy Audio Service");
+	pEnv->DeleteGlobalRef(javaStartClass);
+	pEnv->NewGlobalRef(javaStartObject);
+
+	if (mRecorderObj != NULL) {
+		(*mRecorderObj)->Destroy(mRecorderObj);
+		mRecorderObj = NULL;
+		mRecorder = NULL;
+		mRecorderQueue = NULL;
+	}
+	if (mEngineObj != NULL) {
+		(*mEngineObj)->Destroy(mEngineObj);
+		mEngineObj = NULL;
+		mEngine = NULL;
+	}
 }
 
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
@@ -282,6 +304,10 @@ void callback_to_writeBuffer(short* temp, int size) {
 	jvm->DetachCurrentThread();
 }
 
+// ----------------------------------------------------------------
+// ----------------------FOR PLAYER -------------------------------
+// ----------------------------------------------------------------
+
 jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Init Player");
 	SLresult res;
@@ -298,7 +324,6 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-// Set-up sound audio source.
 	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn;
 	lDataLocatorIn.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
 	lDataLocatorIn.numBuffers = 2;
@@ -335,7 +360,6 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-// Registers a callback called when sound is finished.
 	res = (*mPlayerQueue)->RegisterCallback(mPlayerQueue, callback_player,
 			NULL);
 	if (checkError(res) != STATUS_OK)
@@ -367,8 +391,42 @@ void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 	}
 }
 
-void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis) {
+void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv* pEnv,
+		jobject pThis) {
+	Log::info("Start Player");
+	SLresult lRes;
+	SLuint32 lPlayerState;
+	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
+	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
+		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
+		if (checkError(lRes) != STATUS_OK)
+			return;
+		lRes = (*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
+		if (checkError(lRes) != STATUS_OK)
+			return;
+	}
+	return;
+}
+
+void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
+	Log::info("Stop Player");
+	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
+	(*mPlayerQueue)->Clear(mPlayerQueue);
+}
+
+int processBlock(short** playerBuffer) {
+	int result = 0;
+	result = processBlockForSoundTouch(playerBuffer);
+	if (mHasReverb) {
+		result = processBlockForReverb(playerBuffer, result);
+	}
+	return result;
+}
+
+void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
+		jboolean hasReverb) {
 	Log::info("playEffect");
+	mHasReverb = hasReverb;
 	SLresult lRes;
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
@@ -386,23 +444,6 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis) {
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 			size * sizeof(short));
 	tempSize = processBlock(&mPlayerBuffer2);
-	return;
-}
-
-void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv* pEnv,
-		jobject pThis) {
-	SLresult lRes;
-	SLuint32 lPlayerState;
-	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
-	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
-		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
-		if (checkError(lRes) != STATUS_OK)
-			return;
-		Log::info("Start Player");
-		lRes = (*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
-		if (checkError(lRes) != STATUS_OK)
-			return;
-	}
 	return;
 }
 
@@ -431,30 +472,6 @@ void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 		pthread_kill(playerThread, SIGUSR1);
 	}
 	pthread_create(&playerThread, NULL, playbackFile, NULL);
-}
-
-void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
-	Log::info("Stop Player");
-	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
-	(*mPlayerQueue)->Clear(mPlayerQueue);
-}
-
-void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
-	Log::info("Destroy Audio Service");
-	pEnv->DeleteGlobalRef(javaStartClass);
-	pEnv->NewGlobalRef(javaStartObject);
-
-	if (mRecorderObj != NULL) {
-		(*mRecorderObj)->Destroy(mRecorderObj);
-		mRecorderObj = NULL;
-		mRecorder = NULL;
-		mRecorderQueue = NULL;
-	}
-	if (mEngineObj != NULL) {
-		(*mEngineObj)->Destroy(mEngineObj);
-		mEngineObj = NULL;
-		mEngine = NULL;
-	}
 }
 
 int checkError(SLresult res) {
