@@ -9,6 +9,7 @@
 #include "WavFile.h"
 #include "SoundTouchWrapper.h"
 #include "ReverbWrapper.h"
+#include "EchoWrapper.h"
 
 const int STATUS_OK = 0;
 const int STATUS_KO = -1;
@@ -53,7 +54,7 @@ jobject javaStartObject;
 jobject javaStartClass;
 JavaVM * jvm;
 
-bool mHasReverb = false;
+bool mHasEcho = false;
 
 const char* pathFileTemp = "/sdcard/voice.wav";
 WavOutFile* outFileTemp;
@@ -154,7 +155,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	// SET VARIABLE
 	stopTime = 0;
 	numRecord = 0;
-	mHasReverb = false;
+	mHasEcho = false;
 
 	return STATUS_OK;
 }
@@ -417,16 +418,16 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 int processBlock(short** playerBuffer) {
 	int result = 0;
 	result = processBlockForSoundTouch(playerBuffer);
-	if (mHasReverb) {
-		result = processBlockForReverb(playerBuffer, result);
+	if (mHasEcho) {
+		result = processBlockForEcho(playerBuffer, result);
 	}
 	return result;
 }
 
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
-		jboolean hasReverb) {
+		jboolean setIfEcho) {
 	Log::info("playEffect");
-	mHasReverb = hasReverb;
+	mHasEcho = setIfEcho;
 	SLresult lRes;
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
