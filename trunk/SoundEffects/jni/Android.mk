@@ -13,11 +13,17 @@ LOCAL_SRC_FILES := $(MY_FILE_LIST:$(LOCAL_PATH)/%=%)
 include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := echoAudacity
+MY_FILE_LIST := $(wildcard $(LOCAL_PATH)/EchoEffect/*.cpp)
+LOCAL_SRC_FILES := $(MY_FILE_LIST:$(LOCAL_PATH)/%=%)
+include $(BUILD_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE    := soundEffect
 MY_FILE_LIST := $(wildcard $(LOCAL_PATH)/*.cpp)
 LOCAL_SRC_FILES := $(MY_FILE_LIST:$(LOCAL_PATH)/%=%)
 #LOCAL_SRC_FILES := AudioService.cpp SoundTouchWrapper.cpp Log.cpp WavFile.cpp
 LOCAL_LDLIBS    := -landroid -llog -lOpenSLES
 
-LOCAL_STATIC_LIBRARIES := soundTouch reverbAudacity
+LOCAL_STATIC_LIBRARIES := soundTouch reverbAudacity echoAudacity
 include $(BUILD_SHARED_LIBRARY)

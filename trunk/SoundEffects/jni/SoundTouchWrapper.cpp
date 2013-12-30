@@ -13,7 +13,7 @@
 using namespace soundtouch;
 using namespace std;
 
-#define BUFF_SIZE 10000
+#define BUFF_SIZE 100000
 WavInFile *inFile;
 SoundTouch *pSoundTouch;
 const char* inFilePath;

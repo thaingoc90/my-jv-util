@@ -1,6 +1,7 @@
 package vng.wmb.activity;
 
 import vng.wmb.service.AudioService;
+import vng.wmb.service.EchoEffect;
 import vng.wmb.service.ReverbEffect;
 import vng.wmb.service.SoundTouchEffect;
 import android.app.Activity;
@@ -15,7 +16,7 @@ public class EffectActivity extends Activity {
 	private Button catBtn, cowBtn, birdBtn, fastBtn, robotBtn, stageBtn;
 	private static String inFilePath, storagePath;
 	public SoundTouchEffect soundTouchService;
-	public ReverbEffect reverbService;
+	public EchoEffect echoService;
 	public static AudioService audioServices = StartActivity.audioServices;
 
 	@Override
@@ -32,8 +33,8 @@ public class EffectActivity extends Activity {
 		inFilePath = storagePath + "/voice.wav";
 		soundTouchService.init(inFilePath);
 
-		reverbService = new ReverbEffect();
-		reverbService.init();
+		echoService = new EchoEffect();
+		echoService.init();
 
 		/* CAT EFFECT */
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
@@ -86,7 +87,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Robot Effect");
 				soundTouchService.createSoundTouch(0, 0, 0);
-				reverbService.initProcess(75, 20, 50, 50, 100, 100, 3, -1);
+				echoService.initProcess(8, 0.85);
 				audioServices.playEffect(true);
 			}
 		});
@@ -98,7 +99,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Stage Effect");
 				soundTouchService.createSoundTouch(0, 0, 0);
-				reverbService.initProcess(75, 20, 50, 50, 100, 100, 3, -1);
+				echoService.initProcess(68, 0.5);
 				audioServices.playEffect(true);
 			}
 		});
@@ -108,7 +109,7 @@ public class EffectActivity extends Activity {
 	@Override
 	protected void onStop() {
 		soundTouchService.destroy();
-		reverbService.destroy();
+		echoService.destroy();
 		audioServices.stopPlayer();
 		audioServices.destroyPlayer();
 		super.onStop();
