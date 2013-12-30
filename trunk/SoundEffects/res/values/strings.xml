@@ -14,5 +14,7 @@
     <string name="btn_effect_cow">Cow</string>
     <string name="btn_effect_bird">Bird</string>
     <string name="btn_effect_fast">Fast</string>
+    <string name="btn_effect_robot">Robot</string>
+    <string name="btn_effect_stage">Stage</string>
 
 </resources>

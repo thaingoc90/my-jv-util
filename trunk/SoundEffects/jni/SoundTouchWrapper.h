@@ -12,7 +12,7 @@ extern "C" {
  * Method:    init
  * Signature: ()V
  */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv *,
-		jobject, jstring, jstring);
+		jobject, jstring);
 
 /*
  * Class:     vng_wmb_service_SoundTouchEffect
@@ -43,15 +43,6 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_changeRate(
 
 /*
  * Class:     vng_wmb_service_SoundTouchEffect
- * Method:    process
- * Signature: ()V
- */
-
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_writeToFile(
-		JNIEnv *, jobject);
-
-/*
- * Class:     vng_wmb_service_SoundTouchEffect
  * Method:    destroy
  * Signature: ()V
  */
@@ -68,7 +59,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv *,
 JNIEXPORT void JNICALL Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(
 		JNIEnv *, jobject, jdouble, jdouble, jdouble);
 
-int processBlock(short** playerBuffer);
+int processBlockForSoundTouch(short** playerBuffer);
 
 #ifdef __cplusplus
 }
