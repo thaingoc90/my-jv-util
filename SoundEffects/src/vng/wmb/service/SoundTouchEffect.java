@@ -2,7 +2,7 @@ package vng.wmb.service;
 
 public class SoundTouchEffect {
 
-	public native int init(String inFilePath);
+	public native int init();
 
 	public native void changeTempo(double tempo);
 
