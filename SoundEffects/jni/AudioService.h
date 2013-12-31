@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-static const int SAMPE_RATE = 44100;
+static const int SAMPLE_RATE = 44100;
 static bool thread_done = true;
 static pthread_t playerThread;
 
@@ -30,10 +30,6 @@ void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv *, jobject);
 void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv *, jobject);
-
-void callback_to_writeBuffer_withEnv(JNIEnv* pEnv, short* temp, int size);
-
-void callback_to_writeBuffer(short* temp, int size);
 
 #ifdef __cplusplus
 }

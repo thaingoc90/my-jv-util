@@ -18,24 +18,18 @@ const int STATUS_KO = -1;
 SLObjectItf mEngineObj = NULL;
 SLEngineItf mEngine;
 SLDataFormat_PCM lDataFormat;
-
 // RECORDER
 SLObjectItf mRecorderObj = NULL;
 SLRecordItf mRecorder;
 SLAndroidSimpleBufferQueueItf mRecorderQueue;
-std::clock_t startTime;
-SLint32 stopTime = 0;
-
 // PLAYER
 SLObjectItf mOutputMixObj;
 SLObjectItf mPlayerObj = NULL;
 SLPlayItf mPlayer;
 SLAndroidSimpleBufferQueueItf mPlayerQueue;
 
-bool isRecording = false;
-
 const int MAX_TIME_RECORD = 50; // ms
-const int32_t mRecordSize = SAMPE_RATE * MAX_TIME_RECORD / 1000;
+const int32_t mRecordSize = SAMPLE_RATE * MAX_TIME_RECORD / 1000;
 int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
 int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
 int16_t* mActiveRecordBuffer = mRecordBuffer1;
@@ -43,20 +37,20 @@ int16_t* mPlayerBuffer1;
 int16_t* mPlayerBuffer2;
 int16_t* mActivePlayerBuffer;
 int32_t tempSize = 0;
+bool isRecording = false;
+int numRecord = 0;
+bool isPlaying = false;
+std::clock_t startTime;
+SLint32 stopTime = 0;
 
-// Use to write File after 1000s (more performance to access IO). Now, not use.
-const int32_t mBufferWriteFileSize = 1000 * SAMPE_RATE / 1000;
+// Use to write File after 1000ms (access IO more performance). Now, not use.
+const int32_t mBufferWriteFileSize = 1000 * SAMPLE_RATE / 1000;
 int16_t* mBufferWriteFile = new int16_t[mBufferWriteFileSize];
 int32_t currentBufferSize = 0;
 
-int numRecord = 0;
-bool isPlaying = false;
 jobject javaStartObject;
 jobject javaStartClass;
 JavaVM * jvm;
-
-bool mHasEcho = false;
-bool mHasSoundTouch = false;
 
 const char* pathFileTemp = "/sdcard/voice.wav";
 WavOutFile* outFileTemp;
@@ -64,14 +58,21 @@ WavInFile* inFileTemp;
 pthread_mutex_t isProcessingBlock;
 #define BUFF_SIZE 10000
 short sampleBuffer[BUFF_SIZE];
+bool mHasEcho = false;
+bool mHasSoundTouch = false;
 
+// INTERFACE OF METHOD
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 void callback_player(SLAndroidSimpleBufferQueueItf, void*);
 void writeFile(short* temp, int size, bool isStopping);
 void * playbackFile(void * param);
 int processBlock(short*& playerBuffer);
 int checkError(SLresult);
+void callback_to_writeBuffer(short* temp, int size);
 
+/**
+ * Save JVM.
+ */
 jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 	Log::info("JNI_ONLOAD");
 	jvm = aVm;
@@ -209,7 +210,7 @@ void Java_vng_wmb_service_AudioService_startRecord(JNIEnv* pEnv,
 	if (checkError(res) != STATUS_OK)
 		return;
 	startTime = std::clock();
-	outFileTemp = new WavOutFile(pathFileTemp, SAMPE_RATE, 16, 1);
+	outFileTemp = new WavOutFile(pathFileTemp, SAMPLE_RATE, 16, 1);
 }
 
 void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
@@ -219,17 +220,17 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 		SLint32 duration = (std::clock() - startTime) / 1000;
 		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
 		// Write to file temp
-		int32_t size = (duration * SAMPE_RATE) / 1000;
+		int32_t size = (duration * SAMPLE_RATE) / 1000;
 		if (stopTime == 0) {
 			outFileTemp->write(mActiveRecordBuffer, size);
 //			writeFile(mActiveRecordBuffer, size, true);
 		} else {
 			int16_t * temp = new int16_t[size];
 			if (mActiveRecordBuffer == mRecordBuffer1) {
-				memcpy(temp, mRecordBuffer1 + stopTime * SAMPE_RATE / 1000,
+				memcpy(temp, mRecordBuffer1 + stopTime * SAMPLE_RATE / 1000,
 						size * 2);
 			} else {
-				memcpy(temp, mRecordBuffer2 + stopTime * SAMPE_RATE / 1000,
+				memcpy(temp, mRecordBuffer2 + stopTime * SAMPLE_RATE / 1000,
 						size * 2);
 			}
 
@@ -266,7 +267,7 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	(*mRecorderQueue)->Enqueue(mRecorderQueue, mActiveRecordBuffer,
 			mRecordSize * sizeof(int16_t));
 
-	int32_t size = (callbackTime * SAMPE_RATE) / 1000;
+	int32_t size = (callbackTime * SAMPLE_RATE) / 1000;
 	int16_t * temp = new int16_t[size];
 	if (mActiveRecordBuffer == mRecordBuffer1) {
 		memcpy(temp, mRecordBuffer2 + (mRecordSize - size), size * 2);
@@ -290,15 +291,6 @@ void writeFile(short* temp, int size, bool isStopping) {
 	if (isStopping) {
 		outFileTemp->write(mBufferWriteFile, currentBufferSize);
 	}
-}
-
-void callback_to_writeBuffer_withEnv(JNIEnv* pEnv, short* temp, int size) {
-	jshortArray buffer = pEnv->NewShortArray(size);
-	pEnv->SetShortArrayRegion(buffer, 0, size, temp);
-
-	jmethodID method = pEnv->GetMethodID((jclass) javaStartClass, "setBuffer",
-			"([S)V");
-	pEnv->CallVoidMethod(javaStartObject, method, buffer);
 }
 
 void callback_to_writeBuffer(short* temp, int size) {
@@ -467,6 +459,18 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 	return;
 }
 
+void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+	if (mActivePlayerBuffer == mPlayerBuffer1) {
+		mActivePlayerBuffer = mPlayerBuffer2;
+	} else {
+		mActivePlayerBuffer = mPlayerBuffer1;
+	}
+	if (!thread_done) {
+		pthread_kill(playerThread, SIGUSR1);
+	}
+	pthread_create(&playerThread, NULL, playbackFile, NULL);
+}
+
 void * playbackFile(void * param) {
 	thread_done = false;
 	if (tempSize != 0) {
@@ -480,18 +484,6 @@ void * playbackFile(void * param) {
 	}
 	thread_done = true;
 	return NULL;
-}
-
-void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	if (mActivePlayerBuffer == mPlayerBuffer1) {
-		mActivePlayerBuffer = mPlayerBuffer2;
-	} else {
-		mActivePlayerBuffer = mPlayerBuffer1;
-	}
-	if (!thread_done) {
-		pthread_kill(playerThread, SIGUSR1);
-	}
-	pthread_create(&playerThread, NULL, playbackFile, NULL);
 }
 
 int processBlock(short*& playerBuffer) {

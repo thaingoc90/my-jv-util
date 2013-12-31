@@ -11,7 +11,8 @@ import android.widget.Button;
 
 public class EffectActivity extends Activity {
 
-	private Button catBtn, cowBtn, birdBtn, fastBtn, robotBtn, stageBtn;
+	private Button catBtn, cowBtn, birdBtn, fastBtn, robotBtn, stageBtn,
+			dubVaderBtn;
 	public SoundTouchEffect soundTouchService;
 	public EchoEffect echoService;
 	public static AudioService audioServices = StartActivity.audioServices;
@@ -79,21 +80,31 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Robot Effect");
-				soundTouchService.createSoundTouch(0, 0, 0);
 				echoService.initProcess(8, 0.85);
 				audioServices.playEffect(false, true);
 			}
 		});
 
-		/* ROBOT EFFECT */
+		/* STAGE EFFECT */
 		stageBtn = (Button) findViewById(R.id.btn_effect_stage);
 		stageBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.i("EFFECT", "Stage Effect");
-				soundTouchService.createSoundTouch(0, 0, 0);
 				echoService.initProcess(68, 0.5);
 				audioServices.playEffect(false, true);
+			}
+		});
+
+		/* DUB VADER EFFECT */
+		dubVaderBtn = (Button) findViewById(R.id.btn_effect_dub_vader);
+		dubVaderBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.i("EFFECT", "Dub Vader Effect");
+				soundTouchService.createSoundTouch(-2, -6, -2);
+				echoService.initProcess(200, 0.3);
+				audioServices.playEffect(true, true);
 			}
 		});
 

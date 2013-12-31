@@ -17,7 +17,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_initProcess(
 		jdouble mToneHigh, jdouble mWetGain, jdouble mDryGain) {
 	pEffectReverb->setParam(mRoomSize, mDelay, mReverberance, mHfDamping,
 			mToneLow, mToneHigh, mWetGain, mDryGain);
-	pEffectReverb->InitProcess(SAMPE_RATE, false);
+	pEffectReverb->InitProcess(SAMPLE_RATE, false);
 }
 
 JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_destroy(JNIEnv * pEnv,

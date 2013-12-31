@@ -9,7 +9,7 @@ EffectEcho *pEffectEcho;
 JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_init(JNIEnv *pEnv,
 		jobject pThis) {
 	Log::info("Init Echo");
-	pEffectEcho = new EffectEcho(SAMPE_RATE);
+	pEffectEcho = new EffectEcho(SAMPLE_RATE);
 }
 
 JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_initProcess(JNIEnv *pEnv,
