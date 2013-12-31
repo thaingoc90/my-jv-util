@@ -1,6 +1,10 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#include <stdlib.h>
+
+static const int SAMPLE_RATE = 44100;
+
 // TODO: Rename
 static int saturate(float fvalue, float minval, float maxval) {
 	if (fvalue > maxval) {

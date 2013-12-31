@@ -9,10 +9,6 @@
 extern "C" {
 #endif
 
-static const int SAMPLE_RATE = 44100;
-static bool thread_done = true;
-static pthread_t playerThread;
-
 jint Java_vng_wmb_service_AudioService_init(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_startRecord(JNIEnv *, jobject);
