@@ -58,6 +58,8 @@ WavInFile* inFileTemp;
 pthread_mutex_t isProcessingBlock;
 #define BUFF_SIZE 10000
 short sampleBuffer[BUFF_SIZE];
+bool thread_done = true;
+pthread_t playerThread;
 bool mHasEcho = false;
 bool mHasSoundTouch = false;
 
