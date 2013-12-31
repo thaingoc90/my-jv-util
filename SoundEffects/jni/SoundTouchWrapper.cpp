@@ -2,13 +2,10 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <Log.h>
-#include "WavFile.h"
 #include "SoundTouch/SoundTouch.h"
-#include "SoundTouch/BPMDetect.h"
 #include "AudioService.h"
 #include "Utils.h"
+#include "Log.h"
 
 using namespace soundtouch;
 using namespace std;
