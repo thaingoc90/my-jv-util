@@ -68,8 +68,9 @@
         android:id="@+id/btn_effect_robot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/btn_effect_cat"
+        android:layout_alignLeft="@+id/btn_effect_cow"
+        android:layout_below="@+id/btn_effect_cow"
+        android:layout_marginTop="36dp"
         android:text="@string/btn_effect_robot"
         android:textSize="15sp"
         android:width="100dp" />

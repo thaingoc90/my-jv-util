@@ -27,14 +27,14 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_destroy(JNIEnv * pEnv,
 	}
 }
 
-int processBlockForEcho(short** playerBuffer, int size) {
-	float* echoBuffer = convertToFloat((*playerBuffer), size);
+int processBlockForEcho(short*& playerBuffer, int size) {
+	float* echoBuffer = convertToFloat(playerBuffer, size);
 	int result = pEffectEcho->ProcessOneBlock(echoBuffer, size);
 	short *tempPlayerBuffer = convertToShortBuffer(echoBuffer, result);
 	delete echoBuffer;
-	if (*playerBuffer != NULL) {
-		delete (*playerBuffer);
+	if (playerBuffer != NULL) {
+		delete playerBuffer;
 	}
-	(*playerBuffer) = tempPlayerBuffer;
+	playerBuffer = tempPlayerBuffer;
 	return result;
 }

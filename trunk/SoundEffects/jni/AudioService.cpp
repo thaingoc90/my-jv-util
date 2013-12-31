@@ -10,6 +10,7 @@
 #include "SoundTouchWrapper.h"
 #include "ReverbWrapper.h"
 #include "EchoWrapper.h"
+#include "Utils.h"
 
 const int STATUS_OK = 0;
 const int STATUS_KO = -1;
@@ -55,14 +56,21 @@ jobject javaStartClass;
 JavaVM * jvm;
 
 bool mHasEcho = false;
+bool mHasSoundTouch = false;
 
 const char* pathFileTemp = "/sdcard/voice.wav";
 WavOutFile* outFileTemp;
+WavInFile* inFileTemp;
+pthread_mutex_t isProcessingBlock;
+#define BUFF_SIZE 10000
+short sampleBuffer[BUFF_SIZE];
 
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 void callback_player(SLAndroidSimpleBufferQueueItf, void*);
-int checkError(SLresult);
 void writeFile(short* temp, int size, bool isStopping);
+void * playbackFile(void * param);
+int processBlock(short*& playerBuffer);
+int checkError(SLresult);
 
 jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 	Log::info("JNI_ONLOAD");
@@ -156,6 +164,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	stopTime = 0;
 	numRecord = 0;
 	mHasEcho = false;
+	mHasSoundTouch = false;
 
 	return STATUS_OK;
 }
@@ -380,6 +389,7 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 		jobject pThis) {
 	Log::info("Destroy Player");
+
 	if (mPlayerObj != NULL) {
 		(*mPlayerObj)->Destroy(mPlayerObj);
 		mPlayerObj = NULL;
@@ -390,11 +400,14 @@ void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 		(*mOutputMixObj)->Destroy(mOutputMixObj);
 		mOutputMixObj = NULL;
 	}
+
 }
 
 void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv* pEnv,
 		jobject pThis) {
 	Log::info("Start Player");
+	inFileTemp = new WavInFile(pathFileTemp);
+
 	SLresult lRes;
 	SLuint32 lPlayerState;
 	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
@@ -413,20 +426,26 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Stop Player");
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
-}
 
-int processBlock(short** playerBuffer) {
-	int result = 0;
-	result = processBlockForSoundTouch(playerBuffer);
-	if (mHasEcho) {
-		result = processBlockForEcho(playerBuffer, result);
+	if (inFileTemp != NULL) {
+		delete inFileTemp;
+		inFileTemp = NULL;
 	}
-	return result;
 }
 
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
-		jboolean setIfEcho) {
+		jboolean setIfSoundTouch, jboolean setIfEcho) {
 	Log::info("playEffect");
+
+	if (!thread_done) {
+		pthread_kill(playerThread, SIGUSR1);
+	}
+
+	pthread_mutex_lock(&isProcessingBlock);
+	inFileTemp->rewind();
+	pthread_mutex_unlock(&isProcessingBlock);
+
+	mHasSoundTouch = setIfSoundTouch;
 	mHasEcho = setIfEcho;
 	SLresult lRes;
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
@@ -440,11 +459,11 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 		delete mPlayerBuffer2;
 		mPlayerBuffer2 = new short[1];
 	}
-	int size = processBlock(&mPlayerBuffer1);
+	int size = processBlock(mPlayerBuffer1);
 	mActivePlayerBuffer = mPlayerBuffer1;
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 			size * sizeof(short));
-	tempSize = processBlock(&mPlayerBuffer2);
+	tempSize = processBlock(mPlayerBuffer2);
 	return;
 }
 
@@ -454,9 +473,9 @@ void * playbackFile(void * param) {
 		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 				tempSize * sizeof(short));
 		if (mActivePlayerBuffer == mPlayerBuffer1) {
-			tempSize = processBlock(&mPlayerBuffer2);
+			tempSize = processBlock(mPlayerBuffer2);
 		} else {
-			tempSize = processBlock(&mPlayerBuffer1);
+			tempSize = processBlock(mPlayerBuffer1);
 		}
 	}
 	thread_done = true;
@@ -473,6 +492,28 @@ void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 		pthread_kill(playerThread, SIGUSR1);
 	}
 	pthread_create(&playerThread, NULL, playbackFile, NULL);
+}
+
+int processBlock(short*& playerBuffer) {
+	int result = 0;
+	pthread_mutex_lock(&isProcessingBlock);
+	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
+		result = inFileTemp->read(sampleBuffer, BUFF_SIZE);
+		short *buffer = convertToShortBuffer(sampleBuffer, result);
+		if (playerBuffer != NULL) {
+			delete playerBuffer;
+		}
+		playerBuffer = buffer;
+	}
+	pthread_mutex_unlock(&isProcessingBlock);
+
+	if (result > 0 && mHasSoundTouch) {
+		result = processBlockForSoundTouch(playerBuffer, result);
+	}
+	if (result > 0 && mHasEcho) {
+		result = processBlockForEcho(playerBuffer, result);
+	}
+	return result;
 }
 
 int checkError(SLresult res) {
