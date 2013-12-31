@@ -13,12 +13,10 @@
 using namespace soundtouch;
 using namespace std;
 
-#define BUFF_SIZE 10000
 SoundTouch *pSoundTouch;
-bool playFirst = true;
 
 jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis) {
-	playFirst = true;
+	pSoundTouch = new SoundTouch();
 	return 0;
 }
 
@@ -34,13 +32,8 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 		jobject pThis, jdouble tempo, jdouble pitch, jdouble rate) {
 
 	Log::info("createSoundTouch");
-	if (playFirst || pSoundTouch == NULL) {
-		pSoundTouch = new SoundTouch();
-		playFirst = false;
-	} else {
-		pSoundTouch->reset();
-	}
 
+	pSoundTouch->reset();
 	int sampleRate, channels;
 
 	pSoundTouch->setSetting(SETTING_USE_QUICKSEEK, 0);
@@ -51,7 +44,7 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pSoundTouch->setSetting(SETTING_SEEKWINDOW_MS, 15);
 	pSoundTouch->setSetting(SETTING_OVERLAP_MS, 8);
 
-	sampleRate = SAMPE_RATE;
+	sampleRate = SAMPLE_RATE;
 	channels = 1;
 	pSoundTouch->setSampleRate(sampleRate);
 	pSoundTouch->setChannels(channels);

@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/btn_effect_fast"
         android:layout_alignBottom="@+id/btn_effect_fast"
+        android:layout_marginTop="26dp"
         android:layout_toLeftOf="@+id/btn_effect_cat"
         android:text="@string/btn_effect_cow"
         android:textSize="15sp"
@@ -60,6 +61,7 @@
         android:layout_alignBaseline="@+id/btn_effect_robot"
         android:layout_alignBottom="@+id/btn_effect_robot"
         android:layout_alignLeft="@+id/btn_effect_fast"
+        android:layout_marginTop="26dp"
         android:text="@string/btn_effect_stage"
         android:textSize="15sp"
         android:width="100dp" />
@@ -68,10 +70,21 @@
         android:id="@+id/btn_effect_robot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btn_effect_cow"
-        android:layout_below="@+id/btn_effect_cow"
-        android:layout_marginTop="36dp"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/btn_effect_cat"
         android:text="@string/btn_effect_robot"
+        android:textSize="15sp"
+        android:width="100dp" />
+
+    <Button
+        android:id="@+id/btn_effect_dub_vader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_effect_stage"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/btn_effect_cat"
+        android:text="@string/btn_effect_dub_vader"
         android:textSize="15sp"
         android:width="100dp" />
 
