@@ -19,7 +19,8 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv *, jobject);
 
 void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv*, jobject);
 
-void Java_vng_wmb_service_AudioService_playEffect(JNIEnv *, jobject, jboolean, jboolean);
+void Java_vng_wmb_service_AudioService_playEffect(JNIEnv *, jobject, jboolean,
+		jboolean, jboolean);
 
 void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv *, jobject);
 

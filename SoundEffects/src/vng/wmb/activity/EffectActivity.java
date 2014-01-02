@@ -1,9 +1,11 @@
 package vng.wmb.activity;
 
 import vng.wmb.service.AudioService;
+import vng.wmb.service.BackgroundEffect;
 import vng.wmb.service.EchoEffect;
 import vng.wmb.service.SoundTouchEffect;
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,15 +14,18 @@ import android.widget.Button;
 public class EffectActivity extends Activity {
 
 	private Button catBtn, cowBtn, birdBtn, fastBtn, robotBtn, stageBtn,
-			dubVaderBtn;
+			dubVaderBtn, musicBtn;
 	public SoundTouchEffect soundTouchService;
 	public EchoEffect echoService;
+	public BackgroundEffect backgroundService;
 	public static AudioService audioServices = StartActivity.audioServices;
+	private AssetManager mgr;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_effect);
+		mgr = getResources().getAssets();
 
 		audioServices.initPlayer();
 
@@ -30,6 +35,9 @@ public class EffectActivity extends Activity {
 		echoService = new EchoEffect();
 		echoService.init();
 
+		backgroundService = new BackgroundEffect();
+		backgroundService.init(mgr);
+
 		/* CAT EFFECT */
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
 		catBtn.setOnClickListener(new View.OnClickListener() {
@@ -37,7 +45,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cat Effect");
 				soundTouchService.createSoundTouch(0, 6, 15);
-				audioServices.playEffect(true, false);
+				audioServices.playEffect(true, false, false);
 			}
 		});
 
@@ -48,7 +56,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Cow Effect");
 				soundTouchService.createSoundTouch(0, -4, 0);
-				audioServices.playEffect(true, false);
+				audioServices.playEffect(true, false, false);
 			}
 		});
 
@@ -59,7 +67,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Bird Effect");
 				soundTouchService.createSoundTouch(0, 7, 25);
-				audioServices.playEffect(true, false);
+				audioServices.playEffect(true, false, false);
 			}
 		});
 
@@ -70,7 +78,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Fast Effect");
 				soundTouchService.createSoundTouch(60, 0, 0);
-				audioServices.playEffect(true, false);
+				audioServices.playEffect(true, false, false);
 			}
 		});
 
@@ -81,7 +89,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Robot Effect");
 				echoService.initProcess(8, 0.85);
-				audioServices.playEffect(false, true);
+				audioServices.playEffect(false, true, false);
 			}
 		});
 
@@ -92,7 +100,7 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				Log.i("EFFECT", "Stage Effect");
 				echoService.initProcess(68, 0.5);
-				audioServices.playEffect(false, true);
+				audioServices.playEffect(false, true, false);
 			}
 		});
 
@@ -104,7 +112,18 @@ public class EffectActivity extends Activity {
 				Log.i("EFFECT", "Dub Vader Effect");
 				soundTouchService.createSoundTouch(-2, -6, -2);
 				echoService.initProcess(200, 0.3);
-				audioServices.playEffect(true, true);
+				audioServices.playEffect(true, true, false);
+			}
+		});
+
+		/* MUSIC EFFECT */
+		musicBtn = (Button) findViewById(R.id.btn_effect_music);
+		musicBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.i("EFFECT", "MUSIC Effect");
+				backgroundService.initProcess("bg_rain.wav", 0.1);
+				audioServices.playEffect(false, false, true);
 			}
 		});
 
@@ -126,6 +145,7 @@ public class EffectActivity extends Activity {
 	protected void onDestroy() {
 		soundTouchService.destroy();
 		echoService.destroy();
+		backgroundService.destroy();
 		audioServices.destroyPlayer();
 		super.onDestroy();
 	}

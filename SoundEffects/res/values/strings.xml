@@ -7,7 +7,7 @@
     <string name="title_activity_effect">EffectActivity</string>
     <string name="title_activity_recording">RecordingActivity</string>
     <string name="btn_record">Record</string>
-    <string name="recording">Recording in 20s..</string>
+    <string name="recording">Recording in ..</string>
     <string name="btn_stop_record">Stop</string>
     <string name="btn_record_again">ReRecord</string>
     <string name="btn_effect_cat">Cat</string>
@@ -17,5 +17,6 @@
     <string name="btn_effect_robot">Robot</string>
     <string name="btn_effect_stage">Stage</string>
     <string name="btn_effect_dub_vader">Dub Vader</string>
+    <string name="btn_effect_music">Music</string>
 
 </resources>

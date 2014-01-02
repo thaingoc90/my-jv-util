@@ -10,6 +10,7 @@
 #include "SoundTouchWrapper.h"
 #include "ReverbWrapper.h"
 #include "EchoWrapper.h"
+#include "BackgroundWrapper.h"
 #include "Utils.h"
 
 const int STATUS_OK = 0;
@@ -62,6 +63,7 @@ bool thread_done = true;
 pthread_t playerThread;
 bool mHasEcho = false;
 bool mHasSoundTouch = false;
+bool mHasBackGround = false;
 
 // INTERFACE OF METHOD
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
@@ -168,6 +170,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	numRecord = 0;
 	mHasEcho = false;
 	mHasSoundTouch = false;
+	mHasBackGround = false;
 
 	return STATUS_OK;
 }
@@ -175,7 +178,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 void Java_vng_wmb_service_AudioService_destroy(JNIEnv* pEnv, jobject pThis) {
 	Log::info("Destroy Audio Service");
 	pEnv->DeleteGlobalRef(javaStartClass);
-	pEnv->NewGlobalRef(javaStartObject);
+	pEnv->DeleteGlobalRef(javaStartObject);
 
 	if (mRecorderObj != NULL) {
 		(*mRecorderObj)->Destroy(mRecorderObj);
@@ -428,7 +431,8 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 }
 
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
-		jboolean setIfSoundTouch, jboolean setIfEcho) {
+		jboolean setIfSoundTouch, jboolean setIfEcho,
+		jboolean setIfBackground) {
 	Log::info("playEffect");
 
 	if (!thread_done) {
@@ -441,6 +445,8 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 
 	mHasSoundTouch = setIfSoundTouch;
 	mHasEcho = setIfEcho;
+	mHasBackGround = setIfBackground;
+
 	SLresult lRes;
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
@@ -507,6 +513,11 @@ int processBlock(short*& playerBuffer) {
 	if (result > 0 && mHasEcho) {
 		result = processBlockForEcho(playerBuffer, result);
 	}
+
+	if (result > 0 && mHasBackGround) {
+		result = processBlockForBackground(playerBuffer, result);
+	}
+
 	return result;
 }
 
