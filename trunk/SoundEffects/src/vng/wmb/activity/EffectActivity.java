@@ -43,9 +43,13 @@ public class EffectActivity extends Activity {
 		catBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Cat Effect");
-				soundTouchService.createSoundTouch(0, 6, 15);
-				audioServices.playEffect(true, false, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Cat Effect");
+						soundTouchService.createSoundTouch(0, 6, 15);
+						audioServices.playEffect(true, false, false);
+					}
+				}).start();
 			}
 		});
 
@@ -54,9 +58,13 @@ public class EffectActivity extends Activity {
 		cowBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Cow Effect");
-				soundTouchService.createSoundTouch(0, -4, 0);
-				audioServices.playEffect(true, false, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Cow Effect");
+						soundTouchService.createSoundTouch(0, -4, 0);
+						audioServices.playEffect(true, false, false);
+					}
+				}).start();
 			}
 		});
 
@@ -65,9 +73,13 @@ public class EffectActivity extends Activity {
 		birdBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Bird Effect");
-				soundTouchService.createSoundTouch(0, 7, 25);
-				audioServices.playEffect(true, false, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Bird Effect");
+						soundTouchService.createSoundTouch(0, 7, 25);
+						audioServices.playEffect(true, false, false);
+					}
+				}).start();
 			}
 		});
 
@@ -76,9 +88,13 @@ public class EffectActivity extends Activity {
 		fastBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Fast Effect");
-				soundTouchService.createSoundTouch(60, 0, 0);
-				audioServices.playEffect(true, false, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Fast Effect");
+						soundTouchService.createSoundTouch(60, 0, 0);
+						audioServices.playEffect(true, false, false);
+					}
+				}).start();
 			}
 		});
 
@@ -87,9 +103,13 @@ public class EffectActivity extends Activity {
 		robotBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Robot Effect");
-				echoService.initProcess(8, 0.85);
-				audioServices.playEffect(false, true, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Robot Effect");
+						echoService.initProcess(8, 0.85);
+						audioServices.playEffect(false, true, false);
+					}
+				}).start();
 			}
 		});
 
@@ -98,9 +118,13 @@ public class EffectActivity extends Activity {
 		stageBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Stage Effect");
-				echoService.initProcess(68, 0.5);
-				audioServices.playEffect(false, true, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Stage Effect");
+						echoService.initProcess(68, 0.5);
+						audioServices.playEffect(false, true, false);
+					}
+				}).start();
 			}
 		});
 
@@ -109,10 +133,14 @@ public class EffectActivity extends Activity {
 		dubVaderBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "Dub Vader Effect");
-				soundTouchService.createSoundTouch(-2, -6, -2);
-				echoService.initProcess(200, 0.3);
-				audioServices.playEffect(true, true, false);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "Dub Vader Effect");
+						soundTouchService.createSoundTouch(-2, -6, -2);
+						echoService.initProcess(200, 0.3);
+						audioServices.playEffect(true, true, false);
+					}
+				}).start();
 			}
 		});
 
@@ -121,9 +149,13 @@ public class EffectActivity extends Activity {
 		musicBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i("EFFECT", "MUSIC Effect");
-				backgroundService.initProcess("bg_rain.wav", 0.1);
-				audioServices.playEffect(false, false, true);
+				new Thread(new Runnable() {
+					public void run() {
+						Log.i("EFFECT", "MUSIC Effect");
+						backgroundService.initProcess("bg_rain.wav", 0.1);
+						audioServices.playEffect(false, false, true);
+					}
+				}).start();
 			}
 		});
 
