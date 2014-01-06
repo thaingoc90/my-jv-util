@@ -152,7 +152,7 @@ public class EffectActivity extends Activity {
 				new Thread(new Runnable() {
 					public void run() {
 						Log.i("EFFECT", "MUSIC Effect");
-						backgroundService.initProcess("bg_rain.wav", 0.1);
+						backgroundService.initProcess("bg_rain.wav", 0.7);
 						audioServices.playEffect(false, false, true);
 					}
 				}).start();

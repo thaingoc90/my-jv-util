@@ -5,11 +5,13 @@
 #include "SoundTouch/SoundTouch.h"
 #include "Utils.h"
 #include "Log.h"
+#include <pthread.h>
 
 using namespace soundtouch;
 using namespace std;
 
 SoundTouch *pSoundTouch;
+pthread_mutex_t isProcessingSoundTouch;
 
 jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis) {
 	pSoundTouch = new SoundTouch();
@@ -29,6 +31,7 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 
 	Log::info("createSoundTouch");
 
+	pthread_mutex_lock(&isProcessingSoundTouch);
 	pSoundTouch->reset();
 	int sampleRate, channels;
 
@@ -40,6 +43,7 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pSoundTouch->setSetting(SETTING_SEEKWINDOW_MS, 15);
 	pSoundTouch->setSetting(SETTING_OVERLAP_MS, 8);
 
+
 	sampleRate = SAMPLE_RATE;
 	channels = 1;
 	pSoundTouch->setSampleRate(sampleRate);
@@ -48,7 +52,7 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pSoundTouch->setTempoChange((float) tempo);
 	pSoundTouch->setPitchSemiTones((float) pitch);
 	pSoundTouch->setRateChange(rate);
-
+	pthread_mutex_unlock(&isProcessingSoundTouch);
 }
 
 void Java_vng_wmb_service_SoundTouchEffect_changeTempo(JNIEnv* pEnv,
@@ -77,6 +81,7 @@ int processBlockForSoundTouch(short*& playerBuffer, int size) {
 		sampleBuffer = (SAMPLETYPE*) convertToShortBuffer(playerBuffer, size);
 	}
 
+	pthread_mutex_lock(&isProcessingSoundTouch);
 	pSoundTouch->putSamples(sampleBuffer, size);
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, size);
@@ -95,6 +100,7 @@ int processBlockForSoundTouch(short*& playerBuffer, int size) {
 		sizePlayerBuffer += nSamples;
 
 	} while (nSamples != 0);
+	pthread_mutex_unlock(&isProcessingSoundTouch);
 
 	delete sampleBuffer;
 	delete playerBuffer;
