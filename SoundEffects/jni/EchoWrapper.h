@@ -33,7 +33,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_initProcess(JNIEnv *,
 JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_destroy(JNIEnv *,
 		jobject);
 
-int processBlockForEcho(short*& playerBuffer, int size);
+int processBlockForEcho(short** playerBuffer, int size);
 
 #ifdef __cplusplus
 }

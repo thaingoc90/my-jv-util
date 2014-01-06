@@ -47,8 +47,8 @@ void Java_vng_wmb_service_BackgroundEffect_destroy(JNIEnv* pEnv,
 	}
 }
 
-int processBlockForBackground(short*& playerBuffer, int size) {
-	float* buffer = convertToFloat(playerBuffer, size);
+int processBlockForBackground(short** playerBuffer, int size) {
+	float* buffer = convertToFloat((*playerBuffer), size);
 	short tempBuffer[size];
 	int numRead = 0, c = size;
 	float* floatTempBuffer;
@@ -76,8 +76,8 @@ int processBlockForBackground(short*& playerBuffer, int size) {
 	}
 	pthread_mutex_unlock(&isProcessingFile);
 
-	delete playerBuffer;
-	playerBuffer = convertToShortBuffer(buffer, size);
+	delete (*playerBuffer);
+	(*playerBuffer) = convertToShortBuffer(buffer, size);
 	delete buffer;
 	return size;
 }

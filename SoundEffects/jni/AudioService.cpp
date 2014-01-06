@@ -70,7 +70,7 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
 void callback_player(SLAndroidSimpleBufferQueueItf, void*);
 void writeFile(short* temp, int size, bool isStopping);
 void * playbackFile(void * param);
-int processBlock(short*& playerBuffer);
+int processBlock(short** playerBuffer);
 int checkError(SLresult);
 void callback_to_writeBuffer(short* temp, int size);
 
@@ -452,11 +452,11 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
-	int size = processBlock(mPlayerBuffer1);
+	int size = processBlock(&mPlayerBuffer1);
 	mActivePlayerBuffer = mPlayerBuffer1;
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 			size * sizeof(short));
-	tempSize = processBlock(mPlayerBuffer2);
+	tempSize = processBlock(&mPlayerBuffer2);
 	return;
 }
 
@@ -478,25 +478,25 @@ void * playbackFile(void * param) {
 		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 				tempSize * sizeof(short));
 		if (mActivePlayerBuffer == mPlayerBuffer1) {
-			tempSize = processBlock(mPlayerBuffer2);
+			tempSize = processBlock(&mPlayerBuffer2);
 		} else {
-			tempSize = processBlock(mPlayerBuffer1);
+			tempSize = processBlock(&mPlayerBuffer1);
 		}
 	}
 	thread_done = true;
 	return NULL;
 }
 
-int processBlock(short*& playerBuffer) {
+int processBlock(short** playerBuffer) {
 	int result = 0;
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
 		result = inFileTemp->read(sampleBuffer, BUFF_SIZE);
 		short *buffer = convertToShortBuffer(sampleBuffer, result);
-		if (playerBuffer != NULL) {
-			delete playerBuffer;
+		if ((*playerBuffer) != NULL) {
+			delete (*playerBuffer);
 		}
-		playerBuffer = buffer;
+		(*playerBuffer) = buffer;
 	}
 
 	if (result > 0 && mHasSoundTouch) {

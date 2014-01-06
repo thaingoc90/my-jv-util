@@ -34,7 +34,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_BackgroundEffect_initProcess(
 JNIEXPORT void JNICALL Java_vng_wmb_service_BackgroundEffect_destroy(JNIEnv *,
 		jobject);
 
-int processBlockForBackground(short*& playerBuffer, int size);
+int processBlockForBackground(short** playerBuffer, int size);
 
 #ifdef __cplusplus
 }
