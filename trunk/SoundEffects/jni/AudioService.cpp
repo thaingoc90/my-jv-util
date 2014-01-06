@@ -403,6 +403,7 @@ void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv* pEnv,
 		jobject pThis) {
 	Log::info("Start Player");
+
 	inFileTemp = new WavInFile(pathFileTemp);
 
 	SLresult lRes;
@@ -451,14 +452,6 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
 	(*mPlayerQueue)->Clear(mPlayerQueue);
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
-	if (mPlayerBuffer1 != NULL) {
-		delete mPlayerBuffer1;
-		mPlayerBuffer1 = new short[1];
-	}
-	if (mPlayerBuffer2 != NULL) {
-		delete mPlayerBuffer2;
-		mPlayerBuffer2 = new short[1];
-	}
 	int size = processBlock(mPlayerBuffer1);
 	mActivePlayerBuffer = mPlayerBuffer1;
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
@@ -505,7 +498,6 @@ int processBlock(short*& playerBuffer) {
 		}
 		playerBuffer = buffer;
 	}
-	pthread_mutex_unlock(&isProcessingBlock);
 
 	if (result > 0 && mHasSoundTouch) {
 		result = processBlockForSoundTouch(playerBuffer, result);
@@ -517,6 +509,8 @@ int processBlock(short*& playerBuffer) {
 	if (result > 0 && mHasBackGround) {
 		result = processBlockForBackground(playerBuffer, result);
 	}
+
+	pthread_mutex_unlock(&isProcessingBlock);
 
 	return result;
 }
