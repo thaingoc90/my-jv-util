@@ -43,7 +43,6 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pSoundTouch->setSetting(SETTING_SEEKWINDOW_MS, 15);
 	pSoundTouch->setSetting(SETTING_OVERLAP_MS, 8);
 
-
 	sampleRate = SAMPLE_RATE;
 	channels = 1;
 	pSoundTouch->setSampleRate(sampleRate);
@@ -70,15 +69,16 @@ void Java_vng_wmb_service_SoundTouchEffect_changeRate(JNIEnv* pEnv,
 	pSoundTouch->setRateChange(rate);
 }
 
-int processBlockForSoundTouch(short*& playerBuffer, int size) {
+int processBlockForSoundTouch(short** playerBuffer, int size) {
 	int nSamples, sizePlayerBuffer = 0;
 	SAMPLETYPE* sampleBuffer;
 	short* tempPlayerBuffer = NULL;
 
 	if (sizeof(SAMPLETYPE) == sizeof(float)) {
-		sampleBuffer = (SAMPLETYPE*) convertToFloat(playerBuffer, size);
+		sampleBuffer = (SAMPLETYPE*) convertToFloat((*playerBuffer), size);
 	} else {
-		sampleBuffer = (SAMPLETYPE*) convertToShortBuffer(playerBuffer, size);
+		sampleBuffer = (SAMPLETYPE*) convertToShortBuffer((*playerBuffer),
+				size);
 	}
 
 	pthread_mutex_lock(&isProcessingSoundTouch);
@@ -103,7 +103,7 @@ int processBlockForSoundTouch(short*& playerBuffer, int size) {
 	pthread_mutex_unlock(&isProcessingSoundTouch);
 
 	delete sampleBuffer;
-	delete playerBuffer;
-	playerBuffer = tempPlayerBuffer;
+	delete (*playerBuffer);
+	(*playerBuffer) = tempPlayerBuffer;
 	return sizePlayerBuffer;
 }
