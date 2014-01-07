@@ -77,15 +77,19 @@ int processBlockForSoundTouch(short** playerBuffer, int size) {
 	if (sizeof(SAMPLETYPE) == sizeof(float)) {
 		sampleBuffer = (SAMPLETYPE*) convertToFloat((*playerBuffer), size);
 	} else {
-		sampleBuffer = (SAMPLETYPE*) convertToShortBuffer((*playerBuffer),
-				size);
+		sampleBuffer = (SAMPLETYPE*) copyShortBuffer((*playerBuffer), size);
 	}
 
 	pthread_mutex_lock(&isProcessingSoundTouch);
 	pSoundTouch->putSamples(sampleBuffer, size);
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, size);
-		short *buffer = convertToShortBuffer(sampleBuffer, nSamples);
+		short* buffer;
+		if (sizeof(SAMPLETYPE) == sizeof(float)) {
+			buffer = convertToShortBuffer((float*) sampleBuffer, nSamples);
+		} else {
+			buffer = copyShortBuffer((short*) sampleBuffer, nSamples);
+		}
 
 		if (tempPlayerBuffer == NULL) {
 			tempPlayerBuffer = buffer;
