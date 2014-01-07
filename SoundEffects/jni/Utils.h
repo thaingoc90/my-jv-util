@@ -28,7 +28,7 @@ static short* convertToShortBuffer(float* buffer, int numSample) {
 }
 
 // Use for bit_per_sample = 16bit. Copy short buffer to new buffer.
-static short* convertToShortBuffer(short* buffer, int numSample) {
+static short* copyShortBuffer(short* buffer, int numSample) {
 	short* shortBuffer = (short*) new char[numSample * 2];
 	memcpy(shortBuffer, buffer, numSample * 2);
 	return shortBuffer;

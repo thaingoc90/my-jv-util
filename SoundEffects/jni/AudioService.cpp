@@ -57,7 +57,7 @@ const char* pathFileTemp = "/sdcard/voice.wav";
 WavOutFile* outFileTemp;
 WavInFile* inFileTemp;
 pthread_mutex_t isProcessingBlock;
-#define BUFF_SIZE 10000
+#define BUFF_SIZE 10 * 1024
 short sampleBuffer[BUFF_SIZE];
 bool thread_done = true;
 pthread_t playerThread;
@@ -241,7 +241,7 @@ void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv* pEnv, jobject pThis) {
 
 			outFileTemp->write(temp, size);
 //			writeFile(temp, size, true);
-			delete temp;
+			delete[] temp;
 		}
 		delete outFileTemp;
 		stopTime = (stopTime == 0) ? duration : stopTime + duration;
@@ -282,7 +282,7 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	callback_to_writeBuffer(temp, size);
 	outFileTemp->write(temp, size);
 //	writeFile(temp, size, false);
-	delete temp;
+	delete[] temp;
 }
 
 // Use to write buffer to file when bufferWriteFile full or isStopping is true.
@@ -492,9 +492,9 @@ int processBlock(short** playerBuffer) {
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
 		result = inFileTemp->read(sampleBuffer, BUFF_SIZE);
-		short *buffer = convertToShortBuffer(sampleBuffer, result);
+		short *buffer = copyShortBuffer(sampleBuffer, result);
 		if ((*playerBuffer) != NULL) {
-			delete (*playerBuffer);
+			delete[] (*playerBuffer);
 		}
 		(*playerBuffer) = buffer;
 	}
