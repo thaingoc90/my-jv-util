@@ -35,7 +35,7 @@ int processBlockForReverb(short** playerBuffer, int size) {
 	pEffectReverb->ProcessOneBlock(size, reverbBuffer);
 	short *tempPlayerBuffer = convertToShortBuffer(reverbBuffer[0], size);
 	if (*playerBuffer != NULL) {
-		delete (*playerBuffer);
+		delete[] (*playerBuffer);
 	}
 	(*playerBuffer) = tempPlayerBuffer;
 	return size;

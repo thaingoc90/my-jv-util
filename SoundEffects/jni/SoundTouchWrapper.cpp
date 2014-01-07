@@ -93,8 +93,8 @@ int processBlockForSoundTouch(short** playerBuffer, int size) {
 			short * temp = new short[sizePlayerBuffer + nSamples];
 			memcpy(temp, tempPlayerBuffer, sizePlayerBuffer * 2);
 			memcpy(temp + sizePlayerBuffer, buffer, nSamples * 2);
-			delete buffer;
-			delete tempPlayerBuffer;
+			delete[] buffer;
+			delete[] tempPlayerBuffer;
 			tempPlayerBuffer = temp;
 		}
 		sizePlayerBuffer += nSamples;
@@ -102,8 +102,8 @@ int processBlockForSoundTouch(short** playerBuffer, int size) {
 	} while (nSamples != 0);
 	pthread_mutex_unlock(&isProcessingSoundTouch);
 
-	delete sampleBuffer;
-	delete (*playerBuffer);
+	delete[] sampleBuffer;
+	delete[] (*playerBuffer);
 	(*playerBuffer) = tempPlayerBuffer;
 	return sizePlayerBuffer;
 }

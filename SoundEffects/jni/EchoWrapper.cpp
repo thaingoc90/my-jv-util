@@ -30,9 +30,9 @@ int processBlockForEcho(short** playerBuffer, int size) {
 	float* echoBuffer = convertToFloat((*playerBuffer), size);
 	int result = pEffectEcho->ProcessOneBlock(echoBuffer, size);
 	short *tempPlayerBuffer = convertToShortBuffer(echoBuffer, result);
-	delete echoBuffer;
+	delete[] echoBuffer;
 	if ((*playerBuffer) != NULL) {
-		delete (*playerBuffer);
+		delete[] (*playerBuffer);
 	}
 	(*playerBuffer) = tempPlayerBuffer;
 	return result;
