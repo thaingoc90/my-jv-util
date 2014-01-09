@@ -81,6 +81,13 @@ public class StartActivity extends Activity {
 	}
 
 	@Override
+	protected void onStop() {
+		Log.i(LOG_TAG, "onStop");
+		stopRecording();
+		super.onStop();
+	}
+
+	@Override
 	protected void onRestart() {
 		Log.i(LOG_TAG, "onRestart");
 		super.onRestart();
