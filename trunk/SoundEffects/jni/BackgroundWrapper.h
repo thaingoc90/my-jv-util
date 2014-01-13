@@ -23,7 +23,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_BackgroundEffect_init(JNIEnv *,
  */
 
 JNIEXPORT void JNICALL Java_vng_wmb_service_BackgroundEffect_initProcess(
-		JNIEnv *, jobject, jstring, jdouble);
+		JNIEnv *, jobject, jstring, jdouble, jboolean);
 
 /*
  * Class:     vng_wmb_service_BackgroundEffect

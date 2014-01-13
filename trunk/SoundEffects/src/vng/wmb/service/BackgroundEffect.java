@@ -12,7 +12,8 @@ public class BackgroundEffect {
 	 *            (ms)
 	 * @param mDecay
 	 */
-	public native void initProcess(String pathFileBackground, double gain);
+	public native void initProcess(String pathFileBackground, double gain,
+			boolean fileFromApp);
 
 	public native void destroy();
 }

@@ -17,6 +17,11 @@
     <string name="btn_effect_robot">Robot</string>
     <string name="btn_effect_stage">Stage</string>
     <string name="btn_effect_dub_vader">Dub Vader</string>
-    <string name="btn_effect_music">Music</string>
+    <string name="btn_effect_romance">Romance</string>
+    <string name="btn_effect_mic">Mic</string>
+    <string name="btn_effect_original">Original</string>
+    <string name="btn_effect_bath">Bathroom</string>
+    <string name="btn_effect_techtronic">Techtronic</string>
+    <string name="btn_effect_dub">Dub</string>
 
 </resources>

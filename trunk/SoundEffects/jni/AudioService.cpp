@@ -11,6 +11,7 @@
 #include "ReverbWrapper.h"
 #include "EchoWrapper.h"
 #include "BackgroundWrapper.h"
+#include "ReverbWrapper.h"
 #include "Utils.h"
 
 const int STATUS_OK = 0;
@@ -64,6 +65,7 @@ pthread_t playerThread;
 bool mHasEcho = false;
 bool mHasSoundTouch = false;
 bool mHasBackGround = false;
+bool mHasReverb = false;
 
 // INTERFACE OF METHOD
 void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
@@ -171,6 +173,7 @@ jint Java_vng_wmb_service_AudioService_init(JNIEnv* pEnv, jobject pThis) {
 	mHasEcho = false;
 	mHasSoundTouch = false;
 	mHasBackGround = false;
+	mHasReverb = false;
 
 	return STATUS_OK;
 }
@@ -432,8 +435,8 @@ void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 }
 
 void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
-		jboolean setIfSoundTouch, jboolean setIfEcho,
-		jboolean setIfBackground) {
+		jboolean setIfSoundTouch, jboolean setIfEcho, jboolean setIfBackground,
+		jboolean setIfReverb) {
 	Log::info("playEffect");
 
 	if (!thread_done) {
@@ -447,6 +450,7 @@ void Java_vng_wmb_service_AudioService_playEffect(JNIEnv* pEnv, jobject pThis,
 	mHasSoundTouch = setIfSoundTouch;
 	mHasEcho = setIfEcho;
 	mHasBackGround = setIfBackground;
+	mHasReverb = setIfReverb;
 
 	SLresult lRes;
 	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
@@ -488,31 +492,36 @@ void * playbackFile(void * param) {
 }
 
 int processBlock(short** playerBuffer) {
-	int result = 0;
+	int numRead = 0;
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
-		result = inFileTemp->read(sampleBuffer, BUFF_SIZE);
-		short *buffer = copyShortBuffer(sampleBuffer, result);
+		numRead = inFileTemp->read(sampleBuffer, BUFF_SIZE);
+		short *buffer = copyShortBuffer(sampleBuffer, numRead);
 		if ((*playerBuffer) != NULL) {
 			delete[] (*playerBuffer);
 		}
 		(*playerBuffer) = buffer;
 	}
 
-	if (result > 0 && mHasSoundTouch) {
-		result = processBlockForSoundTouch(playerBuffer, result);
-	}
-	if (result > 0 && mHasEcho) {
-		result = processBlockForEcho(playerBuffer, result);
+	if (numRead > 0 && mHasSoundTouch) {
+		numRead = processBlockForSoundTouch(playerBuffer, numRead);
 	}
 
-	if (result > 0 && mHasBackGround) {
-		result = processBlockForBackground(playerBuffer, result);
+	if (numRead > 0 && mHasEcho) {
+		numRead = processBlockForEcho(playerBuffer, numRead);
+	}
+
+	if (numRead > 0 && mHasReverb) {
+		numRead = processBlockForReverb(playerBuffer, numRead);
+	}
+
+	if (numRead > 0 && mHasBackGround) {
+		numRead = processBlockForBackground(playerBuffer, numRead);
 	}
 
 	pthread_mutex_unlock(&isProcessingBlock);
 
-	return result;
+	return numRead;
 }
 
 int checkError(SLresult res) {

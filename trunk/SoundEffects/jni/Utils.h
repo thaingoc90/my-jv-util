@@ -5,7 +5,6 @@
 
 static const int SAMPLE_RATE = 44100;
 
-// TODO: Rename
 static int saturate(float fvalue, float minval, float maxval) {
 	if (fvalue > maxval) {
 		fvalue = maxval;
@@ -18,7 +17,7 @@ static int saturate(float fvalue, float minval, float maxval) {
 // Use for bit_per_sample = 16bit. Convert float buffer to short buffer.
 static short* convertToShortBuffer(float* buffer, int numSample) {
 	short* shortBuffer = (short*) new char[numSample * 2];
-	short *temp2 = (short *) shortBuffer;
+	short* temp2 = (short*) shortBuffer;
 	for (int i = 0; i < numSample; i++) {
 		short value = (short) saturate(buffer[i] * 32768.0f, -32768.0f,
 				32767.0f);
@@ -34,7 +33,7 @@ static short* copyShortBuffer(short* buffer, int numSample) {
 	return shortBuffer;
 }
 
-static float* convertToFloat(short * buffer, int size) {
+static float* convertToFloat(short* buffer, int size) {
 	float* floatBuffer = new float[size];
 	double conv = 1.0 / 32768.0;
 	for (int i = 0; i < size; i++) {
