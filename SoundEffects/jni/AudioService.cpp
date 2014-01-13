@@ -29,6 +29,8 @@ SLObjectItf mOutputMixObj;
 SLObjectItf mPlayerObj = NULL;
 SLPlayItf mPlayer;
 SLAndroidSimpleBufferQueueItf mPlayerQueue;
+SLVolumeItf mPlayerVolume;
+SLmillibel maxVol;
 
 const int MAX_TIME_RECORD = 50; // ms
 const int32_t mRecordSize = SAMPLE_RATE * MAX_TIME_RECORD / 1000;
@@ -347,9 +349,11 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	SLDataSink lDataSink;
 	lDataSink.pLocator = &lDataLocatorOut;
 	lDataSink.pFormat = NULL;
-	const SLuint32 lSoundPlayerIIDCount = 2;
-	const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_BUFFERQUEUE };
-	const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+	const SLuint32 lSoundPlayerIIDCount = 3;
+	const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_VOLUME,
+			SL_IID_BUFFERQUEUE };
+	const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+			SL_BOOLEAN_TRUE };
 
 	res = (*mEngine)->CreateAudioPlayer(mEngine, &mPlayerObj, &lDataSource,
 			&lDataSink, lSoundPlayerIIDCount, lSoundPlayerIIDs,
@@ -364,6 +368,16 @@ jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv* pEnv, jobject pThis) {
 	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_PLAY, &mPlayer);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
+
+	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_VOLUME,
+			&mPlayerVolume);
+	if (checkError(res) != STATUS_OK)
+		return checkError(res);
+
+	res = (*mPlayerVolume)->GetMaxVolumeLevel(mPlayerVolume, &maxVol);
+	if (checkError(res) == STATUS_OK) {
+		res = (*mPlayerVolume)->SetVolumeLevel(mPlayerVolume, maxVol);
+	}
 
 	res = (*mPlayerObj)->GetInterface(mPlayerObj,
 			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mPlayerQueue);
@@ -395,6 +409,7 @@ void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv* pEnv,
 		mPlayerObj = NULL;
 		mPlayer = NULL;
 		mPlayerQueue = NULL;
+		mPlayerVolume = NULL;
 	}
 	if (mOutputMixObj != NULL) {
 		(*mOutputMixObj)->Destroy(mOutputMixObj);
