@@ -22,7 +22,7 @@ public class StartActivity extends Activity {
 	public static boolean isRecording = false;
 	public static AudioService audioServices;
 	private Handler mHandler;
-	private static final int TIME_RECORD = 40000; // ms
+	private static final int TIME_RECORD = 300000; // ms
 	private Runnable stopThreads = null;
 	CountDownTimer cdt;
 	private static final String LOG_TAG = "StartActivity";
@@ -56,7 +56,7 @@ public class StartActivity extends Activity {
 		stopBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				stopRecording();
+				stopRecording(true);
 			}
 		});
 
@@ -77,13 +77,16 @@ public class StartActivity extends Activity {
 	@Override
 	protected void onPause() {
 		Log.i(LOG_TAG, "onPause");
+		mDrawThread = mdrawer.getThread();
+		mDrawThread.setRun(false);
+		mDrawThread.SetSleeping(true);
 		super.onPause();
 	}
 
 	@Override
 	protected void onStop() {
 		Log.i(LOG_TAG, "onStop");
-		stopRecording();
+		stopRecording(false);
 		super.onStop();
 	}
 
@@ -110,7 +113,7 @@ public class StartActivity extends Activity {
 		stopThreads = new Runnable() {
 			@Override
 			public void run() {
-				stopRecording();
+				stopRecording(true);
 			}
 		};
 		mHandler.postDelayed(stopThreads, TIME_RECORD);
@@ -118,15 +121,17 @@ public class StartActivity extends Activity {
 	}
 
 	/**
-	 * Stop recording & start EffectActivity.
+	 * Stop recording. Start EffectActivity if startNewAct is true.
 	 */
-	private synchronized void stopRecording() {
+	private synchronized void stopRecording(boolean startNewAct) {
 		if (isRecording) {
 			audioServices.stopRecord();
 			isRecording = false;
-			Intent intent = new Intent(getApplicationContext(),
-					EffectActivity.class);
-			startActivity(intent);
+			if (startNewAct) {
+				Intent intent = new Intent(getApplicationContext(),
+						EffectActivity.class);
+				startActivity(intent);
+			}
 			if (cdt != null) {
 				cdt.cancel();
 			}

@@ -93,7 +93,7 @@ int processBlockForSoundTouch(short** playerBuffer, int size) {
 
 		if (tempPlayerBuffer == NULL) {
 			tempPlayerBuffer = buffer;
-		} else {
+		} else if (nSamples > 0) {
 			short * temp = new short[sizePlayerBuffer + nSamples];
 			memcpy(temp, tempPlayerBuffer, sizePlayerBuffer * 2);
 			memcpy(temp + sizePlayerBuffer, buffer, nSamples * 2);

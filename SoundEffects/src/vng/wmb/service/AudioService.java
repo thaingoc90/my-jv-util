@@ -25,7 +25,7 @@ public class AudioService {
 	public native void destroyPlayer();
 
 	public native void playEffect(boolean setIfSoundTouch, boolean setIfEcho,
-			boolean setIfBackground);
+			boolean setIfBackground, boolean setIfReverb);
 
 	public native void startPlayer();
 

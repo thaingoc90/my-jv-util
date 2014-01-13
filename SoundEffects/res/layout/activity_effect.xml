@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/btn_effect_fast"
         android:layout_marginLeft="34dp"
-        android:layout_toRightOf="@+id/btn_effect_bird"
+        android:layout_toRightOf="@+id/btn_effect_original"
         android:text="@string/btn_effect_cat"
         android:textSize="15sp"
         android:width="100dp" />
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/btn_effect_cat"
-        android:layout_below="@+id/btn_effect_bird"
+        android:layout_below="@+id/btn_effect_original"
         android:layout_marginTop="26dp"
         android:text="@string/btn_effect_fast"
         android:textSize="15sp"
@@ -43,48 +43,14 @@
         android:width="100dp" />
 
     <Button
-        android:id="@+id/btn_effect_bird"
+        android:id="@+id/btn_effect_original"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="28dp"
-        android:layout_marginTop="46dp"
-        android:text="@string/btn_effect_bird"
-        android:textSize="15sp"
-        android:width="100dp" />
-
-    <Button
-        android:id="@+id/btn_effect_stage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/btn_effect_robot"
-        android:layout_alignBottom="@+id/btn_effect_robot"
-        android:layout_alignLeft="@+id/btn_effect_fast"
-        android:layout_marginTop="26dp"
-        android:text="@string/btn_effect_stage"
-        android:textSize="15sp"
-        android:width="100dp" />
-
-    <Button
-        android:id="@+id/btn_effect_dub_vader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_effect_stage"
-        android:layout_marginTop="26dp"
-        android:layout_toLeftOf="@+id/btn_effect_cat"
-        android:text="@string/btn_effect_dub_vader"
-        android:textSize="15sp"
-        android:width="100dp" />
-
-    <Button
-        android:id="@+id/btn_effect_music"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btn_effect_stage"
-        android:layout_below="@+id/btn_effect_stage"
-        android:layout_marginTop="26dp"
-        android:text="@string/btn_effect_music"
+        android:layout_marginTop="10dp"
+        android:text="@string/btn_effect_original"
         android:textSize="15sp"
         android:width="100dp" />
 
@@ -92,10 +58,88 @@
         android:id="@+id/btn_effect_robot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btn_effect_bird"
+        android:layout_alignBottom="@+id/btn_effect_bird"
+        android:layout_alignLeft="@+id/btn_effect_fast"
+        android:layout_marginTop="26dp"
+        android:text="@string/btn_effect_robot"
+        android:textSize="15sp"
+        android:width="100dp" />
+
+    <Button
+        android:id="@+id/btn_effect_dub_vader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_effect_robot"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/btn_effect_cat"
+        android:text="@string/btn_effect_dub_vader"
+        android:textSize="15sp"
+        android:width="100dp" />
+
+    <Button
+        android:id="@+id/btn_effect_romance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_effect_robot"
+        android:layout_below="@+id/btn_effect_robot"
+        android:layout_marginTop="26dp"
+        android:text="@string/btn_effect_romance"
+        android:textSize="15sp"
+        android:width="100dp" />
+
+    <Button
+        android:id="@+id/btn_effect_bird"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/btn_effect_cow"
         android:layout_below="@+id/btn_effect_cow"
         android:layout_marginTop="26dp"
-        android:text="@string/btn_effect_robot"
+        android:text="@string/btn_effect_bird"
+        android:textSize="15sp"
+        android:width="100dp" />
+    
+    <Button
+        android:id="@+id/btn_effect_mic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_effect_romance"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/btn_effect_cat"
+        android:text="@string/btn_effect_mic"
+        android:textSize="15sp"
+        android:width="100dp" />
+    
+    <Button
+        android:id="@+id/btn_effect_techtronic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_effect_romance"
+        android:layout_below="@+id/btn_effect_romance"
+        android:layout_marginTop="26dp"
+        android:text="@string/btn_effect_techtronic"
+        android:textSize="15sp"
+        android:width="100dp" />
+    
+    <Button
+        android:id="@+id/btn_effect_stage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_effect_techtronic"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/btn_effect_cat"
+        android:text="@string/btn_effect_stage"
+        android:textSize="15sp"
+        android:width="100dp" />
+    
+    <Button
+        android:id="@+id/btn_effect_dub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_effect_techtronic"
+        android:layout_below="@+id/btn_effect_techtronic"
+        android:layout_marginTop="26dp"
+        android:text="@string/btn_effect_dub"
         android:textSize="15sp"
         android:width="100dp" />
 
