@@ -52,6 +52,7 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	public void Restart(boolean paramBoolean) {
 		if (isCreated) {
 			if (mDrawThread.getRun() && mDrawThread.GetDead2()) {
+				Log.i(LOG_TAG, "RST 1");
 				mDrawThread.SetDead2(false);
 				mDrawThread.setRun(false);
 				if ((!paramBoolean) || (!mDrawThread.GetDead()))
@@ -242,6 +243,11 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 			 */
 			while (StratX < width - 1) {
 
+				if (mBuffIndex >= mBuffer.length || mBuffIndex <= 0) {
+					Log.i("WaveDrawer", " BuffLength " + mBuffer.length
+							+ " BuffIndex " + mBuffIndex);
+					break;
+				}
 				int StartBaseY = mBuffer[(mBuffIndex - 1)] / scale;
 
 				int StopBaseY = mBuffer[mBuffIndex] / scale;

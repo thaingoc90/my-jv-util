@@ -129,7 +129,7 @@ public class EffectActivity extends Activity {
 					public void run() {
 						Log.i(LOG_TAG, "Stage Effect");
 						reverbService
-								.initProcess(70, 20, 70, 50, 100, 80, 0, -1);
+								.initProcess(70, 30, 80, 60, 100, 80, 0, 0);
 						audioServices.playEffect(false, false, false, true);
 					}
 				}).start();
