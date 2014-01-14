@@ -1,10 +1,19 @@
 package vng.wmb.activity;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.LinkedList;
+import java.util.List;
+
 import vng.wmb.service.AudioService;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -107,9 +116,10 @@ public class StartActivity extends Activity {
 	 */
 	private void startRecording() {
 		audioServices.startRecord();
-		mDrawThread = mdrawer.getThread();
-		startCountTimer();
 		isRecording = true;
+		mDrawThread = mdrawer.getThread();
+		checkInterface();
+		startCountTimer();
 		stopThreads = new Runnable() {
 			@Override
 			public void run() {
@@ -117,7 +127,6 @@ public class StartActivity extends Activity {
 			}
 		};
 		mHandler.postDelayed(stopThreads, TIME_RECORD);
-		checkInterface();
 	}
 
 	/**
@@ -149,6 +158,7 @@ public class StartActivity extends Activity {
 	 * CHECK & SHOW INTERFACE OF START ACTIVITY.
 	 */
 	private void checkInterface() {
+		Log.i(LOG_TAG, "checkInterface");
 		if (isRecording) {
 			messageRecord.setVisibility(View.VISIBLE);
 			stopBtn.setVisibility(View.VISIBLE);
@@ -192,4 +202,108 @@ public class StartActivity extends Activity {
 		mDrawThread.setBuffer(paramArrayOfShort);
 	}
 
+	// ---------------------------------------------------------
+	// --------------------DIALOG - NOT USE YET-----------------------------
+	// ---------------------------------------------------------
+
+	private File mFile = Environment.getExternalStorageDirectory();
+	private static final String FTYPE = "mp3";
+	private List<String> mListFile;
+	private String mChosenPath;
+
+	/**
+	 * Load all folders which contain file match with condition.
+	 * 
+	 * @param file
+	 * @param listPathFiles
+	 */
+	private void loadFolders(File file, List<String> listPathFiles) {
+		if (!file.exists()) {
+			return;
+		}
+		boolean flagContainFile = false;
+		File[] listFiles = file.listFiles();
+
+		// If subFile is folder, recursion.
+		// Else, check if filename contains FTYPE.
+		// Do not process hidden files.
+		for (File subFile : listFiles) {
+			if (subFile.isDirectory() && !subFile.isHidden()) {
+				loadFolders(subFile, listPathFiles);
+			} else if (!flagContainFile && subFile.isFile()
+					&& !subFile.isHidden()) {
+				String fileName = subFile.getName();
+				if (fileName.contains("." + FTYPE)) {
+					listPathFiles.add(file.getAbsolutePath());
+					flagContainFile = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load all files which match condition.
+	 * 
+	 * @param path
+	 * @param listPathFiles
+	 */
+	private void loadFiles(String path, List<String> listPathFiles) {
+		File file = new File(path);
+		if (!file.exists() || !file.isDirectory()) {
+			return;
+		}
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File dir, String filename) {
+				return filename.contains(FTYPE);
+			}
+		};
+		File[] listFiles = file.listFiles(filter);
+		if (listFiles != null) {
+			for (File subFile : listFiles) {
+				listPathFiles.add(subFile.getName());
+			}
+		}
+	}
+
+	/**
+	 * Create dialog. loadFolder is true, dialog to load folders.
+	 * 
+	 * @param loadFolder
+	 * @return
+	 */
+	protected Dialog onCreateDialog(boolean loadFolder) {
+		Dialog dialog = null;
+		String dialogTitle;
+		DialogInterface.OnClickListener listener;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		mListFile = new LinkedList<String>();
+
+		if (loadFolder) {
+			loadFolders(mFile, mListFile);
+			dialogTitle = "Select " + FTYPE + " file";
+			listener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					mChosenPath = mListFile.get(which);
+					onCreateDialog(false);
+				}
+			};
+		} else {
+			loadFiles(mChosenPath, mListFile);
+			dialogTitle = mChosenPath;
+			listener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					mChosenPath = mChosenPath + "/" + mListFile.get(which);
+					// Process here.
+				}
+			};
+		}
+
+		builder.setTitle(dialogTitle);
+		builder.setItems(mListFile.toArray(new String[0]), listener);
+		dialog = builder.show();
+		return dialog;
+	}
 }
