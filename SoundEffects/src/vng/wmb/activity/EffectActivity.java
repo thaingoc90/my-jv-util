@@ -128,8 +128,9 @@ public class EffectActivity extends Activity {
 				new Thread(new Runnable() {
 					public void run() {
 						Log.i(LOG_TAG, "Stage Effect");
-						echoService.initProcess(80, 0.6);
-						audioServices.playEffect(false, true, false, false);
+						reverbService
+								.initProcess(70, 20, 70, 50, 100, 80, 0, -1);
+						audioServices.playEffect(false, false, false, true);
 					}
 				}).start();
 			}
@@ -176,7 +177,7 @@ public class EffectActivity extends Activity {
 					public void run() {
 						Log.i(LOG_TAG, "MICROPHONE Effect");
 						reverbService
-								.initProcess(30, 10, 50, 50, 50, 100, 0, 0);
+								.initProcess(30, 10, 50, 50, 50, 100, 4, 4);
 						audioServices.playEffect(false, false, false, true);
 					}
 				}).start();
