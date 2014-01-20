@@ -46,6 +46,7 @@
         android:layout_above="@+id/drawer"
         android:layout_alignLeft="@+id/btn_record"
         android:text="@string/btn_stop_record"
+        android:visibility="invisible"
         android:textSize="15sp"
         android:width="100dp" />
 
