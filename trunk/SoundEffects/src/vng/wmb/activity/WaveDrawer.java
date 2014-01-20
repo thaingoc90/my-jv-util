@@ -50,6 +50,7 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	 *            the thread dead?
 	 */
 	public void Restart(boolean paramBoolean) {
+		Log.i(LOG_TAG, "Restart drawthread");
 		if (isCreated) {
 			if (mDrawThread.getRun() && mDrawThread.GetDead2()) {
 				Log.i(LOG_TAG, "RST 1");
@@ -59,16 +60,14 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 					mHolder = getHolder();
 				mHolder.addCallback(this);
 			}
-			Log.i(LOG_TAG, "Restart drawthread");
-			mDrawThread = new DrawThread(mHolder, mContext, new Handler() {
-				public void handleMessage(Message paramMessage) {
-				}
-			});
-			mDrawThread.setName("DrawThread Restart 1 - "
-					+ System.currentTimeMillis());
-			mDrawThread.start();
-			return;
 		}
+		mDrawThread = new DrawThread(mHolder, mContext, new Handler() {
+			public void handleMessage(Message paramMessage) {
+			}
+		});
+		mDrawThread.setName("DrawThread Restart - "
+				+ System.currentTimeMillis());
+		mDrawThread.start();
 	}
 
 	public void setRun(boolean paramBoolean) {

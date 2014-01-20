@@ -5,22 +5,20 @@
 
 EffectReverb *pEffectReverb;
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_init(JNIEnv *pEnv,
-		jobject pThis) {
+void ReverbEffect_init() {
 	pEffectReverb = new EffectReverb();
 }
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_initProcess(
-		JNIEnv *pEnv, jobject pThis, jdouble mRoomSize, jdouble mDelay,
-		jdouble mReverberance, jdouble mHfDamping, jdouble mToneLow,
-		jdouble mToneHigh, jdouble mWetGain, jdouble mDryGain) {
+void ReverbEffect_initProcess(double mRoomSize, double mDelay,
+		double mReverberance, double mHfDamping, double mToneLow,
+		double mToneHigh, double mWetGain, double mDryGain) {
 	pEffectReverb->setParam(mRoomSize, mDelay, mReverberance, mHfDamping,
 			mToneLow, mToneHigh, mWetGain, mDryGain);
 	pEffectReverb->InitProcess(SAMPLE_RATE, false);
 }
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_destroy(JNIEnv * pEnv,
-		jobject pThis) {
+void ReverbEffect_destroy() {
+	Log::info("ReverbEffect_destroy");
 	if (pEffectReverb != NULL) {
 		pEffectReverb->Delete();
 		delete pEffectReverb;
@@ -28,7 +26,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_ReverbEffect_destroy(JNIEnv * pEnv,
 	}
 }
 
-int processBlockForReverb(short** playerBuffer, int size) {
+int ReverbEffect_processBlock(short** playerBuffer, int size) {
 	float* reverbBuffer[2];
 	reverbBuffer[0] = convertToFloat((*playerBuffer), size);
 	reverbBuffer[1] = 0;
