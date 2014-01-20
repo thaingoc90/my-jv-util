@@ -5,28 +5,23 @@
 
 EffectEcho *pEffectEcho;
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_init(JNIEnv *pEnv,
-		jobject pThis) {
-	Log::info("Init Echo");
+void EchoEffect_init() {
 	pEffectEcho = new EffectEcho(SAMPLE_RATE);
 }
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_initProcess(JNIEnv *pEnv,
-		jobject pThis, jdouble mDelay, jdouble mDecay) {
-	Log::info("Init Process Echo");
+void EchoEffect_initProcess(double mDelay, double mDecay) {
 	pEffectEcho->init(mDelay / 1000, mDecay);
 }
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_EchoEffect_destroy(JNIEnv * pEnv,
-		jobject pThis) {
-	Log::info("Destroy Echo");
+void EchoEffect_destroy() {
+	Log::info("EchoEffect_destroy");
 	if (pEffectEcho != NULL) {
 		delete pEffectEcho;
 		pEffectEcho = NULL;
 	}
 }
 
-int processBlockForEcho(short** playerBuffer, int size) {
+int EchoEffect_processBlock(short** playerBuffer, int size) {
 	float* echoBuffer = convertToFloat((*playerBuffer), size);
 	int result = pEffectEcho->ProcessOneBlock(echoBuffer, size);
 	short *tempPlayerBuffer = convertToShortBuffer(echoBuffer, result);

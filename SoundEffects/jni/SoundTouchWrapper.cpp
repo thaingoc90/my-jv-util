@@ -13,23 +13,21 @@ using namespace std;
 SoundTouch *pSoundTouch;
 pthread_mutex_t isProcessingSoundTouch;
 
-jint Java_vng_wmb_service_SoundTouchEffect_init(JNIEnv* pEnv, jobject pThis) {
+void SoundTouchEffect_init() {
 	pSoundTouch = new SoundTouch();
-	return 0;
 }
 
-void Java_vng_wmb_service_SoundTouchEffect_destroy(JNIEnv* pEnv,
-		jobject pThis) {
+void SoundTouchEffect_destroy() {
+	Log::info("SoundTouchEffect_destroy");
+	pthread_mutex_lock(&isProcessingSoundTouch);
 	if (pSoundTouch != NULL) {
 		delete pSoundTouch;
 		pSoundTouch = NULL;
 	}
+	pthread_mutex_unlock(&isProcessingSoundTouch);
 }
 
-void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
-		jobject pThis, jdouble tempo, jdouble pitch, jdouble rate) {
-
-	Log::info("createSoundTouch");
+void SoundTouchEffect_initProcess(double tempo, double pitch, double rate) {
 
 	pthread_mutex_lock(&isProcessingSoundTouch);
 	pSoundTouch->reset();
@@ -54,22 +52,7 @@ void Java_vng_wmb_service_SoundTouchEffect_createSoundTouch(JNIEnv* pEnv,
 	pthread_mutex_unlock(&isProcessingSoundTouch);
 }
 
-void Java_vng_wmb_service_SoundTouchEffect_changeTempo(JNIEnv* pEnv,
-		jobject pThis, jdouble tempo) {
-	pSoundTouch->setTempoChange(tempo);
-}
-
-void Java_vng_wmb_service_SoundTouchEffect_changePitch(JNIEnv* pEnv,
-		jobject pThis, jdouble pitch) {
-	pSoundTouch->setPitchSemiTones((float) pitch);
-}
-
-void Java_vng_wmb_service_SoundTouchEffect_changeRate(JNIEnv* pEnv,
-		jobject pThis, jdouble rate) {
-	pSoundTouch->setRateChange(rate);
-}
-
-int processBlockForSoundTouch(short** playerBuffer, int size) {
+int SoundTouchEffect_processBlock(short** playerBuffer, int size) {
 	int nSamples, sizePlayerBuffer = 0;
 	SAMPLETYPE* sampleBuffer;
 	short* tempPlayerBuffer = NULL;

@@ -1,35 +1,22 @@
-#include <jni.h>
-
 #ifndef _AUDIOSERVICE_H_
 #define _AUDIOSERVICE_H_
 
-#include <pthread.h>
+int AudioService_init();
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void AudioService_startRecord();
 
-jint Java_vng_wmb_service_AudioService_init(JNIEnv *, jobject);
+void AudioService_stopRecord();
 
-void Java_vng_wmb_service_AudioService_startRecord(JNIEnv *, jobject);
+int AudioService_initPlayer();
 
-void Java_vng_wmb_service_AudioService_stopRecord(JNIEnv *, jobject);
+void AudioService_destroyPlayer();
 
-jint Java_vng_wmb_service_AudioService_initPlayer(JNIEnv *, jobject);
+void AudioService_playEffect();
 
-void Java_vng_wmb_service_AudioService_destroyPlayer(JNIEnv*, jobject);
+void AudioService_startPlayer();
 
-void Java_vng_wmb_service_AudioService_playEffect(JNIEnv *, jobject, jboolean,
-		jboolean, jboolean, jboolean);
+void AudioService_stopPlayer();
 
-void Java_vng_wmb_service_AudioService_startPlayer(JNIEnv *, jobject);
-
-void Java_vng_wmb_service_AudioService_stopPlayer(JNIEnv *, jobject);
-
-void Java_vng_wmb_service_AudioService_destroy(JNIEnv *, jobject);
-
-#ifdef __cplusplus
-}
-#endif
+void AudioService_destroy();
 
 #endif

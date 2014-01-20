@@ -1,19 +1,11 @@
 package vng.wmb.activity;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.LinkedList;
-import java.util.List;
-
-import vng.wmb.service.AudioService;
+import vng.wmb.service.SoundEffect;
+import vng.wmb.util.Utils;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -28,14 +20,16 @@ public class StartActivity extends Activity {
 
 	private Button recordBtn, stopBtn;
 	private TextView messageRecord;
-	public static boolean isRecording = false;
-	public static AudioService audioServices;
 	private Handler mHandler;
-	private static final int TIME_RECORD = 300000; // ms
 	private Runnable stopThreads = null;
-	CountDownTimer cdt;
+	private boolean isRecording = false;
 	private static final String LOG_TAG = "StartActivity";
 	private static final String message = "Recording ....";
+	private CountDownTimer cdt;
+
+	public static final int TIME_RECORD = 300000; // ms
+	public static SoundEffect soundServices;
+	private boolean initFail = false;
 
 	// FOR SOUND WAVE
 	private WaveDrawer.DrawThread mDrawThread;
@@ -43,37 +37,54 @@ public class StartActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.i(LOG_TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
 
-		audioServices = new AudioService(this);
-		audioServices.init();
+		soundServices = new SoundEffect(this);
+		int res = soundServices.init();
+		if (res == 0) {
+			Utils.showMsg(this,
+					"Init fail, maybe your device doesn't support this plugin");
+			initFail = true;
+		}
 
 		mHandler = new Handler();
 
 		// button record
 		recordBtn = (Button) findViewById(R.id.btn_record);
-		recordBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startRecording();
-			}
-		});
+		if (!initFail) {
+			recordBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					startRecording();
+				}
+			});
+		}
 
 		// button stop
 		stopBtn = (Button) findViewById(R.id.btn_stop_record);
-		stopBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				stopRecording(true);
-			}
-		});
+		if (!initFail) {
+			stopBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					stopRecording(true);
+				}
+			});
+		}
 
 		// message to count time.
 		messageRecord = (TextView) findViewById(R.id.text_recording);
 
 		// for soundwave
 		mdrawer = (WaveDrawer) findViewById(R.id.drawer);
+
+		stopThreads = new Runnable() {
+			@Override
+			public void run() {
+				stopRecording(true);
+			}
+		};
 	}
 
 	@Override
@@ -100,33 +111,26 @@ public class StartActivity extends Activity {
 	}
 
 	@Override
-	protected void onRestart() {
-		Log.i(LOG_TAG, "onRestart");
-		super.onRestart();
-	}
-
-	@Override
 	protected void onDestroy() {
-		audioServices.destroy();
+		Log.i(LOG_TAG, "onDestroy");
+		if (!initFail) {
+			soundServices.destroy();
+		}
 		super.onDestroy();
 	}
 
 	/**
 	 * Start recording & stop when press button 'stop' or after TIME_RECORD.
 	 */
-	private void startRecording() {
-		audioServices.startRecord();
-		isRecording = true;
-		mDrawThread = mdrawer.getThread();
-		checkInterface();
-		startCountTimer();
-		stopThreads = new Runnable() {
-			@Override
-			public void run() {
-				stopRecording(true);
-			}
-		};
-		mHandler.postDelayed(stopThreads, TIME_RECORD);
+	private synchronized void startRecording() {
+		if (!isRecording) {
+			soundServices.startRecord();
+			isRecording = true;
+			mDrawThread = mdrawer.getThread();
+			checkInterface();
+			startCountTimer();
+			mHandler.postDelayed(stopThreads, TIME_RECORD);
+		}
 	}
 
 	/**
@@ -134,7 +138,7 @@ public class StartActivity extends Activity {
 	 */
 	private synchronized void stopRecording(boolean startNewAct) {
 		if (isRecording) {
-			audioServices.stopRecord();
+			soundServices.stopRecord();
 			isRecording = false;
 			if (startNewAct) {
 				Intent intent = new Intent(getApplicationContext(),
@@ -146,7 +150,6 @@ public class StartActivity extends Activity {
 			}
 			if (stopThreads != null) {
 				mHandler.removeCallbacks(stopThreads);
-				stopThreads = null;
 			}
 			mDrawThread = mdrawer.getThread();
 			mDrawThread.setRun(false);
@@ -158,7 +161,6 @@ public class StartActivity extends Activity {
 	 * CHECK & SHOW INTERFACE OF START ACTIVITY.
 	 */
 	private void checkInterface() {
-		Log.i(LOG_TAG, "checkInterface");
 		if (isRecording) {
 			messageRecord.setVisibility(View.VISIBLE);
 			stopBtn.setVisibility(View.VISIBLE);
@@ -202,108 +204,4 @@ public class StartActivity extends Activity {
 		mDrawThread.setBuffer(paramArrayOfShort);
 	}
 
-	// ---------------------------------------------------------
-	// --------------------DIALOG - NOT USE YET-----------------------------
-	// ---------------------------------------------------------
-
-	private File mFile = Environment.getExternalStorageDirectory();
-	private static final String FTYPE = "mp3";
-	private List<String> mListFile;
-	private String mChosenPath;
-
-	/**
-	 * Load all folders which contain file match with condition.
-	 * 
-	 * @param file
-	 * @param listPathFiles
-	 */
-	private void loadFolders(File file, List<String> listPathFiles) {
-		if (!file.exists()) {
-			return;
-		}
-		boolean flagContainFile = false;
-		File[] listFiles = file.listFiles();
-
-		// If subFile is folder, recursion.
-		// Else, check if filename contains FTYPE.
-		// Do not process hidden files.
-		for (File subFile : listFiles) {
-			if (subFile.isDirectory() && !subFile.isHidden()) {
-				loadFolders(subFile, listPathFiles);
-			} else if (!flagContainFile && subFile.isFile()
-					&& !subFile.isHidden()) {
-				String fileName = subFile.getName();
-				if (fileName.contains("." + FTYPE)) {
-					listPathFiles.add(file.getAbsolutePath());
-					flagContainFile = true;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Load all files which match condition.
-	 * 
-	 * @param path
-	 * @param listPathFiles
-	 */
-	private void loadFiles(String path, List<String> listPathFiles) {
-		File file = new File(path);
-		if (!file.exists() || !file.isDirectory()) {
-			return;
-		}
-		FilenameFilter filter = new FilenameFilter() {
-			public boolean accept(File dir, String filename) {
-				return filename.contains(FTYPE);
-			}
-		};
-		File[] listFiles = file.listFiles(filter);
-		if (listFiles != null) {
-			for (File subFile : listFiles) {
-				listPathFiles.add(subFile.getName());
-			}
-		}
-	}
-
-	/**
-	 * Create dialog. loadFolder is true, dialog to load folders.
-	 * 
-	 * @param loadFolder
-	 * @return
-	 */
-	protected Dialog onCreateDialog(boolean loadFolder) {
-		Dialog dialog = null;
-		String dialogTitle;
-		DialogInterface.OnClickListener listener;
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		mListFile = new LinkedList<String>();
-
-		if (loadFolder) {
-			loadFolders(mFile, mListFile);
-			dialogTitle = "Select " + FTYPE + " file";
-			listener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					mChosenPath = mListFile.get(which);
-					onCreateDialog(false);
-				}
-			};
-		} else {
-			loadFiles(mChosenPath, mListFile);
-			dialogTitle = mChosenPath;
-			listener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					mChosenPath = mChosenPath + "/" + mListFile.get(which);
-					// Process here.
-				}
-			};
-		}
-
-		builder.setTitle(dialogTitle);
-		builder.setItems(mListFile.toArray(new String[0]), listener);
-		dialog = builder.show();
-		return dialog;
-	}
 }

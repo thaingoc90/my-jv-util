@@ -5,6 +5,13 @@
 
 static const int SAMPLE_RATE = 44100;
 
+const static char* pathFileTemp = "/sdcard/voice.wav";
+
+const static int STATUS_OK = 1;
+const static int STATUS_KO = 0;
+
+const static int MAX_TIME_BUFFER_RECORD = 50; // ms
+
 static int saturate(float fvalue, float minval, float maxval) {
 	if (fvalue > maxval) {
 		fvalue = maxval;
