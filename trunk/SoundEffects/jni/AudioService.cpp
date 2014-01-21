@@ -230,16 +230,10 @@ void AudioService_stopRecord() {
  * It will enqueue the other buffer & write data in this buffer to file.
  */
 void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	std::clock_t endTime;
 	long callbackTime;
-	if (stopTime == 0) {
-		callbackTime = MAX_TIME_BUFFER_RECORD;
-		startTime = std::clock();
-	} else {
-		startTime = std::clock();
-		callbackTime = MAX_TIME_BUFFER_RECORD - stopTime;
-	}
 
+	startTime = std::clock();
+	callbackTime = MAX_TIME_BUFFER_RECORD - stopTime;
 	stopTime = 0;
 
 	if (mActiveRecordBuffer == mRecordBuffer1) {
