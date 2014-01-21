@@ -3,6 +3,10 @@
 
 int AudioService_init();
 
+int AudioService_initRecorder();
+
+void AudioService_destroyRecorder();
+
 void AudioService_startRecord();
 
 void AudioService_stopRecord();

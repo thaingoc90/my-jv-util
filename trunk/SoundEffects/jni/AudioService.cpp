@@ -29,8 +29,8 @@ SLAndroidSimpleBufferQueueItf mPlayerQueue;
 SLVolumeItf mPlayerVolume;
 
 const int32_t mRecordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
-int16_t* mRecordBuffer1 = new int16_t[mRecordSize];
-int16_t* mRecordBuffer2 = new int16_t[mRecordSize];
+int16_t mRecordBuffer1[mRecordSize];
+int16_t mRecordBuffer2[mRecordSize];
 int16_t* mActiveRecordBuffer = mRecordBuffer1;
 int16_t* mPlayerBuffer1;
 int16_t* mPlayerBuffer2;
@@ -48,7 +48,7 @@ pthread_t playerThread;
 // Use to write File after 1000ms (access IO more performance). Now, not use.
 // ---------------Start----------------
 const int32_t mBufferWriteFileSize = 1000 * SAMPLE_RATE / 1000;
-int16_t* mBufferWriteFile = new int16_t[mBufferWriteFileSize];
+int16_t mBufferWriteFile[mBufferWriteFileSize];
 int32_t currentBufferSize = 0;
 // ---------------End----------------
 
@@ -81,6 +81,39 @@ int AudioService_init() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
+	lDataFormat.channelMask = SL_SPEAKER_FRONT_CENTER;
+	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+	lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
+	lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+	lDataFormat.formatType = SL_DATAFORMAT_PCM;
+	lDataFormat.numChannels = SL_AUDIOCHANMODE_MP3_MONO;
+	lDataFormat.endianness = SL_BYTEORDER_LITTLEENDIAN;
+
+	return STATUS_OK;
+}
+
+void AudioService_destroy() {
+	Log::info("Destroy Audio Service");
+
+	if (mRecorderObj != NULL) {
+		(*mRecorderObj)->Destroy(mRecorderObj);
+		mRecorderObj = NULL;
+		mRecorder = NULL;
+		mRecorderQueue = NULL;
+	}
+	if (mEngineObj != NULL) {
+		(*mEngineObj)->Destroy(mEngineObj);
+		mEngineObj = NULL;
+		mEngine = NULL;
+	}
+}
+
+/**
+ *Init Recorder
+ */
+int AudioService_initRecorder() {
+	Log::info("Init Recorder");
+	SLresult res;
 	const SLuint32 lEngineRecorderIIDCount = 2;
 	const SLInterfaceID lEngineRecorderIIDs[] = { SL_IID_RECORD,
 			SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
@@ -89,13 +122,6 @@ int AudioService_init() {
 	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorOut;
 	lDataLocatorOut.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
 	lDataLocatorOut.numBuffers = 2;
-	lDataFormat.channelMask = SL_SPEAKER_FRONT_CENTER;
-	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
-	lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-	lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
-	lDataFormat.formatType = SL_DATAFORMAT_PCM;
-	lDataFormat.numChannels = SL_AUDIOCHANMODE_MP3_MONO;
-	lDataFormat.endianness = SL_BYTEORDER_LITTLEENDIAN;
 	SLDataLocator_IODevice lDataLocatorIn;
 	lDataLocatorIn.locatorType = SL_DATALOCATOR_IODEVICE;
 	lDataLocatorIn.deviceType = SL_IODEVICE_AUDIOINPUT;
@@ -140,19 +166,16 @@ int AudioService_init() {
 	return STATUS_OK;
 }
 
-void AudioService_destroy() {
-	Log::info("Destroy Audio Service");
-
+/**
+ * Destroy Recorder
+ */
+void AudioService_destroyRecorder() {
+	Log::info("Destroy Recorder");
 	if (mRecorderObj != NULL) {
 		(*mRecorderObj)->Destroy(mRecorderObj);
 		mRecorderObj = NULL;
 		mRecorder = NULL;
 		mRecorderQueue = NULL;
-	}
-	if (mEngineObj != NULL) {
-		(*mEngineObj)->Destroy(mEngineObj);
-		mEngineObj = NULL;
-		mEngine = NULL;
 	}
 }
 
@@ -174,11 +197,12 @@ void AudioService_startRecord() {
 			return;
 		memset(mRecordBuffer1, 0, mRecordSize * sizeof(short));
 		memset(mRecordBuffer2, 0, mRecordSize * sizeof(short));
+		memset(mBufferWriteFile, 0, mBufferWriteFileSize * sizeof(int16_t));
 
 		if (numRecord == 0) {
 			res = (*mRecorderQueue)->Enqueue(mRecorderQueue,
 					mActiveRecordBuffer, mRecordSize * sizeof(int16_t));
-			numRecord++;
+//			numRecord++;
 		}
 		res = (*mRecorder)->SetRecordState(mRecorder,
 				SL_RECORDSTATE_RECORDING );

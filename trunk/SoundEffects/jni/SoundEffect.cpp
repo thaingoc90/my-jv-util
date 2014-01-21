@@ -81,6 +81,7 @@ void Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
  * Start record.
  */
 void Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
+	AudioService_initRecorder();
 	AudioService_startRecord();
 }
 
@@ -89,6 +90,7 @@ void Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
  */
 void Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
 	AudioService_stopRecord();
+	AudioService_destroyRecorder();
 }
 
 /**
