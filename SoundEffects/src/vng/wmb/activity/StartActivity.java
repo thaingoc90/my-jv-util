@@ -99,7 +99,6 @@ public class StartActivity extends Activity {
 		Log.i(LOG_TAG, "onPause");
 		mDrawThread = mdrawer.getThread();
 		mDrawThread.setRun(false);
-		mDrawThread.SetSleeping(true);
 		super.onPause();
 	}
 
@@ -153,7 +152,6 @@ public class StartActivity extends Activity {
 			}
 			mDrawThread = mdrawer.getThread();
 			mDrawThread.setRun(false);
-			mDrawThread.SetSleeping(true);
 		}
 	}
 

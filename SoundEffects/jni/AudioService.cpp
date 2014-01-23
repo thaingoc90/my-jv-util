@@ -228,7 +228,6 @@ void AudioService_stopRecord() {
 		// Write to file temp
 		int32_t size = (duration * SAMPLE_RATE) / 1000;
 		if (stopTime == 0) {
-//			outFileTemp->write(mActiveRecordBuffer, size);
 			writeFile(mActiveRecordBuffer, size, true);
 		} else {
 			int16_t * temp = new int16_t[size];
@@ -240,7 +239,6 @@ void AudioService_stopRecord() {
 						size * 2);
 			}
 
-//			outFileTemp->write(temp, size);
 			writeFile(temp, size, true);
 			delete[] temp;
 		}
@@ -276,13 +274,16 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 		memcpy(temp, mRecordBuffer1 + (mRecordSize - size), size * 2);
 	}
 	callback_to_writeBuffer(temp, size);
-//	outFileTemp->write(temp, size);
 	writeFile(temp, size, false);
 	delete[] temp;
 }
 
-// Use to write buffer to file when bufferWriteFile full or isStopping is true.
+// Write to file 'outFileTemp'
 void writeFile(short* temp, int size, bool isStopping) {
+	// Not use a temp buffer
+	//	outFileTemp->write(temp, size);
+
+	// Use a temp buffer. Just write file when bufferWriteFile full or isStopping is true
 	if (currentBufferSize + size > mBufferWriteFileSize) {
 		outFileTemp->write(mBufferWriteFile, currentBufferSize);
 		currentBufferSize = 0;
