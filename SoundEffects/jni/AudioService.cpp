@@ -437,9 +437,9 @@ void AudioService_playEffect() {
 	(*mPlayerQueue)->Clear(mPlayerQueue);
 	int size = processBlock(&mPlayerBuffer1);
 	mActivePlayerBuffer = mPlayerBuffer1;
+	tempSize = processBlock(&mPlayerBuffer2);
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 			size * sizeof(short));
-	tempSize = processBlock(&mPlayerBuffer2);
 	return;
 }
 
