@@ -21,7 +21,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	private DrawThread mDrawThread;
 	private SurfaceHolder mHolder;
 
-	private boolean isCreated = false;
 	private static final String LOG_TAG = "WaveDrawer";
 
 	public WaveDrawer(Context paramContext, AttributeSet paramAttributeSet) {
@@ -39,10 +38,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 		setFocusable(true);
 	}
 
-	public boolean GetDead2() {
-		return mDrawThread.GetDead2();
-	}
-
 	/**
 	 * restarts the thread
 	 * 
@@ -51,16 +46,14 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	public void Restart(boolean paramBoolean) {
 		Log.i(LOG_TAG, "Restart drawthread");
-		if (isCreated) {
-			if (mDrawThread.getRun() && mDrawThread.GetDead2()) {
-				Log.i(LOG_TAG, "RST 1");
-				mDrawThread.SetDead2(false);
-				mDrawThread.setRun(false);
-				if ((!paramBoolean) || (!mDrawThread.GetDead()))
-					mHolder = getHolder();
-				mHolder.addCallback(this);
+		if (mDrawThread.getRun()) {
+			mDrawThread.setRun(false);
+			if (!paramBoolean) {
+				mHolder = getHolder();
 			}
+			mHolder.addCallback(this);
 		}
+
 		mDrawThread = new DrawThread(mHolder, mContext, new Handler() {
 			public void handleMessage(Message paramMessage) {
 			}
@@ -68,10 +61,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 		mDrawThread.setName("DrawThread Restart - "
 				+ System.currentTimeMillis());
 		mDrawThread.start();
-	}
-
-	public void setRun(boolean paramBoolean) {
-		mDrawThread.setRun(paramBoolean);
 	}
 
 	public DrawThread getThread() {
@@ -92,7 +81,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder paramSurfaceHolder) {
 		Log.i(LOG_TAG, "surfaceCreated");
 		if (mDrawThread.getRun()) {
-			isCreated = true;
 			mDrawThread.start();
 			return;
 		}
@@ -106,16 +94,14 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 	 * Surface destroyd
 	 */
 	public void surfaceDestroyed(SurfaceHolder paramSurfaceHolder) {
-		// int i = 1;
 		while (true) {
 			try {
 				Log.i(LOG_TAG, "surfaceDestroyed");
+				mDrawThread.setRun(false);
 				mDrawThread.join();
 				return;
 			} catch (InterruptedException localInterruptedException) {
 			}
-			// if (i == 0)
-			// return;
 		}
 	}
 
@@ -134,13 +120,8 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 		private Paint mLinePaint;
 		// private int mPaintCounter = 0;
 		private SurfaceHolder mSurfaceHolder;
-		private boolean m_bDead = false;
-		private boolean m_bDead2 = true;
 		private boolean m_bRun = true;
-		private boolean m_bSleep = false;
 		private int m_iScaler = 8;
-
-		// private int counter = 0;
 
 		/**
 		 * Instance the Thread All the parameters i handled by the cDrawer class
@@ -180,28 +161,12 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 			return m_iScaler;
 		}
 
-		public boolean GetDead() {
-			return m_bDead;
-		}
-
-		public boolean GetDead2() {
-			return m_bDead2;
-		}
-
-		public boolean GetSleep() {
-			return m_bSleep;
-		}
-
-		public void SetDead2(boolean paramBoolean) {
-			m_bDead2 = paramBoolean;
-		}
-
-		public void SetSleeping(boolean paramBoolean) {
-			m_bSleep = paramBoolean;
-		}
-
 		public boolean getRun() {
 			return m_bRun;
+		}
+
+		public void setRun(boolean paramBoolean) {
+			m_bRun = paramBoolean;
 		}
 
 		/**
@@ -277,8 +242,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 		public void run() {
 			while (true) {
 				if (!m_bRun) {
-					m_bDead = true;
-					m_bDead2 = true;
 					Log.i(LOG_TAG, "Goodbye Drawthread");
 					return;
 				}
@@ -302,10 +265,6 @@ public class WaveDrawer extends SurfaceView implements SurfaceHolder.Callback {
 				mBuffer = paramArrayOfShort;
 				return;
 			}
-		}
-
-		public void setRun(boolean paramBoolean) {
-			m_bRun = paramBoolean;
 		}
 
 		public void setSurfaceSize(int paramInt1, int paramInt2) {
