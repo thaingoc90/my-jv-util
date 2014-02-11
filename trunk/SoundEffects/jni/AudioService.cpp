@@ -82,7 +82,23 @@ int AudioService_init() {
 		return checkError(res);
 
 	lDataFormat.channelMask = SL_SPEAKER_FRONT_CENTER;
-	lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+	switch (SAMPLE_RATE) {
+	case 44100:
+		lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+		break;
+	case 32000:
+		lDataFormat.samplesPerSec = SL_SAMPLINGRATE_32;
+		break;
+	case 16000:
+		lDataFormat.samplesPerSec = SL_SAMPLINGRATE_16;
+		break;
+	case 8000:
+		lDataFormat.samplesPerSec = SL_SAMPLINGRATE_8;
+		break;
+	default:
+		lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+		break;
+	}
 	lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
 	lDataFormat.formatType = SL_DATAFORMAT_PCM;
