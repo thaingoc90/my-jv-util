@@ -1,4 +1,5 @@
 LOCAL_PATH := $(call my-dir)
+JNI_PATH := $(LOCAL_PATH)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := lameMp3
@@ -29,8 +30,12 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := soundEffect
 MY_FILE_LIST := $(wildcard $(LOCAL_PATH)/*.cpp)
 LOCAL_SRC_FILES := $(MY_FILE_LIST:$(LOCAL_PATH)/%=%)
-#LOCAL_SRC_FILES := AudioService.cpp SoundTouchWrapper.cpp Log.cpp WavFile.cpp
+#LOCAL_SRC_FILES := AudioService.cpp SoundTouchWrapper.cpp Log.cpp WavFile.cpp 
 LOCAL_LDLIBS    := -landroid -llog -lOpenSLES
 
-LOCAL_STATIC_LIBRARIES := soundTouch reverbAudacity echoAudacity lameMp3
+LOCAL_STATIC_LIBRARIES :=  soundTouch reverbAudacity echoAudacity opencore_amrnben lameMp3
 include $(BUILD_SHARED_LIBRARY)
+
+LOCAL_PATH := $(JNI_PATH)
+include $(JNI_PATH)/opencore/Android.mk
+
