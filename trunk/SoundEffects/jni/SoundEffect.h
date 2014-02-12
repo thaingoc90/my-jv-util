@@ -75,9 +75,9 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
 		jobject);
 /*
  * Class:     vng_wmb_service_SoundEffect
- * Method:    initEffect
+ * Method:    initEffectLib
  * Signature: (O)I
- */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_initEffect(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv *,
 		jobject, jobject);
 
 /*
@@ -86,8 +86,8 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroyEffect(JNIEnv *,
-		jobject);
+JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
+		JNIEnv *, jobject);
 
 /*
  * Class:     vng_wmb_service_SoundEffect
@@ -97,6 +97,12 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroyEffect(JNIEnv *,
 
 JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv *,
 		jobject, jint);
+/*
+ * Class:     vng_wmb_service_SoundEffect
+ * Method:    processAndWriteToAmr
+ * Signature: (I)V
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(
+		JNIEnv *, jobject, jint);
 
 /*
  * Class:     vng_wmb_service_SoundEffect

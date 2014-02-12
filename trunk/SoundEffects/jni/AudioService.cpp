@@ -201,7 +201,7 @@ void AudioService_destroyRecorder() {
 void AudioService_startRecord() {
 	Log::info("Start record");
 
-	outFileTemp = new WavOutFile(pathFileTemp, SAMPLE_RATE, 16, 1);
+	outFileTemp = new WavOutFile(pathWavFileTemp, SAMPLE_RATE, 16, 1);
 	currentBufferSize = 0;
 	SLresult res;
 	SLuint32 state;
@@ -456,7 +456,6 @@ void AudioService_playEffect() {
 	tempSize = processBlock(&mPlayerBuffer2);
 	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
 			size * sizeof(short));
-	return;
 }
 
 /**
@@ -495,7 +494,7 @@ void* playbackFile(void * param) {
 int checkError(SLresult res) {
 	if (res != SL_RESULT_SUCCESS ) {
 		Log::error("Error when processing data");
-		return STATUS_KO;
+		return STATUS_FAIL;
 	}
 	return STATUS_OK;
 }

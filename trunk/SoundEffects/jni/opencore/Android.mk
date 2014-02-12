@@ -5,7 +5,7 @@ include $(CLEAR_VARS)
 
 include $(PV_TOP)/amr_nb_enc.mk
 include $(PV_TOP)/amr_nb_common.mk
-LOCAL_SRC_FILES += wrapper.cpp
+LOCAL_SRC_FILES += AMRWrapper.cpp
 
 
 LOCAL_MODULE := opencore_amrnben

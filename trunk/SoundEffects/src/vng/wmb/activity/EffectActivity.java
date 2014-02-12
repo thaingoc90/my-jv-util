@@ -2,6 +2,7 @@ package vng.wmb.activity;
 
 import vng.wmb.service.SoundEffect;
 import vng.wmb.util.EffectConstants;
+import vng.wmb.util.Utils;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -13,10 +14,11 @@ public class EffectActivity extends Activity {
 
 	private Button catBtn, cowBtn, birdBtn, fastBtn, robotBtn, stageBtn,
 			dubVaderBtn, romanceBtn, micBtn, originalBtn, dubBtn,
-			techtronicBtn;
+			techtronicBtn, sendBtn;
 
 	private AssetManager mgr;
 	private static final String LOG_TAG = "EffectActivity";
+	private int effectType = EffectConstants.EFFECT_ORIGINAL;
 	public static SoundEffect soundServices = StartActivity.soundServices;
 
 	@Override
@@ -25,7 +27,27 @@ public class EffectActivity extends Activity {
 		setContentView(R.layout.activity_effect);
 
 		mgr = getResources().getAssets();
-		soundServices.initEffect(mgr);
+		soundServices.initEffectLib(mgr);
+		effectType = EffectConstants.EFFECT_ORIGINAL;
+
+		/* SEND */
+		sendBtn = (Button) findViewById(R.id.btn_action_send);
+		sendBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.i(LOG_TAG, "SEND ACTION");
+				int status = soundServices.processAndWriteToAmr(effectType);
+
+				if (status == EffectConstants.STATUS_OK) {
+					Utils.showMsg(EffectActivity.this, "Send succeffully");
+				} else if (status == EffectConstants.STATUS_NOT_SUPPORT) {
+					Utils.showMsg(EffectActivity.this,
+							"Not support this sample rate");
+				} else {
+					Utils.showMsg(EffectActivity.this, "Failed");
+				}
+			}
+		});
 
 		/* CAT EFFECT */
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
@@ -34,8 +56,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Cat Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_CAT);
+						Log.i(LOG_TAG, "CAT EFFECT");
+						effectType = EffectConstants.EFFECT_CAT;
+						soundServices.playEffect(effectType);
 
 						// Another way
 						// soundServices.prepareSoundTouchEffect(0, 6, 15);
@@ -53,8 +76,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Cow Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_COW);
+						Log.i(LOG_TAG, "COW EFFECT");
+						effectType = EffectConstants.EFFECT_COW;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -67,8 +91,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Bird Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_BIRD);
+						Log.i(LOG_TAG, "BIRD EFFECT");
+						effectType = EffectConstants.EFFECT_BIRD;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -81,8 +106,8 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Fast Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_FAST);
+						Log.i(LOG_TAG, "FAST EFFECT");
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -95,8 +120,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Robot Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_ROBOT);
+						Log.i(LOG_TAG, "ROBOT EFFECT");
+						effectType = EffectConstants.EFFECT_ROBOT;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -109,8 +135,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Stage Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_STAGE);
+						Log.i(LOG_TAG, "STAGE EFFECT");
+						effectType = EffectConstants.EFFECT_STAGE;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -123,9 +150,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "Dub Vader Effect");
-						soundServices
-								.playEffect(EffectConstants.EFFECT_DUB_VADER);
+						Log.i(LOG_TAG, "DUB VADER EFFECT");
+						effectType = EffectConstants.EFFECT_DUB_VADER;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -138,9 +165,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "ROMANCE Effect");
-						soundServices
-								.playEffect(EffectConstants.EFFECT_ROMANCE);
+						Log.i(LOG_TAG, "ROMANCE EFFECT");
+						effectType = EffectConstants.EFFECT_ROMANCE;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -153,8 +180,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "MICROPHONE Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_MIC);
+						Log.i(LOG_TAG, "MICROPHONE EFFECT");
+						effectType = EffectConstants.EFFECT_MIC;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -167,8 +195,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "DUB Effect");
-						soundServices.playEffect(EffectConstants.EFFECT_DUB);
+						Log.i(LOG_TAG, "DUB EFFECT");
+						effectType = EffectConstants.EFFECT_DUB;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -181,9 +210,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "TECHTRONIC Effect");
-						soundServices
-								.playEffect(EffectConstants.EFFECT_TECHTRONIC);
+						Log.i(LOG_TAG, "TECHTRONIC EFFECT");
+						effectType = EffectConstants.EFFECT_TECHTRONIC;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -196,9 +225,9 @@ public class EffectActivity extends Activity {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
-						Log.i(LOG_TAG, "ORIGINAL Effect");
-						soundServices
-								.playEffect(EffectConstants.EFFECT_ORIGINAL);
+						Log.i(LOG_TAG, "ORIGINAL EFFECT");
+						effectType = EffectConstants.EFFECT_ORIGINAL;
+						soundServices.playEffect(effectType);
 					}
 				}).start();
 			}
@@ -223,7 +252,7 @@ public class EffectActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		Log.i(LOG_TAG, "onDestroy");
-		soundServices.destroyEffect();
+		soundServices.destroyEffectLib();
 		super.onDestroy();
 	}
 
