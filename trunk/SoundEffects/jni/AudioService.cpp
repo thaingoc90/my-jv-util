@@ -198,7 +198,7 @@ void AudioService_destroyRecorder() {
 /**
  * Start record. Use 2 buffers.
  */
-void AudioService_startRecord() {
+int AudioService_startRecord() {
 	Log::info("Start record");
 
 	outFileTemp = new WavOutFile(pathWavFileTemp, SAMPLE_RATE, 16, 1);
@@ -210,7 +210,7 @@ void AudioService_startRecord() {
 	if (state == SL_OBJECT_STATE_REALIZED ) {
 		res = (*recorderQueue)->Clear(recorderQueue);
 		if (checkError(res) != STATUS_OK)
-			return;
+			return STATUS_FAIL;
 		memset(recordBuffer1, 0, recordSize * sizeof(short));
 		memset(recordBuffer2, 0, recordSize * sizeof(short));
 		memset(writeFileBuffer, 0, sizeOfWriteFileBuffer * sizeof(int16_t));
@@ -223,14 +223,16 @@ void AudioService_startRecord() {
 		res = (*recorderItf)->SetRecordState(recorderItf,
 				SL_RECORDSTATE_RECORDING );
 		if (checkError(res) != STATUS_OK)
-			return;
+			return STATUS_FAIL;
 		isRecordingFlag = true;
 		startTimeRecord = std::clock();
 	}
+	return STATUS_OK;
 }
 
-void AudioService_stopRecord() {
+int AudioService_stopRecord() {
 	Log::info("Stop Record");
+	SLresult res;
 	if (isRecordingFlag) {
 		isRecordingFlag = false;
 		SLint32 duration = (std::clock() - startTimeRecord) / 1000;
@@ -240,7 +242,10 @@ void AudioService_stopRecord() {
 		if (duration >= MAX_TIME_BUFFER_RECORD) {
 			duration = duration % MAX_TIME_BUFFER_RECORD;
 		}
-		(*recorderItf)->SetRecordState(recorderItf, SL_RECORDSTATE_STOPPED );
+		res = (*recorderItf)->SetRecordState(recorderItf,
+				SL_RECORDSTATE_STOPPED );
+		if (checkError(res) != STATUS_OK)
+			return STATUS_FAIL;
 		// Write to file temp
 		int32_t size = (duration * SAMPLE_RATE) / 1000;
 		if (stopTimeRecord == 0) {
@@ -265,6 +270,7 @@ void AudioService_stopRecord() {
 				(stopTimeRecord == 0) ? duration : stopTimeRecord + duration;
 		(*recorderQueue)->Clear(recorderQueue);
 	}
+	return STATUS_OK;
 }
 /**
  * Callback is called when buffer is full.
@@ -418,7 +424,7 @@ void AudioService_destroyPlayer() {
 /**
  * Start player. Set state of PlayerObj to SL_PLAYSTATE_PLAYING.
  */
-void AudioService_startPlayer() {
+int AudioService_startPlayer() {
 	Log::info("Start Player");
 
 	SLresult lRes;
@@ -427,37 +433,47 @@ void AudioService_startPlayer() {
 	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
 		lRes = (*playerQueue)->Clear(playerQueue);
 		if (checkError(lRes) != STATUS_OK)
-			return;
+			return STATUS_FAIL;
 		lRes = (*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_PLAYING );
 		if (checkError(lRes) != STATUS_OK)
-			return;
+			return STATUS_FAIL;
 	}
-	return;
+	return STATUS_OK;
 }
 
 /**
  * Stop player
  */
-void AudioService_stopPlayer() {
+int AudioService_stopPlayer() {
 	Log::info("Stop Player");
+	SLresult lRes;
 	(*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_STOPPED );
+	lRes = (*playerQueue)->Clear(playerQueue);
+	if (checkError(lRes) != STATUS_OK)
+		return STATUS_FAIL;
 	(*playerQueue)->Clear(playerQueue);
+	return STATUS_OK;
 }
 
 /**
  * Play tempFile. Read data from function "processBlock" & play it.
  */
-void AudioService_playEffect() {
+int AudioService_playEffect() {
 	if (!threadDoneFlag) {
 		pthread_kill(playbackFileThread, SIGUSR1);
 	}
-
-	(*playerQueue)->Clear(playerQueue);
+	SLresult lRes;
+	lRes = (*playerQueue)->Clear(playerQueue);
+	if (checkError(lRes) != STATUS_OK)
+		return STATUS_FAIL;
 	int size = processBlock(&playerBuffer1);
 	activePlayerBuffer = playerBuffer1;
 	tempSize = processBlock(&playerBuffer2);
-	(*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
+	lRes = (*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
 			size * sizeof(short));
+	if (checkError(lRes) != STATUS_OK)
+		return STATUS_FAIL;
+	return STATUS_OK;
 }
 
 /**

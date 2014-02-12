@@ -7,19 +7,19 @@ int AudioService_initRecorder();
 
 void AudioService_destroyRecorder();
 
-void AudioService_startRecord();
+int AudioService_startRecord();
 
-void AudioService_stopRecord();
+int AudioService_stopRecord();
 
 int AudioService_initPlayer();
 
 void AudioService_destroyPlayer();
 
-void AudioService_playEffect();
+int AudioService_playEffect();
 
-void AudioService_startPlayer();
+int AudioService_startPlayer();
 
-void AudioService_stopPlayer();
+int AudioService_stopPlayer();
 
 void AudioService_destroy();
 
