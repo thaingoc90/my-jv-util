@@ -58,31 +58,31 @@ int SoundTouchEffect_processBlock(short** playerBuffer, int size) {
 	short* tempPlayerBuffer = NULL;
 
 	if (sizeof(SAMPLETYPE) == sizeof(float)) {
-		sampleBuffer = (SAMPLETYPE*) convertToFloat((*playerBuffer), size);
+		sampleBuffer = (SAMPLETYPE*) convertShortPtrToFloatPtr((*playerBuffer), size);
 	} else {
-		sampleBuffer = (SAMPLETYPE*) copyShortBuffer((*playerBuffer), size);
+		sampleBuffer = (SAMPLETYPE*) duplicateShortPtr((*playerBuffer), size);
 	}
 
 	pthread_mutex_lock(&isProcessingSoundTouch);
 	pSoundTouch->putSamples(sampleBuffer, size);
 	do {
 		nSamples = pSoundTouch->receiveSamples(sampleBuffer, size);
-		short* buffer;
+		short* outShortBuffer;
 		if (sizeof(SAMPLETYPE) == sizeof(float)) {
-			buffer = convertToShortBuffer((float*) sampleBuffer, nSamples);
+			outShortBuffer = convertFloatPtrToShortPtr((float*) sampleBuffer, nSamples);
 		} else {
-			buffer = copyShortBuffer((short*) sampleBuffer, nSamples);
+			outShortBuffer = duplicateShortPtr((short*) sampleBuffer, nSamples);
 		}
 
 		if (tempPlayerBuffer == NULL) {
-			tempPlayerBuffer = buffer;
+			tempPlayerBuffer = outShortBuffer;
 		} else if (nSamples > 0) {
-			short * temp = new short[sizePlayerBuffer + nSamples];
-			memcpy(temp, tempPlayerBuffer, sizePlayerBuffer * 2);
-			memcpy(temp + sizePlayerBuffer, buffer, nSamples * 2);
-			delete[] buffer;
+			short * resBuffer = new short[sizePlayerBuffer + nSamples];
+			memcpy(resBuffer, tempPlayerBuffer, sizePlayerBuffer * 2);
+			memcpy(resBuffer + sizePlayerBuffer, outShortBuffer, nSamples * 2);
+			delete[] outShortBuffer;
 			delete[] tempPlayerBuffer;
-			tempPlayerBuffer = temp;
+			tempPlayerBuffer = resBuffer;
 		}
 		sizePlayerBuffer += nSamples;
 

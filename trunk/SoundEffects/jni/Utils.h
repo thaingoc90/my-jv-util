@@ -14,7 +14,7 @@ const static int STATUS_NOT_SUPPORT = 2;
 
 const static int MAX_TIME_BUFFER_RECORD = 50; // ms
 
-static int saturate(float fvalue, float minval, float maxval) {
+static int floatToInt(float fvalue, float minval, float maxval) {
 	if (fvalue > maxval) {
 		fvalue = maxval;
 	} else if (fvalue < minval) {
@@ -24,11 +24,11 @@ static int saturate(float fvalue, float minval, float maxval) {
 }
 
 // Use for bit_per_sample = 16bit. Convert float buffer to short buffer.
-static short* convertToShortBuffer(float* buffer, int numSample) {
+static short* convertFloatPtrToShortPtr(float* buffer, int numSample) {
 	short* shortBuffer = (short*) new char[numSample * 2];
 	short* temp2 = (short*) shortBuffer;
 	for (int i = 0; i < numSample; i++) {
-		short value = (short) saturate(buffer[i] * 32768.0f, -32768.0f,
+		short value = (short) floatToInt(buffer[i] * 32768.0f, -32768.0f,
 				32767.0f);
 		temp2[i] = value;
 	}
@@ -36,13 +36,13 @@ static short* convertToShortBuffer(float* buffer, int numSample) {
 }
 
 // Use for bit_per_sample = 16bit. Copy short buffer to new buffer.
-static short* copyShortBuffer(short* buffer, int numSample) {
+static short* duplicateShortPtr(short* buffer, int numSample) {
 	short* shortBuffer = (short*) new char[numSample * 2];
 	memcpy(shortBuffer, buffer, numSample * 2);
 	return shortBuffer;
 }
 
-static float* convertToFloat(short* buffer, int size) {
+static float* convertShortPtrToFloatPtr(short* buffer, int size) {
 	float* floatBuffer = new float[size];
 	double conv = 1.0 / 32768.0;
 	for (int i = 0; i < size; i++) {

@@ -263,7 +263,7 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	fwrite("#!AMR\n", 1, 6, outAmrFile);
 	while (inWavFile != NULL && inWavFile->eof() == 0) {
 		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
-		buffer = copyShortBuffer(sampleBuffer, numShort);
+		buffer = duplicateShortPtr(sampleBuffer, numShort);
 		if (numShort > 0 && mHasSoundTouch) {
 			numShort = SoundTouchEffect_processBlock(&buffer, numShort);
 		}
@@ -409,7 +409,7 @@ int processBlock(short** playerBuffer) {
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
 		numRead = inFileTemp->read(sampleBuffer, BUFF_SIZE);
-		short *buffer = copyShortBuffer(sampleBuffer, numRead);
+		short *buffer = duplicateShortPtr(sampleBuffer, numRead);
 		if ((*playerBuffer) != NULL) {
 			delete[] (*playerBuffer);
 		}

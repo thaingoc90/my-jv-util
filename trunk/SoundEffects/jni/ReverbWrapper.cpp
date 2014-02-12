@@ -28,10 +28,10 @@ void ReverbEffect_destroy() {
 
 int ReverbEffect_processBlock(short** playerBuffer, int size) {
 	float* reverbBuffer[2];
-	reverbBuffer[0] = convertToFloat((*playerBuffer), size);
+	reverbBuffer[0] = convertShortPtrToFloatPtr((*playerBuffer), size);
 	reverbBuffer[1] = 0;
 	pEffectReverb->ProcessOneBlock(size, reverbBuffer);
-	short *tempPlayerBuffer = convertToShortBuffer(reverbBuffer[0], size);
+	short *tempPlayerBuffer = convertFloatPtrToShortPtr(reverbBuffer[0], size);
 	if (*playerBuffer != NULL) {
 		delete[] (*playerBuffer);
 	}
