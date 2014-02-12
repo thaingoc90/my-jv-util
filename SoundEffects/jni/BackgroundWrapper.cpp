@@ -84,7 +84,7 @@ float* readBuffer = NULL;
 float* tempReadBuffer = NULL;
 
 int BackgroundEffect_processBlock(short** playerBuffer, int size) {
-	float* buffer = convertToFloat((*playerBuffer), size);
+	float* buffer = convertShortPtrToFloatPtr((*playerBuffer), size);
 	short tempBuffer[size];
 	int numRead = 0, c = size;
 	float* floatTempBuffer;
@@ -100,7 +100,7 @@ int BackgroundEffect_processBlock(short** playerBuffer, int size) {
 				}
 				if (numRead > 0) {
 					numRead = numRead / 2;
-					floatTempBuffer = convertToFloat(tempBuffer, numRead);
+					floatTempBuffer = convertShortPtrToFloatPtr(tempBuffer, numRead);
 					for (int i = 0; i < numRead; i++) {
 						buffer[i] += floatTempBuffer[i] * mGain;
 					}
@@ -122,7 +122,7 @@ int BackgroundEffect_processBlock(short** playerBuffer, int size) {
 					numRead = bgInFile->read(tempBuffer, c);
 				}
 				if (numRead > 0) {
-					floatTempBuffer = convertToFloat(tempBuffer, numRead);
+					floatTempBuffer = convertShortPtrToFloatPtr(tempBuffer, numRead);
 					for (int i = 0; i < numRead; i++) {
 						buffer[i] += floatTempBuffer[i] * mGain;
 					}
@@ -181,7 +181,7 @@ int BackgroundEffect_processBlock(short** playerBuffer, int size) {
 					}
 				}
 				if (numRead > 0) {
-					floatTempBuffer = convertToFloat(tempBuffer, numRead);
+					floatTempBuffer = convertShortPtrToFloatPtr(tempBuffer, numRead);
 					for (int i = 0; i < numRead; i++) {
 						buffer[i] += floatTempBuffer[i] * mGain;
 					}
@@ -201,7 +201,7 @@ int BackgroundEffect_processBlock(short** playerBuffer, int size) {
 	pthread_mutex_unlock(&isProcessingFile);
 
 	delete[] (*playerBuffer);
-	(*playerBuffer) = convertToShortBuffer(buffer, size);
+	(*playerBuffer) = convertFloatPtrToShortPtr(buffer, size);
 	delete[] buffer;
 	return size;
 }

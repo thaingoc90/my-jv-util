@@ -22,9 +22,9 @@ void EchoEffect_destroy() {
 }
 
 int EchoEffect_processBlock(short** playerBuffer, int size) {
-	float* echoBuffer = convertToFloat((*playerBuffer), size);
+	float* echoBuffer = convertShortPtrToFloatPtr((*playerBuffer), size);
 	int result = pEffectEcho->ProcessOneBlock(echoBuffer, size);
-	short *tempPlayerBuffer = convertToShortBuffer(echoBuffer, result);
+	short *tempPlayerBuffer = convertFloatPtrToShortPtr(echoBuffer, result);
 	delete[] echoBuffer;
 	if ((*playerBuffer) != NULL) {
 		delete[] (*playerBuffer);

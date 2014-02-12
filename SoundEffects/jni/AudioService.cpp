@@ -14,49 +14,49 @@
 /*
  * VARIABLE OF OPENSLES
  */
-SLObjectItf mEngineObj = NULL;
-SLEngineItf mEngine;
+SLObjectItf engineObj = NULL;
+SLEngineItf engineItf;
 SLDataFormat_PCM lDataFormat;
 // RECORDER
-SLObjectItf mRecorderObj = NULL;
-SLRecordItf mRecorder;
-SLAndroidSimpleBufferQueueItf mRecorderQueue;
+SLObjectItf recorderObj = NULL;
+SLRecordItf recorderItf;
+SLAndroidSimpleBufferQueueItf recorderQueue;
 // PLAYER
-SLObjectItf mOutputMixObj;
-SLObjectItf mPlayerObj = NULL;
-SLPlayItf mPlayer;
-SLAndroidSimpleBufferQueueItf mPlayerQueue;
-SLVolumeItf mPlayerVolume;
+SLObjectItf outputMixObj;
+SLObjectItf playerObj = NULL;
+SLPlayItf playerItf;
+SLAndroidSimpleBufferQueueItf playerQueue;
+SLVolumeItf playerVolume;
 
-const int32_t mRecordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
-int16_t mRecordBuffer1[mRecordSize];
-int16_t mRecordBuffer2[mRecordSize];
-int16_t* mActiveRecordBuffer = mRecordBuffer1;
-int16_t* mPlayerBuffer1;
-int16_t* mPlayerBuffer2;
-int16_t* mActivePlayerBuffer;
+const int32_t recordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
+int16_t recordBuffer1[recordSize];
+int16_t recordBuffer2[recordSize];
+int16_t* activeRecordBuffer = recordBuffer1;
+int16_t* playerBuffer1;
+int16_t* playerBuffer2;
+int16_t* activePlayerBuffer;
 int32_t tempSize = 0;
-bool isRecording = false;
-int numRecord = 0;
-std::clock_t startTime;
-SLint32 stopTime = 0;
+bool isRecordingFlag = false;
+int enqueuedFlag = 0;
+std::clock_t startTimeRecord;
+SLint32 stopTimeRecord = 0;
 
 WavOutFile* outFileTemp;
-bool thread_done = true;
-pthread_t playerThread;
+bool threadDoneFlag = true;
+pthread_t playbackFileThread;
 
 // Use to write File after 1000ms (access IO more performance). Now, not use.
 // ---------------Start----------------
-const int32_t mBufferWriteFileSize = 1000 * SAMPLE_RATE / 1000;
-int16_t mBufferWriteFile[mBufferWriteFileSize];
-int32_t currentBufferSize = 0;
+const int32_t sizeOfWriteFileBuffer = 1000 * SAMPLE_RATE / 1000;
+int16_t writeFileBuffer[sizeOfWriteFileBuffer];
+int32_t currentSizeBuffer = 0;
 // ---------------End----------------
 
 // INTERFACE OF METHOD
-void callback_recorder(SLAndroidSimpleBufferQueueItf, void*);
-void callback_player(SLAndroidSimpleBufferQueueItf, void*);
+void recorderCallback(SLAndroidSimpleBufferQueueItf, void*);
+void playerCallback(SLAndroidSimpleBufferQueueItf, void*);
 void writeFile(short* temp, int size, bool isStopping);
-void* playbackFile(void * param);
+void* playbackFileFunc(void * param);
 int checkError(SLresult);
 
 /****************************************************************/
@@ -68,16 +68,16 @@ int AudioService_init() {
 	const SLInterfaceID lEngineIIDs[] = { SL_IID_ENGINE };
 	const SLboolean lEngineReqs[] = { SL_BOOLEAN_TRUE };
 
-	res = slCreateEngine(&mEngineObj, 0, NULL, lEngineIIDCount, lEngineIIDs,
+	res = slCreateEngine(&engineObj, 0, NULL, lEngineIIDCount, lEngineIIDs,
 			lEngineReqs);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mEngineObj)->Realize(mEngineObj, SL_BOOLEAN_FALSE );
+	res = (*engineObj)->Realize(engineObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mEngineObj)->GetInterface(mEngineObj, SL_IID_ENGINE, &mEngine);
+	res = (*engineObj)->GetInterface(engineObj, SL_IID_ENGINE, &engineItf);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -111,16 +111,16 @@ int AudioService_init() {
 void AudioService_destroy() {
 	Log::info("Destroy Audio Service");
 
-	if (mRecorderObj != NULL) {
-		(*mRecorderObj)->Destroy(mRecorderObj);
-		mRecorderObj = NULL;
-		mRecorder = NULL;
-		mRecorderQueue = NULL;
+	if (recorderObj != NULL) {
+		(*recorderObj)->Destroy(recorderObj);
+		recorderObj = NULL;
+		recorderItf = NULL;
+		recorderQueue = NULL;
 	}
-	if (mEngineObj != NULL) {
-		(*mEngineObj)->Destroy(mEngineObj);
-		mEngineObj = NULL;
-		mEngine = NULL;
+	if (engineObj != NULL) {
+		(*engineObj)->Destroy(engineObj);
+		engineObj = NULL;
+		engineItf = NULL;
 	}
 }
 
@@ -151,34 +151,34 @@ int AudioService_initRecorder() {
 	lDataSource.pLocator = &lDataLocatorIn;
 	lDataSource.pFormat = NULL;
 
-	res = (*mEngine)->CreateAudioRecorder(mEngine, &mRecorderObj, &lDataSource,
-			&lDataSink, lEngineRecorderIIDCount, lEngineRecorderIIDs,
-			lEngineRecorderReqs);
+	res = (*engineItf)->CreateAudioRecorder(engineItf, &recorderObj,
+			&lDataSource, &lDataSink, lEngineRecorderIIDCount,
+			lEngineRecorderIIDs, lEngineRecorderReqs);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mRecorderObj)->Realize(mRecorderObj, SL_BOOLEAN_FALSE );
+	res = (*recorderObj)->Realize(recorderObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mRecorderObj)->GetInterface(mRecorderObj, SL_IID_RECORD,
-			&mRecorder);
+	res = (*recorderObj)->GetInterface(recorderObj, SL_IID_RECORD,
+			&recorderItf);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mRecorderObj)->GetInterface(mRecorderObj,
-			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mRecorderQueue);
+	res = (*recorderObj)->GetInterface(recorderObj,
+			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &recorderQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mRecorderQueue)->RegisterCallback(mRecorderQueue, callback_recorder,
+	res = (*recorderQueue)->RegisterCallback(recorderQueue, recorderCallback,
 			NULL);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
 	// SET VARIABLE
-	stopTime = 0;
-	numRecord = 0;
+	stopTimeRecord = 0;
+	enqueuedFlag = 0;
 	return STATUS_OK;
 }
 
@@ -187,11 +187,11 @@ int AudioService_initRecorder() {
  */
 void AudioService_destroyRecorder() {
 	Log::info("Destroy Recorder");
-	if (mRecorderObj != NULL) {
-		(*mRecorderObj)->Destroy(mRecorderObj);
-		mRecorderObj = NULL;
-		mRecorder = NULL;
-		mRecorderQueue = NULL;
+	if (recorderObj != NULL) {
+		(*recorderObj)->Destroy(recorderObj);
+		recorderObj = NULL;
+		recorderItf = NULL;
+		recorderQueue = NULL;
 	}
 }
 
@@ -202,56 +202,58 @@ void AudioService_startRecord() {
 	Log::info("Start record");
 
 	outFileTemp = new WavOutFile(pathWavFileTemp, SAMPLE_RATE, 16, 1);
-	currentBufferSize = 0;
+	currentSizeBuffer = 0;
 	SLresult res;
 	SLuint32 state;
 
-	(*mRecorderObj)->GetState(mRecorderObj, &state);
+	(*recorderObj)->GetState(recorderObj, &state);
 	if (state == SL_OBJECT_STATE_REALIZED ) {
-		res = (*mRecorderQueue)->Clear(mRecorderQueue);
+		res = (*recorderQueue)->Clear(recorderQueue);
 		if (checkError(res) != STATUS_OK)
 			return;
-		memset(mRecordBuffer1, 0, mRecordSize * sizeof(short));
-		memset(mRecordBuffer2, 0, mRecordSize * sizeof(short));
-		memset(mBufferWriteFile, 0, mBufferWriteFileSize * sizeof(int16_t));
+		memset(recordBuffer1, 0, recordSize * sizeof(short));
+		memset(recordBuffer2, 0, recordSize * sizeof(short));
+		memset(writeFileBuffer, 0, sizeOfWriteFileBuffer * sizeof(int16_t));
 
-		if (numRecord == 0) {
-			res = (*mRecorderQueue)->Enqueue(mRecorderQueue,
-					mActiveRecordBuffer, mRecordSize * sizeof(int16_t));
-//			numRecord++;
+		if (enqueuedFlag == 0) {
+			res = (*recorderQueue)->Enqueue(recorderQueue, activeRecordBuffer,
+					recordSize * sizeof(int16_t));
+//			enqueuedFlag++;
 		}
-		res = (*mRecorder)->SetRecordState(mRecorder,
+		res = (*recorderItf)->SetRecordState(recorderItf,
 				SL_RECORDSTATE_RECORDING );
 		if (checkError(res) != STATUS_OK)
 			return;
-		isRecording = true;
-		startTime = std::clock();
+		isRecordingFlag = true;
+		startTimeRecord = std::clock();
 	}
 }
 
 void AudioService_stopRecord() {
 	Log::info("Stop Record");
-	if (isRecording) {
-		isRecording = false;
-		SLint32 duration = (std::clock() - startTime) / 1000;
+	if (isRecordingFlag) {
+		isRecordingFlag = false;
+		SLint32 duration = (std::clock() - startTimeRecord) / 1000;
 		if (duration < 0) {
 			duration = 0;
 		}
 		if (duration >= MAX_TIME_BUFFER_RECORD) {
 			duration = duration % MAX_TIME_BUFFER_RECORD;
 		}
-		(*mRecorder)->SetRecordState(mRecorder, SL_RECORDSTATE_STOPPED );
+		(*recorderItf)->SetRecordState(recorderItf, SL_RECORDSTATE_STOPPED );
 		// Write to file temp
 		int32_t size = (duration * SAMPLE_RATE) / 1000;
-		if (stopTime == 0) {
-			writeFile(mActiveRecordBuffer, size, true);
+		if (stopTimeRecord == 0) {
+			writeFile(activeRecordBuffer, size, true);
 		} else {
 			int16_t * temp = new int16_t[size];
-			if (mActiveRecordBuffer == mRecordBuffer1) {
-				memcpy(temp, mRecordBuffer1 + stopTime * SAMPLE_RATE / 1000,
+			if (activeRecordBuffer == recordBuffer1) {
+				memcpy(temp,
+						recordBuffer1 + stopTimeRecord * SAMPLE_RATE / 1000,
 						size * 2);
 			} else {
-				memcpy(temp, mRecordBuffer2 + stopTime * SAMPLE_RATE / 1000,
+				memcpy(temp,
+						recordBuffer2 + stopTimeRecord * SAMPLE_RATE / 1000,
 						size * 2);
 			}
 
@@ -259,35 +261,36 @@ void AudioService_stopRecord() {
 			delete[] temp;
 		}
 		delete outFileTemp;
-		stopTime = (stopTime == 0) ? duration : stopTime + duration;
-		(*mRecorderQueue)->Clear(mRecorderQueue);
+		stopTimeRecord =
+				(stopTimeRecord == 0) ? duration : stopTimeRecord + duration;
+		(*recorderQueue)->Clear(recorderQueue);
 	}
 }
 /**
  * Callback is called when buffer is full.
  * It will enqueue the other buffer & write data in this buffer to file.
  */
-void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+void recorderCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	long callbackTime;
 
-	startTime = std::clock();
-	callbackTime = MAX_TIME_BUFFER_RECORD - stopTime;
-	stopTime = 0;
+	startTimeRecord = std::clock();
+	callbackTime = MAX_TIME_BUFFER_RECORD - stopTimeRecord;
+	stopTimeRecord = 0;
 
-	if (mActiveRecordBuffer == mRecordBuffer1) {
-		mActiveRecordBuffer = mRecordBuffer2;
+	if (activeRecordBuffer == recordBuffer1) {
+		activeRecordBuffer = recordBuffer2;
 	} else {
-		mActiveRecordBuffer = mRecordBuffer1;
+		activeRecordBuffer = recordBuffer1;
 	}
-	(*mRecorderQueue)->Enqueue(mRecorderQueue, mActiveRecordBuffer,
-			mRecordSize * sizeof(int16_t));
+	(*recorderQueue)->Enqueue(recorderQueue, activeRecordBuffer,
+			recordSize * sizeof(int16_t));
 
 	int32_t size = (callbackTime * SAMPLE_RATE) / 1000;
 	int16_t * temp = new int16_t[size];
-	if (mActiveRecordBuffer == mRecordBuffer1) {
-		memcpy(temp, mRecordBuffer2 + (mRecordSize - size), size * 2);
+	if (activeRecordBuffer == recordBuffer1) {
+		memcpy(temp, recordBuffer2 + (recordSize - size), size * 2);
 	} else {
-		memcpy(temp, mRecordBuffer1 + (mRecordSize - size), size * 2);
+		memcpy(temp, recordBuffer1 + (recordSize - size), size * 2);
 	}
 	callback_to_writeBuffer(temp, size);
 	writeFile(temp, size, false);
@@ -296,18 +299,18 @@ void callback_recorder(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 
 // Write to file 'outFileTemp'
 void writeFile(short* temp, int size, bool isStopping) {
-	// Not use a temp buffer
+	// Write directly buffer to file
 	//	outFileTemp->write(temp, size);
 
 	// Use a temp buffer. Just write file when bufferWriteFile full or isStopping is true
-	if (currentBufferSize + size > mBufferWriteFileSize) {
-		outFileTemp->write(mBufferWriteFile, currentBufferSize);
-		currentBufferSize = 0;
+	if (currentSizeBuffer + size > sizeOfWriteFileBuffer) {
+		outFileTemp->write(writeFileBuffer, currentSizeBuffer);
+		currentSizeBuffer = 0;
 	}
-	memcpy(mBufferWriteFile + currentBufferSize, temp, size * 2);
-	currentBufferSize += size;
+	memcpy(writeFileBuffer + currentSizeBuffer, temp, size * 2);
+	currentSizeBuffer += size;
 	if (isStopping) {
-		outFileTemp->write(mBufferWriteFile, currentBufferSize);
+		outFileTemp->write(writeFileBuffer, currentSizeBuffer);
 	}
 }
 
@@ -322,12 +325,12 @@ int AudioService_initPlayer() {
 	const SLuint32 lOutputMixIIDCount = 0;
 	const SLInterfaceID lOutputMixIIDs[] = { };
 	const SLboolean lOutputMixReqs[] = { };
-	res = (*mEngine)->CreateOutputMix(mEngine, &mOutputMixObj,
+	res = (*engineItf)->CreateOutputMix(engineItf, &outputMixObj,
 			lOutputMixIIDCount, lOutputMixIIDs, lOutputMixReqs);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mOutputMixObj)->Realize(mOutputMixObj, SL_BOOLEAN_FALSE );
+	res = (*outputMixObj)->Realize(outputMixObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -340,7 +343,7 @@ int AudioService_initPlayer() {
 
 	SLDataLocator_OutputMix lDataLocatorOut;
 	lDataLocatorOut.locatorType = SL_DATALOCATOR_OUTPUTMIX;
-	lDataLocatorOut.outputMix = mOutputMixObj;
+	lDataLocatorOut.outputMix = outputMixObj;
 	SLDataSink lDataSink;
 	lDataSink.pLocator = &lDataLocatorOut;
 	lDataSink.pFormat = NULL;
@@ -350,46 +353,45 @@ int AudioService_initPlayer() {
 	const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
 			SL_BOOLEAN_TRUE };
 
-	res = (*mEngine)->CreateAudioPlayer(mEngine, &mPlayerObj, &lDataSource,
+	res = (*engineItf)->CreateAudioPlayer(engineItf, &playerObj, &lDataSource,
 			&lDataSink, lSoundPlayerIIDCount, lSoundPlayerIIDs,
 			lSoundPlayerReqs);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerObj)->Realize(mPlayerObj, SL_BOOLEAN_FALSE );
+	res = (*playerObj)->Realize(playerObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_PLAY, &mPlayer);
+	res = (*playerObj)->GetInterface(playerObj, SL_IID_PLAY, &playerItf);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_VOLUME,
-			&mPlayerVolume);
+	res = (*playerObj)->GetInterface(playerObj, SL_IID_VOLUME, &playerVolume);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
 	SLmillibel maxVol;
-	res = (*mPlayerVolume)->GetMaxVolumeLevel(mPlayerVolume, &maxVol);
+	res = (*playerVolume)->GetMaxVolumeLevel(playerVolume, &maxVol);
 	if (checkError(res) == STATUS_OK) {
-		res = (*mPlayerVolume)->SetVolumeLevel(mPlayerVolume, maxVol);
+		res = (*playerVolume)->SetVolumeLevel(playerVolume, maxVol);
 	}
 
-	res = (*mPlayerObj)->GetInterface(mPlayerObj,
-			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &mPlayerQueue);
+	res = (*playerObj)->GetInterface(playerObj, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+			&playerQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerQueue)->RegisterCallback(mPlayerQueue, callback_player,
-			NULL);
+	res = (*playerQueue)->RegisterCallback(playerQueue, playerCallback, NULL);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayer)->SetCallbackEventsMask(mPlayer, SL_PLAYEVENT_HEADATEND );
+	res = (*playerItf)->SetCallbackEventsMask(playerItf,
+			SL_PLAYEVENT_HEADATEND );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*mPlayerQueue)->Clear(mPlayerQueue);
+	res = (*playerQueue)->Clear(playerQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -399,16 +401,16 @@ int AudioService_initPlayer() {
 void AudioService_destroyPlayer() {
 	Log::info("Destroy Player");
 
-	if (mPlayerObj != NULL) {
-		(*mPlayerObj)->Destroy(mPlayerObj);
-		mPlayerObj = NULL;
-		mPlayer = NULL;
-		mPlayerQueue = NULL;
-		mPlayerVolume = NULL;
+	if (playerObj != NULL) {
+		(*playerObj)->Destroy(playerObj);
+		playerObj = NULL;
+		playerItf = NULL;
+		playerQueue = NULL;
+		playerVolume = NULL;
 	}
-	if (mOutputMixObj != NULL) {
-		(*mOutputMixObj)->Destroy(mOutputMixObj);
-		mOutputMixObj = NULL;
+	if (outputMixObj != NULL) {
+		(*outputMixObj)->Destroy(outputMixObj);
+		outputMixObj = NULL;
 	}
 
 }
@@ -421,12 +423,12 @@ void AudioService_startPlayer() {
 
 	SLresult lRes;
 	SLuint32 lPlayerState;
-	(*mPlayerObj)->GetState(mPlayerObj, &lPlayerState);
+	(*playerObj)->GetState(playerObj, &lPlayerState);
 	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
-		lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
+		lRes = (*playerQueue)->Clear(playerQueue);
 		if (checkError(lRes) != STATUS_OK)
 			return;
-		lRes = (*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING );
+		lRes = (*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_PLAYING );
 		if (checkError(lRes) != STATUS_OK)
 			return;
 	}
@@ -438,56 +440,56 @@ void AudioService_startPlayer() {
  */
 void AudioService_stopPlayer() {
 	Log::info("Stop Player");
-	(*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_STOPPED );
-	(*mPlayerQueue)->Clear(mPlayerQueue);
+	(*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_STOPPED );
+	(*playerQueue)->Clear(playerQueue);
 }
 
 /**
  * Play tempFile. Read data from function "processBlock" & play it.
  */
 void AudioService_playEffect() {
-	if (!thread_done) {
-		pthread_kill(playerThread, SIGUSR1);
+	if (!threadDoneFlag) {
+		pthread_kill(playbackFileThread, SIGUSR1);
 	}
 
-	(*mPlayerQueue)->Clear(mPlayerQueue);
-	int size = processBlock(&mPlayerBuffer1);
-	mActivePlayerBuffer = mPlayerBuffer1;
-	tempSize = processBlock(&mPlayerBuffer2);
-	(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
+	(*playerQueue)->Clear(playerQueue);
+	int size = processBlock(&playerBuffer1);
+	activePlayerBuffer = playerBuffer1;
+	tempSize = processBlock(&playerBuffer2);
+	(*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
 			size * sizeof(short));
 }
 
 /**
  * Callback when finish playing on a buffer. Enqueue the other buffer & write data to this buffer.
  */
-void callback_player(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
-	if (mActivePlayerBuffer == mPlayerBuffer1) {
-		mActivePlayerBuffer = mPlayerBuffer2;
+void playerCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+	if (activePlayerBuffer == playerBuffer1) {
+		activePlayerBuffer = playerBuffer2;
 	} else {
-		mActivePlayerBuffer = mPlayerBuffer1;
+		activePlayerBuffer = playerBuffer1;
 	}
-	if (!thread_done) {
-		pthread_kill(playerThread, SIGUSR1);
+	if (!threadDoneFlag) {
+		pthread_kill(playbackFileThread, SIGUSR1);
 	}
-	pthread_create(&playerThread, NULL, playbackFile, NULL);
+	pthread_create(&playbackFileThread, NULL, playbackFileFunc, NULL);
 }
 
 /**
- * Body of thread to process mission of callback_player.
+ * Body of thread to process mission of playerCallback.
  */
-void* playbackFile(void * param) {
-	thread_done = false;
+void* playbackFileFunc(void * param) {
+	threadDoneFlag = false;
 	if (tempSize != 0) {
-		(*mPlayerQueue)->Enqueue(mPlayerQueue, mActivePlayerBuffer,
+		(*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
 				tempSize * sizeof(short));
-		if (mActivePlayerBuffer == mPlayerBuffer1) {
-			tempSize = processBlock(&mPlayerBuffer2);
+		if (activePlayerBuffer == playerBuffer1) {
+			tempSize = processBlock(&playerBuffer2);
 		} else {
-			tempSize = processBlock(&mPlayerBuffer1);
+			tempSize = processBlock(&playerBuffer1);
 		}
 	}
-	thread_done = true;
+	threadDoneFlag = true;
 	return NULL;
 }
 
