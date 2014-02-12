@@ -35,7 +35,7 @@ const int EFFECT_DUB = 11;
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroy(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroy(JNIEnv *,
 		jobject);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroy(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv *,
 		jobject);
 
 /*
@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv *,
 		jobject);
 
 /*
@@ -62,7 +62,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv *,
 		jobject);
 
 /*
@@ -71,7 +71,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
 		jobject);
 /*
  * Class:     vng_wmb_service_SoundEffect
@@ -86,7 +86,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
  * Signature: ()V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
 		JNIEnv *, jobject);
 
 /*
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
  * Signature: (I)V
  */
 
-JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv *,
+JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv *,
 		jobject, jint);
 /*
  * Class:     vng_wmb_service_SoundEffect

@@ -66,7 +66,7 @@ jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis) {
 /**
  * Destroy AudioLib
  */
-void Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
+jint Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 
 	{
 		// Delete global variable.
@@ -76,43 +76,54 @@ void Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 
 	AudioService_destroyPlayer();
 	AudioService_destroy();
+	return STATUS_OK;
 }
 
 /**
  * Start record.
  */
-void Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
-	AudioService_initRecorder();
-	AudioService_startRecord();
+jint Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
+	int resStatus = AudioService_initRecorder();
+	if (resStatus != STATUS_OK) {
+		return resStatus;
+	}
+	resStatus = AudioService_startRecord();
+	if (resStatus != STATUS_OK) {
+		return resStatus;
+	}
+	return STATUS_OK;
 }
 
 /**
  * Stop record.
  */
-void Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
-	AudioService_stopRecord();
+jint Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
+	int resStatus = AudioService_stopRecord();
+	if (resStatus != STATUS_OK) {
+		return resStatus;
+	}
 	AudioService_destroyRecorder();
+	return STATUS_OK;
 }
 
 /**
  * Start player. Open tempFile (sdcard/voice.wav) to ready to play.
  */
-void Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv* pEnv, jobject pThis) {
+jint Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv* pEnv, jobject pThis) {
 	inFileTemp = new WavInFile(pathWavFileTemp);
-
-	AudioService_startPlayer();
+	return AudioService_startPlayer();
 }
 
 /**
  * Stop player.
  */
-void Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv* pEnv, jobject pThis) {
+jint Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 	if (inFileTemp != NULL) {
 		delete inFileTemp;
 		inFileTemp = NULL;
 	}
 
-	AudioService_stopPlayer();
+	return AudioService_stopPlayer();
 }
 
 /**
@@ -131,12 +142,13 @@ jint Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv* pEnv, jobject pThis,
 /**
  * Destroy lib of effects.
  */
-void Java_vng_wmb_service_SoundEffect_destroyEffectLib(JNIEnv* pEnv,
+jint Java_vng_wmb_service_SoundEffect_destroyEffectLib(JNIEnv* pEnv,
 		jobject pThis) {
 	SoundTouchEffect_destroy();
 	ReverbEffect_destroy();
 	EchoEffect_destroy();
 	BackgroundEffect_destroy();
+	return STATUS_OK;
 }
 
 /**
@@ -225,7 +237,7 @@ void selectAndInitEffect(int effect) {
 /**
  * Play a effect which is defined.
  */
-void Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
+jint Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
 		jint effect) {
 	selectAndInitEffect(effect);
 
@@ -233,7 +245,7 @@ void Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
 	inFileTemp->rewind();
 	pthread_mutex_unlock(&isProcessingBlock);
 
-	AudioService_playEffect();
+	return AudioService_playEffect();
 }
 
 /**

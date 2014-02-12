@@ -13,21 +13,21 @@ public class SoundEffect {
 
 	public native int init();
 
-	public native void destroy();
+	public native int destroy();
 
-	public native void startRecord();
+	public native int startRecord();
 
-	public native void stopRecord();
+	public native int stopRecord();
 
-	public native void startPlayer();
+	public native int startPlayer();
 
-	public native void stopPlayer();
+	public native int stopPlayer();
 
 	public native int initEffectLib(AssetManager mgr);
 
-	public native void destroyEffectLib();
+	public native int destroyEffectLib();
 
-	public native void playEffect(int effect);
+	public native int playEffect(int effect);
 
 	public native int processAndWriteToAmr(int effect);
 
