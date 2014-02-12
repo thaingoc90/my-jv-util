@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "WavFile.h"
 #include "Utils.h"
+#include "opencore/interf_enc.h"
 
 JavaVM * jvm;
 jobject jSoundEffectObject;
@@ -41,12 +42,12 @@ void setFlagUseOfEffect(bool, bool, bool, bool);
 jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis) {
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
-		return STATUS_KO;
+		return STATUS_FAIL;
 	}
 
 	res = AudioService_initPlayer();
 	if (res != STATUS_OK) {
-		return STATUS_KO;
+		return STATUS_FAIL;
 	}
 
 	{
@@ -97,7 +98,7 @@ void Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
  * Start player. Open tempFile (sdcard/voice.wav) to ready to play.
  */
 void Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv* pEnv, jobject pThis) {
-	inFileTemp = new WavInFile(pathFileTemp);
+	inFileTemp = new WavInFile(pathWavFileTemp);
 
 	AudioService_startPlayer();
 }
@@ -117,7 +118,7 @@ void Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 /**
  * Init lib of effects
  */
-jint Java_vng_wmb_service_SoundEffect_initEffect(JNIEnv* pEnv, jobject pThis,
+jint Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv* pEnv, jobject pThis,
 		jobject assetManager) {
 	SoundTouchEffect_init();
 	ReverbEffect_init();
@@ -130,7 +131,7 @@ jint Java_vng_wmb_service_SoundEffect_initEffect(JNIEnv* pEnv, jobject pThis,
 /**
  * Destroy lib of effects.
  */
-void Java_vng_wmb_service_SoundEffect_destroyEffect(JNIEnv* pEnv,
+void Java_vng_wmb_service_SoundEffect_destroyEffectLib(JNIEnv* pEnv,
 		jobject pThis) {
 	SoundTouchEffect_destroy();
 	ReverbEffect_destroy();
@@ -139,25 +140,23 @@ void Java_vng_wmb_service_SoundEffect_destroyEffect(JNIEnv* pEnv,
 }
 
 /**
- * Play a effect which is defined.
- * Type = 1 : bird
- *      = 2 : cat
- *      = 3 : cow
- *      = 4 : fast
- *      = 5 : robot
- *      = 6 : dub vader
- *      = 7 : microphone
- *      = 8 : stage
- *      = 9 : romance
- *      = 10 : techtronic
- *      = 11 : dub
- *      = else : origninal
+ * Effect = 1 : bird
+ *        = 2 : cat
+ *        = 3 : cow
+ *        = 4 : fast
+ *        = 5 : robot
+ *        = 6 : dub vader
+ *        = 7 : microphone
+ *        = 8 : stage
+ *        = 9 : romance
+ *        = 10 : techtronic
+ *        = 11 : dub
+ *        = else : origninal
  */
-void Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
-		jint type) {
+void selectAndInitEffect(int effect) {
 	bool setIfSoundTouch = false, setIfEcho = false;
 	bool setIfReverb = false, setIfBackground = false;
-	switch (type) {
+	switch (effect) {
 	case EFFECT_BIRD: {
 		SoundTouchEffect_initProcess(0, 7, 25);
 		setIfSoundTouch = true;
@@ -221,12 +220,102 @@ void Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
 	}
 	setFlagUseOfEffect(setIfSoundTouch, setIfEcho, setIfBackground,
 			setIfReverb);
+}
+
+/**
+ * Play a effect which is defined.
+ */
+void Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
+		jint effect) {
+	selectAndInitEffect(effect);
 
 	pthread_mutex_lock(&isProcessingBlock);
 	inFileTemp->rewind();
 	pthread_mutex_unlock(&isProcessingBlock);
 
 	AudioService_playEffect();
+}
+
+/**
+ * Process data & write data to amr file.
+ */
+jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
+		jobject pThis, jint effect) {
+	if (SAMPLE_RATE != 8000) {
+		return STATUS_NOT_SUPPORT;
+	}
+
+	selectAndInitEffect(effect);
+	FILE* outAmrFile = fopen(pathAmrFileTemp, "wb");
+	void* amrObj = Encoder_Interface_init(0);
+	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
+	if (inWavFile == NULL || outAmrFile == NULL) {
+		return STATUS_FAIL;
+	}
+
+	enum ModeAMR modeAMR = AMRNB122;
+	int WAV_FRAME = 160;
+	int numShort = 0, numEncode = 0, sizeInBuffer = 0;
+	short* buffer;
+	short inBuffer[WAV_FRAME];
+	unsigned char outBuffer[200];
+
+	fwrite("#!AMR\n", 1, 6, outAmrFile);
+	while (inWavFile != NULL && inWavFile->eof() == 0) {
+		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
+		buffer = copyShortBuffer(sampleBuffer, numShort);
+		if (numShort > 0 && mHasSoundTouch) {
+			numShort = SoundTouchEffect_processBlock(&buffer, numShort);
+		}
+
+		if (numShort > 0 && mHasEcho) {
+			numShort = EchoEffect_processBlock(&buffer, numShort);
+		}
+
+		if (numShort > 0 && mHasReverb) {
+			numShort = ReverbEffect_processBlock(&buffer, numShort);
+		}
+
+		if (numShort > 0 && mHasBackGround) {
+			numShort = BackgroundEffect_processBlock(&buffer, numShort);
+		}
+
+		int pos = WAV_FRAME - sizeInBuffer;
+		while (pos <= numShort) {
+			for (int i = pos - WAV_FRAME + sizeInBuffer; i < pos; i++) {
+				inBuffer[sizeInBuffer] = buffer[i];
+				sizeInBuffer = (sizeInBuffer + 1) % WAV_FRAME;
+			}
+			pos += WAV_FRAME;
+
+			numEncode = Encoder_Interface_Encode(amrObj, modeAMR, inBuffer,
+					outBuffer, 0);
+			fwrite(outBuffer, 1, numEncode, outAmrFile);
+		}
+		if (pos > numShort) {
+			sizeInBuffer = 0;
+			for (int i = pos - WAV_FRAME; i < numShort; i++) {
+				inBuffer[sizeInBuffer++] = buffer[i];
+			}
+		}
+		sizeInBuffer = sizeInBuffer % WAV_FRAME;
+		delete[] buffer;
+	}
+	if (sizeInBuffer > 0) {
+		short RedundantBuffer[sizeInBuffer];
+		memcpy(RedundantBuffer, inBuffer, sizeInBuffer);
+		numEncode = Encoder_Interface_Encode(amrObj, modeAMR, RedundantBuffer,
+				outBuffer, 0);
+		fwrite(outBuffer, 1, numEncode, outAmrFile);
+	}
+
+	if (inWavFile != NULL) {
+		delete inWavFile;
+		inWavFile = NULL;
+	}
+	fclose(outAmrFile);
+	Encoder_Interface_exit(amrObj);
+	return STATUS_OK;
 }
 
 // ------------------Start custom functions----------------------------------------

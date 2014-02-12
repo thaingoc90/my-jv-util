@@ -23,5 +23,5 @@
     <string name="btn_effect_bath">Bathroom</string>
     <string name="btn_effect_techtronic">Techtronic</string>
     <string name="btn_effect_dub">Dub</string>
-
+    <string name="btn_action_send">Send</string>
 </resources>

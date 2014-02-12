@@ -15,4 +15,8 @@ public class EffectConstants {
 	public static final int EFFECT_TECHTRONIC = 10;
 	public static final int EFFECT_DUB = 11;
 
+	public static final int STATUS_FAIL = 0;
+	public static final int STATUS_OK = 1;
+	public static final int STATUS_NOT_SUPPORT = 2;
+
 }

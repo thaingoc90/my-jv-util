@@ -23,11 +23,13 @@ public class SoundEffect {
 
 	public native void stopPlayer();
 
-	public native int initEffect(AssetManager mgr);
+	public native int initEffectLib(AssetManager mgr);
 
-	public native void destroyEffect();
+	public native void destroyEffectLib();
 
-	public native void playEffect(int type);
+	public native void playEffect(int effect);
+
+	public native int processAndWriteToAmr(int effect);
 
 	// FUNCTION USE FOR CUSTOM EFFECT IF NECESSARY
 

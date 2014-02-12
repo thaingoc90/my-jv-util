@@ -5,10 +5,12 @@
 
 static const int SAMPLE_RATE = 44100;
 
-const static char* pathFileTemp = "/sdcard/voice.wav";
+const static char* pathWavFileTemp = "/sdcard/voice.wav";
+const static char* pathAmrFileTemp = "/sdcard/voice.amr";
 
 const static int STATUS_OK = 1;
-const static int STATUS_KO = 0;
+const static int STATUS_FAIL = 0;
+const static int STATUS_NOT_SUPPORT = 2;
 
 const static int MAX_TIME_BUFFER_RECORD = 50; // ms
 
