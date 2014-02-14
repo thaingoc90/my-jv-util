@@ -20,10 +20,10 @@ WavInFile* inFileTemp;
 #define BUFF_SIZE 10 * 1024
 short sampleBuffer[BUFF_SIZE];
 
-bool mHasEcho = false;
-bool mHasSoundTouch = false;
-bool mHasBackGround = false;
-bool mHasReverb = false;
+bool hasEchoFlag = false;
+bool hasSoundTouchFlag = false;
+bool hasBackGroundFlag = false;
+bool hasReverbFlag = false;
 
 /**
  * JNI_OnLoad. Save JVM.
@@ -276,19 +276,19 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	while (inWavFile != NULL && inWavFile->eof() == 0) {
 		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
 		buffer = duplicateShortPtr(sampleBuffer, numShort);
-		if (numShort > 0 && mHasSoundTouch) {
+		if (numShort > 0 && hasSoundTouchFlag) {
 			numShort = SoundTouchEffect_processBlock(&buffer, numShort);
 		}
 
-		if (numShort > 0 && mHasEcho) {
+		if (numShort > 0 && hasEchoFlag) {
 			numShort = EchoEffect_processBlock(&buffer, numShort);
 		}
 
-		if (numShort > 0 && mHasReverb) {
+		if (numShort > 0 && hasReverbFlag) {
 			numShort = ReverbEffect_processBlock(&buffer, numShort);
 		}
 
-		if (numShort > 0 && mHasBackGround) {
+		if (numShort > 0 && hasBackGroundFlag) {
 			numShort = BackgroundEffect_processBlock(&buffer, numShort);
 		}
 
@@ -391,10 +391,10 @@ void Java_vng_wmb_service_SoundEffect_prepareReverbEffect(JNIEnv* pEnv,
  */
 void setFlagUseOfEffect(bool setIfSoundTouch, bool setIfEcho,
 		bool setIfBackground, bool setIfReverb) {
-	mHasSoundTouch = setIfSoundTouch;
-	mHasEcho = setIfEcho;
-	mHasBackGround = setIfBackground;
-	mHasReverb = setIfReverb;
+	hasSoundTouchFlag = setIfSoundTouch;
+	hasEchoFlag = setIfEcho;
+	hasBackGroundFlag = setIfBackground;
+	hasReverbFlag = setIfReverb;
 }
 
 /**
@@ -428,19 +428,19 @@ int processBlock(short** playerBuffer) {
 		(*playerBuffer) = buffer;
 	}
 
-	if (numRead > 0 && mHasSoundTouch) {
+	if (numRead > 0 && hasSoundTouchFlag) {
 		numRead = SoundTouchEffect_processBlock(playerBuffer, numRead);
 	}
 
-	if (numRead > 0 && mHasEcho) {
+	if (numRead > 0 && hasEchoFlag) {
 		numRead = EchoEffect_processBlock(playerBuffer, numRead);
 	}
 
-	if (numRead > 0 && mHasReverb) {
+	if (numRead > 0 && hasReverbFlag) {
 		numRead = ReverbEffect_processBlock(playerBuffer, numRead);
 	}
 
-	if (numRead > 0 && mHasBackGround) {
+	if (numRead > 0 && hasBackGroundFlag) {
 		numRead = BackgroundEffect_processBlock(playerBuffer, numRead);
 	}
 

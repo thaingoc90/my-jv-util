@@ -5,7 +5,7 @@
 #include "LameMp3/get_audio.h"
 #include <stdio.h>
 
-void convertWavToMp3(char* wavInput, char* mp3Output) {
+int convertWavToMp3(char* wavInput, char* mp3Output) {
 
 	FILE *pcm = fopen(wavInput, "rb");
 	FILE *mp3 = fopen(mp3Output, "wb");
@@ -13,8 +13,8 @@ void convertWavToMp3(char* wavInput, char* mp3Output) {
 	const int PCM_SIZE = 8192;
 	const int MP3_SIZE = 8192;
 
-	short int pcm_buffer[PCM_SIZE * 2];
-	unsigned char mp3_buffer[MP3_SIZE];
+	short int pcmBuffer[PCM_SIZE * 2];
+	unsigned char mpBuffer[MP3_SIZE];
 
 	short read, write;
 
@@ -29,23 +29,26 @@ void convertWavToMp3(char* wavInput, char* mp3Output) {
 
 	if ((lame_init_params(lame)) < 0) {
 		Log::info("Unable to initialize MP3 parameters");
-		return;
+		fclose(mp3);
+		fclose(pcm);
+		return STATUS_FAIL;
 	}
 
 	do {
-		read = fread(pcm_buffer, 2 * sizeof(short int), PCM_SIZE, pcm);
+		read = fread(pcmBuffer, 2 * sizeof(short int), PCM_SIZE, pcm);
 		if (read == 0) {
-			write = lame_encode_flush(lame, mp3_buffer, MP3_SIZE);
+			write = lame_encode_flush(lame, mpBuffer, MP3_SIZE);
 		} else {
-			write = lame_encode_buffer_interleaved(lame, pcm_buffer, read,
-					mp3_buffer, MP3_SIZE);
+			write = lame_encode_buffer_interleaved(lame, pcmBuffer, read,
+					mpBuffer, MP3_SIZE);
 		}
-		fwrite(mp3_buffer, write, 1, mp3);
+		fwrite(mpBuffer, write, 1, mp3);
 	} while (read != 0);
 
 	lame_close(lame);
 	fclose(mp3);
 	fclose(pcm);
+	return STATUS_OK;
 }
 
 static int lame_decoder(lame_t gfp, FILE * outf, char *outPath) {
@@ -56,7 +59,7 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *outPath) {
 
 	if (!(tmp_num_channels >= 1 && tmp_num_channels <= 2)) {
 		Log::info("Internal error.  Aborting.");
-		exit(-1);
+		return -1;
 	}
 
 	if (0 == global_decoder.disable_wav_header)
@@ -125,7 +128,7 @@ static FILE * init_files(lame_global_flags * gf, char const *inPath,
 	return outf;
 }
 
-void convertMp3ToWav(char* mp3Input, char* wavOutput) {
+int convertMp3ToWav(char* mp3Input, char* wavOutput) {
 	lame_t lame = lame_init();
 	lame_set_num_channels(lame, 1);
 	lame_set_in_samplerate(lame, SAMPLE_RATE);
@@ -134,18 +137,23 @@ void convertMp3ToWav(char* mp3Input, char* wavOutput) {
 	lame_set_mode(lame, MONO);
 	lame_set_decode_only(lame, 1);
 	FILE * file = init_files(lame, mp3Input, wavOutput);
+	if (file == NULL) {
+		return STATUS_FAIL;
+	}
 	lame_decoder(lame, file, wavOutput);
 	lame_close(lame);
+	return STATUS_OK;
 }
 
 // Methods for processing block of file.
 // Now, it hasn't used yet.
 
-static void init_files(lame_global_flags * gf, char const *inPath) {
+static int init_inputFile(lame_global_flags * gf, char const *inPath) {
 	if (init_infile(gf, inPath) < 0) {
 		Log::info("Can't init infile '%s'\n", inPath);
-		return;
+		return STATUS_FAIL;
 	}
+	return STATUS_OK;
 }
 
 static int lame_decoder_block(lame_t gfp, short* outBuffer) {
@@ -155,7 +163,7 @@ static int lame_decoder_block(lame_t gfp, short* outBuffer) {
 
 	if (!(num_channels >= 1 && num_channels <= 2)) {
 		Log::info("Internal error.  Aborting.");
-		exit(-1);
+		return -1;
 	}
 
 	iread = get_audio16(gfp, Buffer); /* read in 'iread' samples */
@@ -172,7 +180,7 @@ static int lame_decoder_block(lame_t gfp, short* outBuffer) {
 
 lame_t bgLame = NULL;
 
-void initConvertMp3ToWav(char* mp3Input) {
+int initMp3Decoder(char* mp3Input) {
 	bgLame = lame_init();
 	lame_set_num_channels(bgLame, 1);
 	lame_set_in_samplerate(bgLame, SAMPLE_RATE);
@@ -180,7 +188,7 @@ void initConvertMp3ToWav(char* mp3Input) {
 	lame_set_brate(bgLame, 128);
 	lame_set_mode(bgLame, MONO);
 	lame_set_decode_only(bgLame, 1);
-	init_files(bgLame, mp3Input);
+	return init_inputFile(bgLame, mp3Input);
 }
 
 int convertBlockMp3ToWav(short* buffer) {
@@ -191,7 +199,7 @@ void rewindMp3InputFile() {
 	rewindInputFile();
 }
 
-void destroyConvertMp3ToWav() {
+void destroyMp3Decoder() {
 	if (bgLame != NULL) {
 		close_infile();
 		lame_close(bgLame);
@@ -205,11 +213,11 @@ const int sizePerSecond = 16000; // with birate is 128Kb
  * Cut file mp3 from startTime to endTime with constant bitrate.
  * Unit of startTime & endtime is second
  */
-void cutFileMp3(char* inFilePath, char* outFilePath, int beginTime,
+int cutMp3File(char* inFilePath, char* outFilePath, int beginTime,
 		int endTime) {
 	FILE* inFile = fopen(inFilePath, "rb");
 	if (inFile == NULL) {
-		return;
+		return STATUS_FAIL;
 	}
 
 	FILE* outFile = fopen(outFilePath, "wb");
@@ -220,7 +228,7 @@ void cutFileMp3(char* inFilePath, char* outFilePath, int beginTime,
 	if (beginBytePos > endBytePos) {
 		fclose(inFile);
 		fclose(outFile);
-		return;
+		return STATUS_FAIL;
 	}
 
 	fseek(inFile, beginBytePos, SEEK_SET);
@@ -241,5 +249,6 @@ void cutFileMp3(char* inFilePath, char* outFilePath, int beginTime,
 
 	fclose(inFile);
 	fclose(outFile);
+	return STATUS_OK;
 
 }
