@@ -28,50 +28,35 @@ const int EFFECT_DUB = 11;
  * Signature: ()I
  */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_init(JNIEnv *,
 		jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    destroy
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroy(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroy(JNIEnv *,
 		jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    startRecord
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv *,
 		jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    stopRecord
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv *,
 		jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    startPlayer
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv *,
 		jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    stopPlayer
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
 		jobject);
 /*
  * Class:     vng_wmb_service_SoundEffect
@@ -79,29 +64,29 @@ JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv *,
  * Signature: (O)I
  */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv *,
 		jobject, jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    destroyEffect
  * Signature: ()V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_destroyEffectLib(
 		JNIEnv *, jobject);
-
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    playEffect
  * Signature: (I)V
- */
-
-JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv *,
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv *,
 		jobject, jint);
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    processAndWriteToAmr
  * Signature: (I)V
  */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(
+		JNIEnv *, jobject, jint);
+/*
+ * Class:     vng_wmb_service_SoundEffect
+ * Method:    processAndWriteToMp3
+ * Signature: (I)V
+ */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_processAndWriteToMp3(
 		JNIEnv *, jobject, jint);
 
 /*
@@ -152,7 +137,9 @@ JNIEXPORT void JNICALL Java_vng_wmb_service_SoundEffect_prepareEchoReverb(
 
 void callback_to_writeBuffer(short* temp, int size);
 
-int processBlock(short** playerBuffer);
+int readWavFileAndFilterEffect(short** playerBuffer);
+
+int filterEffect(short** blockData, int size);
 
 #ifdef __cplusplus
 }

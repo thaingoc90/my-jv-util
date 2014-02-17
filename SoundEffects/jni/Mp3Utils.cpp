@@ -10,8 +10,8 @@ int convertWavToMp3(char* wavInput, char* mp3Output) {
 	FILE *pcm = fopen(wavInput, "rb");
 	FILE *mp3 = fopen(mp3Output, "wb");
 
-	const int PCM_SIZE = 8192;
-	const int MP3_SIZE = 8192;
+	const int PCM_SIZE = 2046;
+	const int MP3_SIZE = 2046;
 
 	short int pcmBuffer[PCM_SIZE * 2];
 	unsigned char mpBuffer[MP3_SIZE];
@@ -23,9 +23,7 @@ int convertWavToMp3(char* wavInput, char* mp3Output) {
 	lame_set_in_samplerate(lame, SAMPLE_RATE);
 	lame_set_out_samplerate(lame, SAMPLE_RATE);
 	lame_set_brate(lame, 128);
-	lame_set_mode(lame, MONO);
-	lame_set_quality(lame, 2);
-	lame_set_bWriteVbrTag(lame, 0);
+	lame_set_VBR(lame, vbr_default);
 
 	if ((lame_init_params(lame)) < 0) {
 		Log::info("Unable to initialize MP3 parameters");
@@ -35,11 +33,11 @@ int convertWavToMp3(char* wavInput, char* mp3Output) {
 	}
 
 	do {
-		read = fread(pcmBuffer, 2 * sizeof(short int), PCM_SIZE, pcm);
+		read = fread(pcmBuffer, sizeof(short int), 2 * PCM_SIZE, pcm);
 		if (read == 0) {
 			write = lame_encode_flush(lame, mpBuffer, MP3_SIZE);
 		} else {
-			write = lame_encode_buffer_interleaved(lame, pcmBuffer, read,
+			write = lame_encode_buffer(lame, pcmBuffer, pcmBuffer, read,
 					mpBuffer, MP3_SIZE);
 		}
 		fwrite(mpBuffer, write, 1, mp3);

@@ -36,7 +36,8 @@ public class EffectActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i(LOG_TAG, "SEND ACTION");
-				int status = soundServices.processAndWriteToAmr(effectType);
+//				int status = soundServices.processAndWriteToAmr(effectType);
+				int status = soundServices.processAndWriteToMp3(effectType);
 
 				if (status == EffectConstants.STATUS_OK) {
 					Utils.showMsg(EffectActivity.this, "Send succeffully");

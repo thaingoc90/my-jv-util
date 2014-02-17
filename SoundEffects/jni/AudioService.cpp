@@ -466,9 +466,9 @@ int AudioService_playEffect() {
 	lRes = (*playerQueue)->Clear(playerQueue);
 	if (checkError(lRes) != STATUS_OK)
 		return STATUS_FAIL;
-	int size = processBlock(&playerBuffer1);
+	int size = readWavFileAndFilterEffect(&playerBuffer1);
 	activePlayerBuffer = playerBuffer1;
-	tempSize = processBlock(&playerBuffer2);
+	tempSize = readWavFileAndFilterEffect(&playerBuffer2);
 	lRes = (*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
 			size * sizeof(short));
 	if (checkError(lRes) != STATUS_OK)
@@ -500,9 +500,9 @@ void* playbackFileFunc(void * param) {
 		(*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
 				tempSize * sizeof(short));
 		if (activePlayerBuffer == playerBuffer1) {
-			tempSize = processBlock(&playerBuffer2);
+			tempSize = readWavFileAndFilterEffect(&playerBuffer2);
 		} else {
-			tempSize = processBlock(&playerBuffer1);
+			tempSize = readWavFileAndFilterEffect(&playerBuffer1);
 		}
 	}
 	threadDoneFlag = true;
