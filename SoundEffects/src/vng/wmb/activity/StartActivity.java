@@ -9,6 +9,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -129,6 +130,8 @@ public class StartActivity extends Activity {
 			checkInterface();
 			startCountTimer();
 			mHandler.postDelayed(stopThreads, TIME_RECORD);
+			getWindow()
+					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 	}
 
@@ -152,6 +155,8 @@ public class StartActivity extends Activity {
 			}
 			mDrawThread = mdrawer.getThread();
 			mDrawThread.setRun(false);
+			getWindow().clearFlags(
+					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 	}
 
