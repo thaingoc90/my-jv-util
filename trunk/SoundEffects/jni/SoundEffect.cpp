@@ -10,6 +10,8 @@
 #include "WavFile.h"
 #include "Utils.h"
 #include "opencore/interf_enc.h"
+#include "LameMp3/lame.h"
+#include "Mp3Utils.h"
 
 JavaVM * jvm;
 jobject jSoundEffectObject;
@@ -34,7 +36,7 @@ jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 	return JNI_VERSION_1_6;
 }
 
-void setFlagUseOfEffect(bool, bool, bool, bool);
+void setFlagEffectsInFilter(bool, bool, bool, bool);
 
 /**
  *Init AudioLib
@@ -230,7 +232,7 @@ void selectAndInitEffect(int effect) {
 		break;
 	}
 	}
-	setFlagUseOfEffect(setIfSoundTouch, setIfEcho, setIfBackground,
+	setFlagEffectsInFilter(setIfSoundTouch, setIfEcho, setIfBackground,
 			setIfReverb);
 }
 
@@ -276,21 +278,7 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	while (inWavFile != NULL && inWavFile->eof() == 0) {
 		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
 		buffer = duplicateShortPtr(sampleBuffer, numShort);
-		if (numShort > 0 && hasSoundTouchFlag) {
-			numShort = SoundTouchEffect_processBlock(&buffer, numShort);
-		}
-
-		if (numShort > 0 && hasEchoFlag) {
-			numShort = EchoEffect_processBlock(&buffer, numShort);
-		}
-
-		if (numShort > 0 && hasReverbFlag) {
-			numShort = ReverbEffect_processBlock(&buffer, numShort);
-		}
-
-		if (numShort > 0 && hasBackGroundFlag) {
-			numShort = BackgroundEffect_processBlock(&buffer, numShort);
-		}
+		numShort = filterEffect(&buffer, numShort);
 
 		int pos = WAV_FRAME - sizeInBuffer;
 		while (pos <= numShort) {
@@ -330,6 +318,82 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	return STATUS_OK;
 }
 
+/**
+ * Process data & write data to mp3 file.
+ */
+jint Java_vng_wmb_service_SoundEffect_processAndWriteToMp3(JNIEnv* pEnv,
+		jobject pThis, jint effect) {
+	selectAndInitEffect(effect);
+	FILE* outMp3File = fopen(pathMp3FileTemp, "wb");
+	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
+	if (inWavFile == NULL || outMp3File == NULL) {
+		return STATUS_FAIL;
+	}
+
+	lame_t lame = lame_init();
+	lame_set_num_channels(lame, 1);
+	lame_set_in_samplerate(lame, SAMPLE_RATE);
+	lame_set_out_samplerate(lame, SAMPLE_RATE);
+	lame_set_brate(lame, 128);
+	lame_set_VBR(lame, vbr_default);
+	if ((lame_init_params(lame)) < 0) {
+		delete inWavFile;
+		inWavFile = NULL;
+		fclose(outMp3File);
+		return STATUS_FAIL;
+	}
+
+	int WAV_FRAME = 2048 * 2;
+	int numShort = 0, numEncode = 0, sizeInBuffer = 0;
+	short* buffer;
+	short inBuffer[WAV_FRAME];
+	unsigned char outBuffer[WAV_FRAME / 2];
+
+	while (inWavFile != NULL && inWavFile->eof() == 0) {
+		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
+		buffer = duplicateShortPtr(sampleBuffer, numShort);
+		numShort = filterEffect(&buffer, numShort);
+
+		int pos = WAV_FRAME - sizeInBuffer;
+		while (pos <= numShort) {
+			for (int i = pos - WAV_FRAME + sizeInBuffer; i < pos; i++) {
+				inBuffer[sizeInBuffer] = buffer[i];
+				sizeInBuffer = (sizeInBuffer + 1) % WAV_FRAME;
+			}
+			pos += WAV_FRAME;
+			numEncode = lame_encode_buffer(lame, inBuffer, inBuffer, WAV_FRAME,
+					outBuffer, WAV_FRAME / 2);
+
+			fwrite(outBuffer, numEncode, 1, outMp3File);
+		}
+		if (pos > numShort) {
+			sizeInBuffer = 0;
+			for (int i = pos - WAV_FRAME; i < numShort; i++) {
+				inBuffer[sizeInBuffer++] = buffer[i];
+			}
+		}
+		sizeInBuffer = sizeInBuffer % WAV_FRAME;
+		delete[] buffer;
+	}
+	if (sizeInBuffer > 0) {
+		short RedundantBuffer[sizeInBuffer];
+		memcpy(RedundantBuffer, inBuffer, sizeInBuffer);
+		numEncode = lame_encode_buffer(lame, inBuffer, inBuffer, sizeInBuffer,
+				outBuffer, WAV_FRAME);
+		fwrite(outBuffer, 1, numEncode, outMp3File);
+	}
+
+	lame_encode_flush_nogap(lame, outBuffer, WAV_FRAME);
+
+	if (inWavFile != NULL) {
+		delete inWavFile;
+		inWavFile = NULL;
+	}
+	fclose(outMp3File);
+	lame_close(lame);
+	return STATUS_OK;
+}
+
 // ------------------Start custom functions----------------------------------------
 /**
  * Play custom effect. Note: use this func after inited an any effect.
@@ -338,7 +402,7 @@ void Java_vng_wmb_service_SoundEffect_playCustomEffect(JNIEnv* pEnv,
 		jobject pThis, jboolean setIfSoundTouch, jboolean setIfEcho,
 		jboolean setIfBackground, jboolean setIfReverb) {
 
-	setFlagUseOfEffect(setIfSoundTouch, setIfEcho, setIfBackground,
+	setFlagEffectsInFilter(setIfSoundTouch, setIfEcho, setIfBackground,
 			setIfReverb);
 	pthread_mutex_lock(&isProcessingBlock);
 	inFileTemp->rewind();
@@ -389,7 +453,7 @@ void Java_vng_wmb_service_SoundEffect_prepareReverbEffect(JNIEnv* pEnv,
 /**
  * Set effects which will be used.
  */
-void setFlagUseOfEffect(bool setIfSoundTouch, bool setIfEcho,
+void setFlagEffectsInFilter(bool setIfSoundTouch, bool setIfEcho,
 		bool setIfBackground, bool setIfReverb) {
 	hasSoundTouchFlag = setIfSoundTouch;
 	hasEchoFlag = setIfEcho;
@@ -416,7 +480,7 @@ void callback_to_writeBuffer(short* temp, int size) {
 /**
  * Processing a block. Read data from tempFile & process through effects & play it.
  */
-int processBlock(short** playerBuffer) {
+int readWavFileAndFilterEffect(short** playerBuffer) {
 	int numRead = 0;
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
@@ -428,23 +492,28 @@ int processBlock(short** playerBuffer) {
 		(*playerBuffer) = buffer;
 	}
 
+	numRead = filterEffect(playerBuffer, numRead);
+	pthread_mutex_unlock(&isProcessingBlock);
+
+	return numRead;
+}
+
+int filterEffect(short** blockData, int size) {
+	int numRead = size;
 	if (numRead > 0 && hasSoundTouchFlag) {
-		numRead = SoundTouchEffect_processBlock(playerBuffer, numRead);
+		numRead = SoundTouchEffect_processBlock(blockData, numRead);
 	}
 
 	if (numRead > 0 && hasEchoFlag) {
-		numRead = EchoEffect_processBlock(playerBuffer, numRead);
+		numRead = EchoEffect_processBlock(blockData, numRead);
 	}
 
 	if (numRead > 0 && hasReverbFlag) {
-		numRead = ReverbEffect_processBlock(playerBuffer, numRead);
+		numRead = ReverbEffect_processBlock(blockData, numRead);
 	}
 
 	if (numRead > 0 && hasBackGroundFlag) {
-		numRead = BackgroundEffect_processBlock(playerBuffer, numRead);
+		numRead = BackgroundEffect_processBlock(blockData, numRead);
 	}
-
-	pthread_mutex_unlock(&isProcessingBlock);
-
 	return numRead;
 }
