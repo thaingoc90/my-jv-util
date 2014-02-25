@@ -1,6 +1,7 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#include <string.h>
 #include <stdlib.h>
 
 static const int SAMPLE_RATE = 44100;
