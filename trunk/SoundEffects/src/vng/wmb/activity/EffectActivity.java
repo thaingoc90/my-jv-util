@@ -108,6 +108,7 @@ public class EffectActivity extends Activity {
 				new Thread(new Runnable() {
 					public void run() {
 						Log.i(LOG_TAG, "FAST EFFECT");
+						effectType = EffectConstants.EFFECT_FAST;
 						soundServices.playEffect(effectType);
 					}
 				}).start();
