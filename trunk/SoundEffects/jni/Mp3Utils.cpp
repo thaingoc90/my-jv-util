@@ -1,9 +1,13 @@
+#include "GlobalConstant.h"
 #include "Mp3Utils.h"
-#include "LameMp3/lame.h"
 #include "Log.h"
 #include "Utils.h"
-#include "LameMp3/get_audio.h"
 #include <stdio.h>
+
+#ifdef _USE_LAME_MP3_
+
+#include "LameMp3/get_audio.h"
+#include "LameMp3/lame.h"
 
 int convertWavToMp3(char* wavInput, char* mp3Output) {
 
@@ -250,3 +254,14 @@ int cutMp3File(char* inFilePath, char* outFilePath, int beginTime,
 	return STATUS_OK;
 
 }
+
+#else
+
+int convertWavToMp3(char* wavInput, char* mp3Output) {
+	return STATUS_NOT_SUPPORT;
+}
+int convertMp3ToWav(char* mp3Input, char* wavOutput) {
+	return STATUS_NOT_SUPPORT;
+}
+
+#endif

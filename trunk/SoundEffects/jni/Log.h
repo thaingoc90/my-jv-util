@@ -1,5 +1,5 @@
-#ifndef PACKT_LOG_HPP
-#define PACKT_LOG_HPP
+#ifndef _LOG_H_
+#define _LOG_H_
 
 class Log {
 public:
