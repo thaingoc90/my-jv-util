@@ -1,6 +1,5 @@
-#include <jni.h>
 #include <pthread.h>
-#include "SoundEffect.h"
+#include "VoiceEffectLib.h"
 #include "AudioService.h"
 #include "BackgroundWrapper.h"
 #include "SoundTouchWrapper.h"
@@ -9,17 +8,26 @@
 #include "Log.h"
 #include "WavFile.h"
 #include "Utils.h"
-#include "opencore/interf_enc.h"
-#include "LameMp3/lame.h"
-#include "Mp3Utils.h"
 
+#include "Mp3Utils.h"
+#ifdef _USE_LAME_MP3_
+#include "LameMp3/lame.h"
+#endif
+
+#ifdef _USE_OPENCORE_AMR_
+#include "opencore/interf_enc.h"
+#endif
+
+#ifdef _ANDROID_FLAG_
+#include <android/asset_manager_jni.h>
 JavaVM * jvm;
 jobject jSoundEffectObject;
 jobject jSoundEffectClass;
+#endif
 
 pthread_mutex_t isProcessingBlock;
 WavInFile* inFileTemp;
-#define BUFF_SIZE 10 * 1024
+#define BUFF_SIZE 5120
 short sampleBuffer[BUFF_SIZE];
 
 bool hasEchoFlag = false;
@@ -27,21 +35,24 @@ bool hasSoundTouchFlag = false;
 bool hasBackGroundFlag = false;
 bool hasReverbFlag = false;
 
+void setFlagEffectsInFilter(bool, bool, bool, bool);
+
+
+#ifdef _ANDROID_FLAG_
+
 /**
  * JNI_OnLoad. Save JVM.
  */
-jint JNI_OnLoad(JavaVM* aVm, void* aReserved) {
+int JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 	Log::info("JNI_ONLOAD");
 	jvm = aVm;
 	return JNI_VERSION_1_6;
 }
 
-void setFlagEffectsInFilter(bool, bool, bool, bool);
-
 /**
  *Init AudioLib
  */
-jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_init(JNIEnv* pEnv, jobject pThis) {
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
 		return STATUS_FAIL;
@@ -68,7 +79,7 @@ jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis) {
 /**
  * Destroy AudioLib
  */
-jint Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 
 	{
 		// Delete global variable.
@@ -81,10 +92,40 @@ jint Java_vng_wmb_service_SoundEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 	return STATUS_OK;
 }
 
+#else
+
+/**
+ *Init AudioLib
+ */
+int VoiceEffect_init() {
+	int res = AudioService_init();
+	if (res != STATUS_OK) {
+		return STATUS_FAIL;
+	}
+
+	res = AudioService_initPlayer();
+	if (res != STATUS_OK) {
+		return STATUS_FAIL;
+	}
+
+	return STATUS_OK;
+}
+
+/**
+ * Destroy AudioLib
+ */
+int VoiceEffect_destroy() {
+	AudioService_destroyPlayer();
+	AudioService_destroy();
+	return STATUS_OK;
+}
+
+#endif
+
 /**
  * Start record.
  */
-jint Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_startRecord() {
 	int resStatus = AudioService_initRecorder();
 	if (resStatus != STATUS_OK) {
 		return resStatus;
@@ -99,7 +140,7 @@ jint Java_vng_wmb_service_SoundEffect_startRecord(JNIEnv* pEnv, jobject pThis) {
 /**
  * Stop record.
  */
-jint Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_stopRecord() {
 	int resStatus = AudioService_stopRecord();
 	if (resStatus != STATUS_OK) {
 		return resStatus;
@@ -111,7 +152,7 @@ jint Java_vng_wmb_service_SoundEffect_stopRecord(JNIEnv* pEnv, jobject pThis) {
 /**
  * Start player. Open tempFile (sdcard/voice.wav) to ready to play.
  */
-jint Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_startPlayer() {
 	inFileTemp = new WavInFile(pathWavFileTemp);
 	return AudioService_startPlayer();
 }
@@ -119,7 +160,7 @@ jint Java_vng_wmb_service_SoundEffect_startPlayer(JNIEnv* pEnv, jobject pThis) {
 /**
  * Stop player.
  */
-jint Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_stopPlayer() {
 	if (inFileTemp != NULL) {
 		delete inFileTemp;
 		inFileTemp = NULL;
@@ -128,10 +169,12 @@ jint Java_vng_wmb_service_SoundEffect_stopPlayer(JNIEnv* pEnv, jobject pThis) {
 	return AudioService_stopPlayer();
 }
 
+#ifdef _ANDROID_FLAG_
+
 /**
  * Init lib of effects
  */
-jint Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv* pEnv, jobject pThis,
+int VoiceEffect_initEffectLib(JNIEnv* pEnv, jobject pThis,
 		jobject assetManager) {
 	SoundTouchEffect_init();
 	ReverbEffect_init();
@@ -141,11 +184,26 @@ jint Java_vng_wmb_service_SoundEffect_initEffectLib(JNIEnv* pEnv, jobject pThis,
 	return STATUS_OK;
 }
 
+#else
+
+/**
+ * Init lib of effects
+ */
+int VoiceEffect_initEffectLib() {
+	SoundTouchEffect_init();
+	ReverbEffect_init();
+	EchoEffect_init();
+	BackgroundEffect_init();
+	return STATUS_OK;
+}
+
+#endif
+
+
 /**
  * Destroy lib of effects.
  */
-jint Java_vng_wmb_service_SoundEffect_destroyEffectLib(JNIEnv* pEnv,
-		jobject pThis) {
+int VoiceEffect_destroyEffectLib() {
 	SoundTouchEffect_destroy();
 	ReverbEffect_destroy();
 	EchoEffect_destroy();
@@ -167,7 +225,7 @@ jint Java_vng_wmb_service_SoundEffect_destroyEffectLib(JNIEnv* pEnv,
  *        = 11 : dub
  *        = else : origninal
  */
-void selectAndInitEffect(int effect) {
+void VoiceEffect_selectAndInitEffect(int effect) {
 	bool setIfSoundTouch = false, setIfEcho = false;
 	bool setIfReverb = false, setIfBackground = false;
 	switch (effect) {
@@ -239,9 +297,8 @@ void selectAndInitEffect(int effect) {
 /**
  * Play a effect which is defined.
  */
-jint Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
-		jint effect) {
-	selectAndInitEffect(effect);
+int VoiceEffect_playEffect(int effect) {
+	VoiceEffect_selectAndInitEffect(effect);
 
 	pthread_mutex_lock(&isProcessingBlock);
 	inFileTemp->rewind();
@@ -253,13 +310,13 @@ jint Java_vng_wmb_service_SoundEffect_playEffect(JNIEnv* pEnv, jobject pThis,
 /**
  * Process data & write data to amr file.
  */
-jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
-		jobject pThis, jint effect) {
+#ifdef _USE_OPENCORE_AMR_
+int VoiceEffect_processAndWriteToAmr(int effect) {
 	if (SAMPLE_RATE != 8000) {
 		return STATUS_NOT_SUPPORT;
 	}
 
-	selectAndInitEffect(effect);
+	VoiceEffect_selectAndInitEffect(effect);
 	FILE* outAmrFile = fopen(pathAmrFileTemp, "wb");
 	void* amrObj = Encoder_Interface_init(0);
 	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
@@ -278,7 +335,7 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	while (inWavFile != NULL && inWavFile->eof() == 0) {
 		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
 		buffer = duplicateShortPtr(sampleBuffer, numShort);
-		numShort = filterEffect(&buffer, numShort);
+		numShort = VoiceEffect_filterEffect(&buffer, numShort);
 
 		int pos = WAV_FRAME - sizeInBuffer;
 		while (pos <= numShort) {
@@ -317,13 +374,18 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToAmr(JNIEnv* pEnv,
 	Encoder_Interface_exit(amrObj);
 	return STATUS_OK;
 }
+#else
+int VoiceEffect_processAndWriteToAmr(int effect) {
+	return STATUS_NOT_SUPPORT;
+}
+#endif
 
 /**
  * Process data & write data to mp3 file.
  */
-jint Java_vng_wmb_service_SoundEffect_processAndWriteToMp3(JNIEnv* pEnv,
-		jobject pThis, jint effect) {
-	selectAndInitEffect(effect);
+#ifdef _USE_LAME_MP3_
+int VoiceEffect_processAndWriteToMp3(int effect) {
+	VoiceEffect_selectAndInitEffect(effect);
 	FILE* outMp3File = fopen(pathMp3FileTemp, "wb");
 	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
 	if (inWavFile == NULL || outMp3File == NULL) {
@@ -352,7 +414,7 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToMp3(JNIEnv* pEnv,
 	while (inWavFile != NULL && inWavFile->eof() == 0) {
 		numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
 		buffer = duplicateShortPtr(sampleBuffer, numShort);
-		numShort = filterEffect(&buffer, numShort);
+		numShort = VoiceEffect_filterEffect(&buffer, numShort);
 
 		int pos = WAV_FRAME - sizeInBuffer;
 		while (pos <= numShort) {
@@ -393,14 +455,18 @@ jint Java_vng_wmb_service_SoundEffect_processAndWriteToMp3(JNIEnv* pEnv,
 	lame_close(lame);
 	return STATUS_OK;
 }
+#else
+int VoiceEffect_processAndWriteToMp3(int effect) {
+	return STATUS_NOT_SUPPORT;
+}
+#endif
 
 // ------------------Start custom functions----------------------------------------
 /**
  * Play custom effect. Note: use this func after inited an any effect.
  */
-void Java_vng_wmb_service_SoundEffect_playCustomEffect(JNIEnv* pEnv,
-		jobject pThis, jboolean setIfSoundTouch, jboolean setIfEcho,
-		jboolean setIfBackground, jboolean setIfReverb) {
+void VoiceEffect_playCustomEffect(bool setIfSoundTouch, bool setIfEcho,
+		bool setIfBackground, bool setIfReverb) {
 
 	setFlagEffectsInFilter(setIfSoundTouch, setIfEcho, setIfBackground,
 			setIfReverb);
@@ -413,37 +479,32 @@ void Java_vng_wmb_service_SoundEffect_playCustomEffect(JNIEnv* pEnv,
 /**
  * Prepare for soundTouch Lib
  */
-void Java_vng_wmb_service_SoundEffect_prepareSoundTouchEffect(JNIEnv* pEnv,
-		jobject pThis, jdouble tempo, jdouble pitch, jdouble rate) {
+void VoiceEffect_prepareSoundTouchEffect(double tempo, double pitch,
+		double rate) {
 	SoundTouchEffect_initProcess(tempo, pitch, rate);
 }
 
 /**
  * Prepare for Echo Lib
  */
-void Java_vng_wmb_service_SoundEffect_prepareEchoEffect(JNIEnv* pEnv,
-		jobject pThis, jdouble mDelay, jdouble mDecay) {
+void VoiceEffect_prepareEchoEffect(double mDelay, double mDecay) {
 	EchoEffect_initProcess(mDelay, mDecay);
 }
 
 /**
  * Prepare for Background Lib
  */
-void Java_vng_wmb_service_SoundEffect_prepareBackgroundEffect(JNIEnv* pEnv,
-		jobject pThis, jstring bgPath, jdouble gain, jboolean inAssetFolder,
-		jboolean isWavFile) {
-	const char* bgFilePath = pEnv->GetStringUTFChars(bgPath, NULL);
-	BackgroundEffect_initProcess(bgFilePath, gain, inAssetFolder, isWavFile);
-	pEnv->ReleaseStringUTFChars(bgPath, bgFilePath);
+void VoiceEffect_prepareBackgroundEffect(const char* bgPath, double gain,
+		bool inAssetFolder, bool isWavFile) {
+	BackgroundEffect_initProcess(bgPath, gain, inAssetFolder, isWavFile);
 }
 
 /**
  * Prepare for Reverb Lib
  */
-void Java_vng_wmb_service_SoundEffect_prepareReverbEffect(JNIEnv* pEnv,
-		jobject pThis, jdouble mRoomSize, jdouble mDelay, jdouble mReverberance,
-		jdouble mHfDamping, jdouble mToneLow, jdouble mToneHigh,
-		jdouble mWetGain, jdouble mDryGain) {
+void VoiceEffect_prepareReverbEffect(double mRoomSize, double mDelay,
+		double mReverberance, double mHfDamping, double mToneLow,
+		double mToneHigh, double mWetGain, double mDryGain) {
 	ReverbEffect_initProcess(mRoomSize, mDelay, mReverberance, mHfDamping,
 			mToneLow, mToneHigh, mWetGain, mDryGain);
 }
@@ -464,7 +525,9 @@ void setFlagEffectsInFilter(bool setIfSoundTouch, bool setIfEcho,
 /**
  * Callback to function writeBuffer in obj SoundEffect. Empty if not use
  */
-void callback_to_writeBuffer(short* temp, int size) {
+void VoiceEffect_cbDrawSoundWave(short* temp, int size) {
+
+#if defined(_CALLBACK_TO_DRAW_SOUNDWAVE_) && defined(_ANDROID_FLAG_)
 	JNIEnv* pEnv;
 	jvm->AttachCurrentThread(&pEnv, 0);
 
@@ -475,12 +538,14 @@ void callback_to_writeBuffer(short* temp, int size) {
 			"setBuffer", "([S)V");
 	pEnv->CallVoidMethod(jSoundEffectObject, method, buffer);
 	jvm->DetachCurrentThread();
+#endif
+
 }
 
 /**
  * Processing a block. Read data from tempFile & process through effects & play it.
  */
-int readWavFileAndFilterEffect(short** playerBuffer) {
+int VoiceEffect_readWavFileAndFilterEffect(short** playerBuffer) {
 	int numRead = 0;
 	pthread_mutex_lock(&isProcessingBlock);
 	if (inFileTemp != NULL && inFileTemp->eof() == 0) {
@@ -492,13 +557,13 @@ int readWavFileAndFilterEffect(short** playerBuffer) {
 		(*playerBuffer) = buffer;
 	}
 
-	numRead = filterEffect(playerBuffer, numRead);
+	numRead = VoiceEffect_filterEffect(playerBuffer, numRead);
 	pthread_mutex_unlock(&isProcessingBlock);
 
 	return numRead;
 }
 
-int filterEffect(short** blockData, int size) {
+int VoiceEffect_filterEffect(short** blockData, int size) {
 	int numRead = size;
 	if (numRead > 0 && hasSoundTouchFlag) {
 		numRead = SoundTouchEffect_processBlock(blockData, numRead);

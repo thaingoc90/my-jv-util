@@ -1,7 +1,10 @@
 #include "Log.h"
+#include "GlobalConstant.h"
+
+#ifdef _ANDROID_FLAG_
 #include <android/log.h>
 
-const char* PRO_LOG_TAG = "JNI_SE";
+const char* PRO_LOG_TAG = "JNI_VE";
 void Log::info(const char* pMessage, ...) {
 	va_list lVarArgs;
 	va_start(lVarArgs, pMessage);
@@ -32,3 +35,18 @@ void Log::debug(const char* pMessage, ...) {
 	__android_log_print(ANDROID_LOG_DEBUG, PRO_LOG_TAG, "\n");
 	va_end(lVarArgs);
 }
+#else
+
+void Log::info(const char* pMessage, ...) {
+}
+
+void Log::error(const char* pMessage, ...) {
+}
+
+void Log::warn(const char* pMessage, ...) {
+}
+
+void Log::debug(const char* pMessage, ...) {
+}
+
+#endif

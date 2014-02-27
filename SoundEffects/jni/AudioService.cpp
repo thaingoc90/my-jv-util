@@ -1,15 +1,33 @@
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-#include <SLES/OpenSLES_AndroidConfiguration.h>
+#include "GlobalConstant.h"
 #include <stdio.h>
 #include <assert.h>
 #include <ctime>
-#include <pthread.h>
 #include "AudioService.h"
-#include "SoundEffect.h"
+#include "VoiceEffectLib.h"
 #include "Log.h"
 #include "WavFile.h"
 #include "Utils.h"
+
+#ifdef _AUDIO_SERVICE_USE_OPENSLES_
+
+#include <pthread.h>
+#include <SLES/OpenSLES.h>
+
+#ifdef _ANDROID_FLAG_
+
+#include <SLES/OpenSLES_Android.h>
+#include <SLES/OpenSLES_AndroidConfiguration.h>
+
+#define W_SLBufferQueueItf SLAndroidSimpleBufferQueueItf
+#define W_SL_IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+#define W_SLBufferQueueState SLAndroidSimpleBufferQueueState
+
+#else
+
+#define W_SLBufferQueueItf SLBufferQueueItf
+#define W_SL_IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
+#define W_SLBufferQueueState SLBufferQueueState
+#endif
 
 /*
  * VARIABLE OF OPENSLES
@@ -20,12 +38,12 @@ SLDataFormat_PCM lDataFormat;
 // RECORDER
 SLObjectItf recorderObj = NULL;
 SLRecordItf recorderItf;
-SLAndroidSimpleBufferQueueItf recorderQueue;
+W_SLBufferQueueItf recorderQueue;
 // PLAYER
 SLObjectItf outputMixObj;
 SLObjectItf playerObj = NULL;
 SLPlayItf playerItf;
-SLAndroidSimpleBufferQueueItf playerQueue;
+W_SLBufferQueueItf playerQueue;
 SLVolumeItf playerVolume;
 
 const int32_t recordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
@@ -35,7 +53,6 @@ int16_t* activeRecordBuffer = recordBuffer1;
 int16_t* playerBuffer1;
 int16_t* playerBuffer2;
 int16_t* activePlayerBuffer;
-int32_t tempSize = 0;
 bool isRecordingFlag = false;
 int enqueuedFlag = 0;
 std::clock_t startTimeRecord;
@@ -53,8 +70,8 @@ int32_t currentSizeBuffer = 0;
 // ---------------End----------------
 
 // INTERFACE OF METHOD
-void recorderCallback(SLAndroidSimpleBufferQueueItf, void*);
-void playerCallback(SLAndroidSimpleBufferQueueItf, void*);
+void recorderCallback(W_SLBufferQueueItf, void*);
+void playerCallback(W_SLBufferQueueItf, void*);
 void writeFile(short* temp, int size, bool isStopping);
 void* playbackFileFunc(void * param);
 int checkError(SLresult);
@@ -132,12 +149,16 @@ int AudioService_initRecorder() {
 	SLresult res;
 	const SLuint32 lEngineRecorderIIDCount = 2;
 	const SLInterfaceID lEngineRecorderIIDs[] = { SL_IID_RECORD,
-			SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
+			W_SL_IID_BUFFERQUEUE };
 	const SLboolean lEngineRecorderReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorOut;
-	lDataLocatorOut.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
-	lDataLocatorOut.numBuffers = 2;
+#ifdef _ANDROID_FLAG_
+	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorOut = {
+			SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2 };
+#else
+	SLDataLocator_BufferQueue lDataLocatorOut = {SL_DATALOCATOR_BUFFERQUEUE, 2};
+#endif
+
 	SLDataLocator_IODevice lDataLocatorIn;
 	lDataLocatorIn.locatorType = SL_DATALOCATOR_IODEVICE;
 	lDataLocatorIn.deviceType = SL_IODEVICE_AUDIOINPUT;
@@ -166,8 +187,8 @@ int AudioService_initRecorder() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*recorderObj)->GetInterface(recorderObj,
-			SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &recorderQueue);
+	res = (*recorderObj)->GetInterface(recorderObj, W_SL_IID_BUFFERQUEUE,
+			&recorderQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -276,7 +297,7 @@ int AudioService_stopRecord() {
  * Callback is called when buffer is full.
  * It will enqueue the other buffer & write data in this buffer to file.
  */
-void recorderCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+void recorderCallback(W_SLBufferQueueItf slBuffer, void *pContext) {
 	long callbackTime;
 
 	startTimeRecord = std::clock();
@@ -298,7 +319,7 @@ void recorderCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
 	} else {
 		memcpy(temp, recordBuffer1 + (recordSize - size), size * 2);
 	}
-	callback_to_writeBuffer(temp, size);
+	VoiceEffect_cbDrawSoundWave(temp, size);
 	writeFile(temp, size, false);
 	delete[] temp;
 }
@@ -340,9 +361,13 @@ int AudioService_initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn;
-	lDataLocatorIn.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
-	lDataLocatorIn.numBuffers = 2;
+#ifdef _ANDROID_FLAG_
+	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn = {
+			SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2 };
+#else
+	SLDataLocator_BufferQueue lDataLocatorIn = {SL_DATALOCATOR_BUFFERQUEUE, 2};
+#endif
+
 	SLDataSource lDataSource;
 	lDataSource.pLocator = &lDataLocatorIn;
 	lDataSource.pFormat = &lDataFormat;
@@ -383,7 +408,7 @@ int AudioService_initPlayer() {
 		res = (*playerVolume)->SetVolumeLevel(playerVolume, maxVol);
 	}
 
-	res = (*playerObj)->GetInterface(playerObj, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+	res = (*playerObj)->GetInterface(playerObj, W_SL_IID_BUFFERQUEUE,
 			&playerQueue);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
@@ -466,27 +491,28 @@ int AudioService_playEffect() {
 	lRes = (*playerQueue)->Clear(playerQueue);
 	if (checkError(lRes) != STATUS_OK)
 		return STATUS_FAIL;
-	int size = readWavFileAndFilterEffect(&playerBuffer1);
 	activePlayerBuffer = playerBuffer1;
-	tempSize = readWavFileAndFilterEffect(&playerBuffer2);
-	lRes = (*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
-			size * sizeof(short));
-	if (checkError(lRes) != STATUS_OK)
-		return STATUS_FAIL;
+	int size = VoiceEffect_readWavFileAndFilterEffect(&playerBuffer1);
+	if (size > 0) {
+		lRes = (*playerQueue)->Enqueue(playerQueue, playerBuffer1,
+				size * sizeof(short));
+	}
+	size = VoiceEffect_readWavFileAndFilterEffect(&playerBuffer2);
+	if (size > 0) {
+		lRes = (*playerQueue)->Enqueue(playerQueue, playerBuffer2,
+				size * sizeof(short));
+	}
 	return STATUS_OK;
 }
 
 /**
  * Callback when finish playing on a buffer. Enqueue the other buffer & write data to this buffer.
  */
-void playerCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
+void playerCallback(W_SLBufferQueueItf slBuffer, void *pContext) {
 	if (activePlayerBuffer == playerBuffer1) {
 		activePlayerBuffer = playerBuffer2;
 	} else {
 		activePlayerBuffer = playerBuffer1;
-	}
-	if (!threadDoneFlag) {
-		pthread_kill(playbackFileThread, SIGUSR1);
 	}
 	pthread_create(&playbackFileThread, NULL, playbackFileFunc, NULL);
 }
@@ -496,13 +522,18 @@ void playerCallback(SLAndroidSimpleBufferQueueItf slBuffer, void *pContext) {
  */
 void* playbackFileFunc(void * param) {
 	threadDoneFlag = false;
-	if (tempSize != 0) {
-		(*playerQueue)->Enqueue(playerQueue, activePlayerBuffer,
-				tempSize * sizeof(short));
-		if (activePlayerBuffer == playerBuffer1) {
-			tempSize = readWavFileAndFilterEffect(&playerBuffer2);
-		} else {
-			tempSize = readWavFileAndFilterEffect(&playerBuffer1);
+	int size = 0;
+	if (activePlayerBuffer == playerBuffer1) {
+		size = VoiceEffect_readWavFileAndFilterEffect(&playerBuffer2);
+		if (size > 0) {
+			(*playerQueue)->Enqueue(playerQueue, playerBuffer2,
+					size * sizeof(short));
+		}
+	} else {
+		size = VoiceEffect_readWavFileAndFilterEffect(&playerBuffer1);
+		if (size > 0) {
+			(*playerQueue)->Enqueue(playerQueue, playerBuffer1,
+					size * sizeof(short));
 		}
 	}
 	threadDoneFlag = true;
@@ -517,3 +548,47 @@ int checkError(SLresult res) {
 	return STATUS_OK;
 }
 
+#else
+
+int AudioService_init() {
+	return STATUS_NOT_SUPPORT;
+}
+
+int AudioService_initRecorder() {
+	return STATUS_NOT_SUPPORT;
+}
+
+void AudioService_destroyRecorder() {
+}
+
+int AudioService_startRecord() {
+	return STATUS_NOT_SUPPORT;
+}
+
+int AudioService_stopRecord() {
+	return STATUS_NOT_SUPPORT;
+}
+
+int AudioService_initPlayer() {
+	return STATUS_NOT_SUPPORT;
+}
+
+void AudioService_destroyPlayer() {
+}
+
+int AudioService_playEffect() {
+	return STATUS_NOT_SUPPORT;
+}
+
+int AudioService_startPlayer() {
+	return STATUS_NOT_SUPPORT;
+}
+
+int AudioService_stopPlayer() {
+	return STATUS_NOT_SUPPORT;
+}
+
+void AudioService_destroy() {
+}
+
+#endif
