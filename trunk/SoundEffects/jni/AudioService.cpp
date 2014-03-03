@@ -239,7 +239,7 @@ int AudioService_startRecord() {
 		if (enqueuedFlag == 0) {
 			res = (*recorderQueue)->Enqueue(recorderQueue, activeRecordBuffer,
 					recordSize * sizeof(int16_t));
-//			enqueuedFlag++;
+			enqueuedFlag++;
 		}
 		res = (*recorderItf)->SetRecordState(recorderItf,
 				SL_RECORDSTATE_RECORDING );
