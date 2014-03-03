@@ -58,6 +58,12 @@ int VoiceEffect_init(JNIEnv* pEnv, jobject pThis) {
 		return STATUS_FAIL;
 	}
 
+	res = AudioService_initRecorder();
+	if (res != STATUS_OK) {
+		return res;
+	}
+
+
 	res = AudioService_initPlayer();
 	if (res != STATUS_OK) {
 		return STATUS_FAIL;
@@ -88,6 +94,7 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 	}
 
 	AudioService_destroyPlayer();
+	AudioService_destroyRecorder();
 	AudioService_destroy();
 	return STATUS_OK;
 }
@@ -108,6 +115,11 @@ int VoiceEffect_init() {
 		return STATUS_FAIL;
 	}
 
+	res = AudioService_initRecorder();
+	if (res != STATUS_OK) {
+		return res;
+	}
+
 	return STATUS_OK;
 }
 
@@ -116,6 +128,7 @@ int VoiceEffect_init() {
  */
 int VoiceEffect_destroy() {
 	AudioService_destroyPlayer();
+	AudioService_destroyRecorder();
 	AudioService_destroy();
 	return STATUS_OK;
 }
@@ -126,11 +139,7 @@ int VoiceEffect_destroy() {
  * Start record.
  */
 int VoiceEffect_startRecord() {
-	int resStatus = AudioService_initRecorder();
-	if (resStatus != STATUS_OK) {
-		return resStatus;
-	}
-	resStatus = AudioService_startRecord();
+	int resStatus = AudioService_startRecord();
 	if (resStatus != STATUS_OK) {
 		return resStatus;
 	}
@@ -145,7 +154,6 @@ int VoiceEffect_stopRecord() {
 	if (resStatus != STATUS_OK) {
 		return resStatus;
 	}
-	AudioService_destroyRecorder();
 	return STATUS_OK;
 }
 
