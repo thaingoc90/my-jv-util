@@ -27,7 +27,7 @@ const int EFFECT_DUB = 11;
 
 #ifdef _ANDROID_FLAG_
 
-int VoiceEffect_init(JNIEnv* pEnv, jobject pThis);
+int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char*);
 
 int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis);
 

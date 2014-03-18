@@ -219,7 +219,7 @@ void AudioService_destroyRecorder() {
 /**
  * Start record. Use 2 buffers.
  */
-int AudioService_startRecord() {
+int AudioService_startRecord(char* pathWavFileTemp) {
 	Log::info("Start record");
 
 	outFileTemp = new WavOutFile(pathWavFileTemp, SAMPLE_RATE, 16, 1);

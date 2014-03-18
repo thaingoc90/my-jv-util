@@ -6,10 +6,6 @@
 
 static const int SAMPLE_RATE = 44100;
 
-const static char* pathWavFileTemp = "/sdcard/voice.wav";
-const static char* pathAmrFileTemp = "/sdcard/voice.amr";
-const static char* pathMp3FileTemp = "/sdcard/voice.mp3";
-
 const static int STATUS_OK = 1;
 const static int STATUS_FAIL = 0;
 const static int STATUS_NOT_SUPPORT = 2;

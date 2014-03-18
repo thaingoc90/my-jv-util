@@ -11,7 +11,7 @@ public class SoundEffect {
 		mActivity = activity;
 	}
 
-	public native int init();
+	public native int init(String rootStorage);
 
 	public native int destroy();
 

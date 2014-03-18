@@ -13,7 +13,7 @@ extern "C" {
  * Method:    init
  * Signature: ()I
  */JNIEXPORT jint JNICALL Java_vng_wmb_service_SoundEffect_init(JNIEnv *,
-		jobject);
+		jobject, jstring);
 /*
  * Class:     vng_wmb_service_SoundEffect
  * Method:    destroy

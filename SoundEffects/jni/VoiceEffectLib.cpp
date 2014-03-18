@@ -35,8 +35,11 @@ bool hasSoundTouchFlag = false;
 bool hasBackGroundFlag = false;
 bool hasReverbFlag = false;
 
-void setFlagEffectsInFilter(bool, bool, bool, bool);
+static char* pathWavFileTemp;
+static char* pathAmrFileTemp;
+static char* pathMp3FileTemp;
 
+void setFlagEffectsInFilter(bool, bool, bool, bool);
 
 #ifdef _ANDROID_FLAG_
 
@@ -52,7 +55,19 @@ int JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 /**
  *Init AudioLib
  */
-int VoiceEffect_init(JNIEnv* pEnv, jobject pThis) {
+int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
+
+	int size = strlen(rootStorage) + strlen("/voice.wav") + 1;
+	pathWavFileTemp = new char[size];
+	pathMp3FileTemp = new char[size];
+	pathAmrFileTemp = new char[size];
+	strcpy(pathWavFileTemp, rootStorage);
+	strcat(pathWavFileTemp, "/voice.wav");
+	strcpy(pathMp3FileTemp, rootStorage);
+	strcat(pathMp3FileTemp, "/voice.mp3");
+	strcpy(pathAmrFileTemp, rootStorage);
+	strcat(pathAmrFileTemp, "/voice.amr");
+
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
 		return STATUS_FAIL;
@@ -62,7 +77,6 @@ int VoiceEffect_init(JNIEnv* pEnv, jobject pThis) {
 	if (res != STATUS_OK) {
 		return res;
 	}
-
 
 	res = AudioService_initPlayer();
 	if (res != STATUS_OK) {
@@ -96,6 +110,11 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 	AudioService_destroyPlayer();
 	AudioService_destroyRecorder();
 	AudioService_destroy();
+
+	delete[] pathWavFileTemp;
+	delete[] pathMp3FileTemp;
+	delete[] pathAmrFileTemp;
+
 	return STATUS_OK;
 }
 
@@ -104,7 +123,7 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 /**
  *Init AudioLib
  */
-int VoiceEffect_init() {
+int VoiceEffect_init(char* rootStorage) {
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
 		return STATUS_FAIL;
@@ -139,7 +158,7 @@ int VoiceEffect_destroy() {
  * Start record.
  */
 int VoiceEffect_startRecord() {
-	int resStatus = AudioService_startRecord();
+	int resStatus = AudioService_startRecord(pathWavFileTemp);
 	if (resStatus != STATUS_OK) {
 		return resStatus;
 	}
@@ -206,7 +225,6 @@ int VoiceEffect_initEffectLib() {
 }
 
 #endif
-
 
 /**
  * Destroy lib of effects.

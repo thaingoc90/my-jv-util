@@ -7,7 +7,7 @@ int AudioService_initRecorder();
 
 void AudioService_destroyRecorder();
 
-int AudioService_startRecord();
+int AudioService_startRecord(char*);
 
 int AudioService_stopRecord();
 
