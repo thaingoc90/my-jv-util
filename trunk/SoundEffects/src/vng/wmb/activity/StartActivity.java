@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -43,7 +44,10 @@ public class StartActivity extends Activity {
 		setContentView(R.layout.activity_start);
 
 		soundServices = new SoundEffect(this);
-		int res = soundServices.init();
+		String rootStorage = Environment.getExternalStorageDirectory()
+				.getPath();
+		Log.i(LOG_TAG, rootStorage);
+		int res = soundServices.init(rootStorage);
 		if (res == 0) {
 			Utils.showMsg(this,
 					"Init fail, maybe your device doesn't support this plugin");

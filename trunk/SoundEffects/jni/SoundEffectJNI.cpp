@@ -5,12 +5,15 @@
 /**
  *Init AudioLib
  */
-jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis) {
+jint Java_vng_wmb_service_SoundEffect_init(JNIEnv* pEnv, jobject pThis, jstring rootStorage) {
+	const char* rootStoragePath = pEnv->GetStringUTFChars(rootStorage, 0);
 #ifdef _ANDROID_FLAG_
-	return VoiceEffect_init(pEnv, pThis);
+	int res = VoiceEffect_init(pEnv, pThis, (char*) rootStoragePath);
 #else
-	return VoiceEffect_init();
+	int res = VoiceEffect_init((char*) rootStoragePath);
 #endif
+	pEnv->ReleaseStringUTFChars(rootStorage, rootStoragePath);
+	return res;
 }
 
 /**
