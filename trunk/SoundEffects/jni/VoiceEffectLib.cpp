@@ -124,6 +124,17 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
  *Init AudioLib
  */
 int VoiceEffect_init(char* rootStorage) {
+	int size = strlen(rootStorage) + strlen("/voice.wav") + 1;
+	pathWavFileTemp = new char[size];
+	pathMp3FileTemp = new char[size];
+	pathAmrFileTemp = new char[size];
+	strcpy(pathWavFileTemp, rootStorage);
+	strcat(pathWavFileTemp, "/voice.wav");
+	strcpy(pathMp3FileTemp, rootStorage);
+	strcat(pathMp3FileTemp, "/voice.mp3");
+	strcpy(pathAmrFileTemp, rootStorage);
+	strcat(pathAmrFileTemp, "/voice.amr");
+
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
 		return STATUS_FAIL;
@@ -149,6 +160,10 @@ int VoiceEffect_destroy() {
 	AudioService_destroyPlayer();
 	AudioService_destroyRecorder();
 	AudioService_destroy();
+
+	delete[] pathWavFileTemp;
+	delete[] pathMp3FileTemp;
+	delete[] pathAmrFileTemp;
 	return STATUS_OK;
 }
 
