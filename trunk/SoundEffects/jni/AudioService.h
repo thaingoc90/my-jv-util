@@ -17,6 +17,8 @@ void AudioService_destroyPlayer();
 
 int AudioService_playEffect();
 
+int AudioService_clearPlayer();
+
 int AudioService_startPlayer();
 
 int AudioService_stopPlayer();

@@ -90,7 +90,7 @@ int AudioService_init() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*engineObj)->Realize(engineObj, SL_BOOLEAN_FALSE );
+	res = (*engineObj)->Realize(engineObj, SL_BOOLEAN_FALSE);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -178,7 +178,7 @@ int AudioService_initRecorder() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*recorderObj)->Realize(recorderObj, SL_BOOLEAN_FALSE );
+	res = (*recorderObj)->Realize(recorderObj, SL_BOOLEAN_FALSE);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -228,7 +228,7 @@ int AudioService_startRecord(char* pathWavFileTemp) {
 	SLuint32 state;
 
 	(*recorderObj)->GetState(recorderObj, &state);
-	if (state == SL_OBJECT_STATE_REALIZED ) {
+	if (state == SL_OBJECT_STATE_REALIZED) {
 		res = (*recorderQueue)->Clear(recorderQueue);
 		if (checkError(res) != STATUS_OK)
 			return STATUS_FAIL;
@@ -242,7 +242,7 @@ int AudioService_startRecord(char* pathWavFileTemp) {
 			enqueuedFlag++;
 		}
 		res = (*recorderItf)->SetRecordState(recorderItf,
-				SL_RECORDSTATE_RECORDING );
+				SL_RECORDSTATE_RECORDING);
 		if (checkError(res) != STATUS_OK)
 			return STATUS_FAIL;
 		isRecordingFlag = true;
@@ -264,7 +264,7 @@ int AudioService_stopRecord() {
 			duration = duration % MAX_TIME_BUFFER_RECORD;
 		}
 		res = (*recorderItf)->SetRecordState(recorderItf,
-				SL_RECORDSTATE_STOPPED );
+				SL_RECORDSTATE_STOPPED);
 		if (checkError(res) != STATUS_OK)
 			return STATUS_FAIL;
 		// Write to file temp
@@ -357,7 +357,7 @@ int AudioService_initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*outputMixObj)->Realize(outputMixObj, SL_BOOLEAN_FALSE );
+	res = (*outputMixObj)->Realize(outputMixObj, SL_BOOLEAN_FALSE);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -390,7 +390,7 @@ int AudioService_initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*playerObj)->Realize(playerObj, SL_BOOLEAN_FALSE );
+	res = (*playerObj)->Realize(playerObj, SL_BOOLEAN_FALSE);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -418,7 +418,7 @@ int AudioService_initPlayer() {
 		return checkError(res);
 
 	res = (*playerItf)->SetCallbackEventsMask(playerItf,
-			SL_PLAYEVENT_HEADATEND );
+			SL_PLAYEVENT_HEADATEND);
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
@@ -455,11 +455,11 @@ int AudioService_startPlayer() {
 	SLresult lRes;
 	SLuint32 lPlayerState;
 	(*playerObj)->GetState(playerObj, &lPlayerState);
-	if (lPlayerState == SL_OBJECT_STATE_REALIZED ) {
+	if (lPlayerState == SL_OBJECT_STATE_REALIZED) {
 		lRes = (*playerQueue)->Clear(playerQueue);
 		if (checkError(lRes) != STATUS_OK)
 			return STATUS_FAIL;
-		lRes = (*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_PLAYING );
+		lRes = (*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_PLAYING);
 		if (checkError(lRes) != STATUS_OK)
 			return STATUS_FAIL;
 	}
@@ -472,7 +472,7 @@ int AudioService_startPlayer() {
 int AudioService_stopPlayer() {
 	Log::info("Stop Player");
 	SLresult lRes;
-	(*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_STOPPED );
+	(*playerItf)->SetPlayState(playerItf, SL_PLAYSTATE_STOPPED);
 	lRes = (*playerQueue)->Clear(playerQueue);
 	if (checkError(lRes) != STATUS_OK)
 		return STATUS_FAIL;
@@ -502,6 +502,20 @@ int AudioService_playEffect() {
 		lRes = (*playerQueue)->Enqueue(playerQueue, playerBuffer2,
 				size * sizeof(short));
 	}
+	return STATUS_OK;
+}
+
+/**
+ *	Clear bufferQueue of player
+ */
+int AudioService_clearPlayer() {
+	if (!threadDoneFlag) {
+		pthread_kill(playbackFileThread, SIGUSR1);
+	}
+	SLresult lRes;
+	lRes = (*playerQueue)->Clear(playerQueue);
+	if (checkError(lRes) != STATUS_OK)
+		return STATUS_FAIL;
 	return STATUS_OK;
 }
 
@@ -541,7 +555,7 @@ void* playbackFileFunc(void * param) {
 }
 
 int checkError(SLresult res) {
-	if (res != SL_RESULT_SUCCESS ) {
+	if (res != SL_RESULT_SUCCESS) {
 		Log::error("Error when processing data");
 		return STATUS_FAIL;
 	}
