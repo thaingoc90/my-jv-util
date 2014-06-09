@@ -46,6 +46,8 @@ SLPlayItf playerItf;
 W_SLBufferQueueItf playerQueue;
 SLVolumeItf playerVolume;
 SLAndroidConfigurationItf playerConfig;
+SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_BATHROOM;
+SLEnvironmentalReverbItf outputMixEnvReverb = NULL;
 
 const int32_t recordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
 int16_t recordBuffer1[recordSize];
@@ -350,9 +352,9 @@ int AudioService_initPlayer() {
 	Log::info("Init Player");
 	SLresult res;
 
-	const SLuint32 lOutputMixIIDCount = 0;
-	const SLInterfaceID lOutputMixIIDs[] = { };
-	const SLboolean lOutputMixReqs[] = { };
+	const SLuint32 lOutputMixIIDCount = 1;
+	const SLInterfaceID lOutputMixIIDs[] = {SL_IID_ENVIRONMENTALREVERB };
+	const SLboolean lOutputMixReqs[] = {SL_BOOLEAN_FALSE };
 	res = (*engineItf)->CreateOutputMix(engineItf, &outputMixObj,
 			lOutputMixIIDCount, lOutputMixIIDs, lOutputMixReqs);
 	if (checkError(res) != STATUS_OK)
@@ -361,6 +363,11 @@ int AudioService_initPlayer() {
 	res = (*outputMixObj)->Realize(outputMixObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
+
+	res = (*outputMixObj)->GetInterface(outputMixObj, SL_IID_ENVIRONMENTALREVERB,
+	            &outputMixEnvReverb);
+	if (checkError(res) != STATUS_OK)
+			return checkError(res);
 
 #ifdef _ANDROID_FLAG_
 	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn = {
