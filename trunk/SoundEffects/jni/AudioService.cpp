@@ -391,8 +391,8 @@ int AudioService_initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-//	SLint32 streamType = SL_ANDROID_STREAM_VOICE;
-	SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
+	SLint32 streamType = SL_ANDROID_STREAM_VOICE;
+//	SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
 
 	res = (*playerObj)->GetInterface(playerObj, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
 	if (checkError(res) != STATUS_OK) {
