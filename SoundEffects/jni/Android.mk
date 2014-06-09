@@ -33,7 +33,7 @@ LOCAL_SRC_FILES := $(MY_FILE_LIST:$(LOCAL_PATH)/%=%)
 #LOCAL_SRC_FILES := AudioService.cpp SoundTouchWrapper.cpp Log.cpp WavFile.cpp 
 LOCAL_LDLIBS    := -landroid -llog -lOpenSLES
 
-LOCAL_STATIC_LIBRARIES :=  soundTouch reverbAudacity echoAudacity opencore_amrnben lameMp3
+LOCAL_STATIC_LIBRARIES :=  soundTouch reverbAudacity echoAudacity #opencore_amrnben lameMp3
 include $(BUILD_SHARED_LIBRARY)
 
 LOCAL_PATH := $(JNI_PATH)
