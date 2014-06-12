@@ -7,6 +7,8 @@
 #include "Log.h"
 #include "WavFile.h"
 #include "Utils.h"
+#include "BoostAudioWrapper.h"
+#include "NSWrapper.h"
 
 #ifdef _AUDIO_SERVICE_USE_OPENSLES_
 
@@ -46,7 +48,8 @@ SLPlayItf playerItf;
 W_SLBufferQueueItf playerQueue;
 SLVolumeItf playerVolume;
 SLAndroidConfigurationItf playerConfig;
-SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_BATHROOM;
+SLEnvironmentalReverbSettings reverbSettings =
+		SL_I3DL2_ENVIRONMENT_PRESET_BATHROOM;
 SLEnvironmentalReverbItf outputMixEnvReverb = NULL;
 
 const int32_t recordSize = SAMPLE_RATE * MAX_TIME_BUFFER_RECORD / 1000;
@@ -232,6 +235,8 @@ int AudioService_startRecord(char* pathWavFileTemp) {
 
 	(*recorderObj)->GetState(recorderObj, &state);
 	if (state == SL_OBJECT_STATE_REALIZED ) {
+		NS_init(3, SAMPLE_RATE);
+
 		res = (*recorderQueue)->Clear(recorderQueue);
 		if (checkError(res) != STATUS_OK)
 			return STATUS_FAIL;
@@ -294,6 +299,7 @@ int AudioService_stopRecord() {
 				(stopTimeRecord == 0) ? duration : stopTimeRecord + duration;
 		(*recorderQueue)->Clear(recorderQueue);
 	}
+	NS_destroy();
 	return STATUS_OK;
 }
 /**
@@ -331,6 +337,8 @@ void recorderCallback(W_SLBufferQueueItf slBuffer, void *pContext) {
 void writeFile(short* temp, int size, bool isStopping) {
 	// Write directly buffer to file
 	//	outFileTemp->write(temp, size);
+
+	BoostAudioWrapper_processBlockByDb(temp, size, 5);
 
 	// Use a temp buffer. Just write file when bufferWriteFile full or isStopping is true
 	if (currentSizeBuffer + size > sizeOfWriteFileBuffer) {
@@ -401,15 +409,15 @@ int AudioService_initPlayer() {
 	SLint32 streamType = SL_ANDROID_STREAM_VOICE;
 //	SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
 
-	res = (*playerObj)->GetInterface(playerObj, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
+	res = (*playerObj)->GetInterface(playerObj, SL_IID_ANDROIDCONFIGURATION,
+			&playerConfig);
 	if (checkError(res) != STATUS_OK) {
 		return checkError(res);
 	}
-	res = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE,
-	                         &streamType, sizeof(SLint32));
+	res = (*playerConfig)->SetConfiguration(playerConfig,
+			SL_ANDROID_KEY_STREAM_TYPE, &streamType, sizeof(SLint32));
 	if (checkError(res) != STATUS_OK)
-			return checkError(res);
-
+		return checkError(res);
 
 	res = (*playerObj)->Realize(playerObj, SL_BOOLEAN_FALSE );
 	if (checkError(res) != STATUS_OK)

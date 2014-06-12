@@ -15,10 +15,9 @@
 
 #endif
 
-int NS_init(W_NsHandle**, int);
-int NS_destroy(W_NsHandle*);
-int NS_set_policy(W_NsHandle*, int);
-int NS_Process(W_NsHandle* NS_inst, short* spframe, short* spframe_H,
-		short* outframe, short* outframe_H);
+int NS_init(int mode, unsigned clock_rate);
+int NS_destroy();
+int NS_set_policy(W_NsHandle* NS_inst, int mode);
+int NS_Process(short* rec_frm, unsigned samples_per_frame);
 
 #endif
