@@ -130,11 +130,10 @@ int NS_Process(short* rec_frm, unsigned num_samples) {
 		return STATUS_FAIL;
 	}
 
-	if (num_samples < blockLen10ms) {
-		return STATUS_FAIL;
-	}
-
 	for (i = 0; i < num_samples; i += blockLen10ms) {
+		if (i + blockLen10ms > num_samples) {
+			break;
+		}
 		if (NS_inst) {
 			if (NS_clock_rate == 32000) {
 				status = W_WebRtcNs_Process(NS_inst, (short*) (&rec_frm[i]),
@@ -150,6 +149,6 @@ int NS_Process(short* rec_frm, unsigned num_samples) {
 			}
 		}
 	}
-	memcpy(rec_frm, tmp_frame, num_samples * 2);
+	memcpy(rec_frm, tmp_frame, (i < num_samples ? i : num_samples) * 2);
 	return STATUS_OK;
 }
