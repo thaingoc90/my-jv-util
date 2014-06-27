@@ -129,7 +129,7 @@ public class VoiceEffectActivity extends Activity {
 	 */
 	private synchronized void startRecording() {
 		if (!isRecording) {
-//			soundServices.startRecord();
+			voiceServices.startRecord();
 			isRecording = true;
 			mDrawThread = mdrawer.getThread();
 			checkInterface();
@@ -145,7 +145,7 @@ public class VoiceEffectActivity extends Activity {
 	 */
 	private synchronized void stopRecording(boolean startNewAct) {
 		if (isRecording) {
-//			soundServices.stopRecord();
+			voiceServices.stopRecord();
 			isRecording = false;
 			if (startNewAct) {
 				Intent intent = new Intent(getApplicationContext(),

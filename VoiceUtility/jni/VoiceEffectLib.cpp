@@ -85,7 +85,7 @@ int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
 
 	{
 		//SAVE ENVIROMENT
-		jclass tempClass = pEnv->FindClass("ntdn/voiceutil/service/CVoiceEffect");
+		jclass tempClass = pEnv->FindClass("ntdn/voiceutil/service/CVoiceService");
 		if (tempClass == NULL) {
 			Log::info("ERROR - cant get class");
 		}
