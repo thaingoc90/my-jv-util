@@ -388,10 +388,10 @@ int AudioService_initPlayer() {
 	if (checkError(res) != STATUS_OK)
 		return checkError(res);
 
-	res = (*outputMixObj)->GetInterface(outputMixObj, SL_IID_ENVIRONMENTALREVERB,
-	            &outputMixEnvReverb);
-	if (checkError(res) != STATUS_OK)
-			return checkError(res);
+//	res = (*outputMixObj)->GetInterface(outputMixObj, SL_IID_ENVIRONMENTALREVERB,
+//	            &outputMixEnvReverb);
+//	if (checkError(res) != STATUS_OK)
+//			return checkError(res);
 
 #ifdef _ANDROID_FLAG_
 	SLDataLocator_AndroidSimpleBufferQueue lDataLocatorIn = {
