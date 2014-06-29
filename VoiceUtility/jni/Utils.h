@@ -6,6 +6,7 @@
 
 static int SAMPLE_RATE = 32000;
 static int CHANNEL = 1;
+static char* ROOT_FOLDER = NULL;
 
 const static int STATUS_OK = 0;
 const static int STATUS_FAIL = 1;

@@ -57,7 +57,15 @@ int JNI_OnLoad(JavaVM* aVm, void* aReserved) {
  */
 int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
 
-	int size = strlen(rootStorage) + strlen("/voice.wav") + 1;
+	int rootSize = strlen(rootStorage);
+	if (ROOT_FOLDER == NULL) {
+		delete[] ROOT_FOLDER;
+		ROOT_FOLDER = NULL;
+	}
+	ROOT_FOLDER = new char[rootSize];
+	strcpy(ROOT_FOLDER, rootStorage);
+
+	int size = rootSize + strlen("/voice.wav") + 1;
 	pathWavFileTemp = new char[size];
 	pathMp3FileTemp = new char[size];
 	pathAmrFileTemp = new char[size];
@@ -114,6 +122,11 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 	delete[] pathWavFileTemp;
 	delete[] pathMp3FileTemp;
 	delete[] pathAmrFileTemp;
+
+	if (ROOT_FOLDER == NULL) {
+		delete[] ROOT_FOLDER;
+		ROOT_FOLDER = NULL;
+	}
 
 	return STATUS_OK;
 }
