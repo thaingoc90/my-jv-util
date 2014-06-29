@@ -354,11 +354,14 @@ void writeFile(short* temp, int size, bool isStopping) {
 	// Write directly buffer to file
 	//	outFileTemp->write(temp, size);
 
+	NS_Process(temp, size);
+	BoostAudioWrapper_processBlockByDb(temp, size, 5);
+
 	// Use a temp buffer. Just write file when bufferWriteFile full or isStopping is true
 	if (currentSizeBuffer + size >= sizeOfWriteFileBuffer) {
 		int remainSize = sizeOfWriteFileBuffer - currentSizeBuffer;
 		memcpy(writeFileBuffer + currentSizeBuffer, temp, remainSize * 2);
-		NS_Process(writeFileBuffer, sizeOfWriteFileBuffer);
+//		NS_Process(writeFileBuffer, sizeOfWriteFileBuffer);
 		outFileTemp->write(writeFileBuffer, sizeOfWriteFileBuffer);
 		currentSizeBuffer = 0;
 		if (remainSize < size) {
@@ -370,7 +373,7 @@ void writeFile(short* temp, int size, bool isStopping) {
 		currentSizeBuffer += size;
 	}
 	if (isStopping) {
-		NS_Process(writeFileBuffer, currentSizeBuffer);
+//		NS_Process(writeFileBuffer, currentSizeBuffer);
 		outFileTemp->write(writeFileBuffer, currentSizeBuffer);
 	}
 }
