@@ -145,6 +145,8 @@ public class VoiceEffectActivity extends Activity {
 	 */
 	private synchronized void stopRecording(boolean startNewAct) {
 		if (isRecording) {
+			getWindow().clearFlags(
+					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			voiceServices.stopRecord();
 			isRecording = false;
 			if (startNewAct) {
@@ -160,8 +162,6 @@ public class VoiceEffectActivity extends Activity {
 			}
 			mDrawThread = mdrawer.getThread();
 			mDrawThread.setRun(false);
-			getWindow().clearFlags(
-					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 	}
 
