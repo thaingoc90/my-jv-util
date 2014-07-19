@@ -1,23 +1,7 @@
-#include "GlobalConstant.h"
+#include "Config.h"
 
 #ifndef _VOICE_EFFECT_H_
 #define _VOICE_EFFECT_H_
-
-/*
- * Define type effects.
- */
-const int EFFECT_ORGINAL = 0;
-const int EFFECT_BIRD = 1;
-const int EFFECT_CAT = 2;
-const int EFFECT_COW = 3;
-const int EFFECT_FAST = 4;
-const int EFFECT_ROBOT = 5;
-const int EFFECT_DUB_VADER = 6;
-const int EFFECT_MIC = 7;
-const int EFFECT_STAGE = 8;
-const int EFFECT_ROMANCE = 9;
-const int EFFECT_TECHTRONIC = 10;
-const int EFFECT_DUB = 11;
 
 #ifdef _ANDROID_FLAG_
 
@@ -64,6 +48,8 @@ int VoiceEffect_playEffect(int);
 int VoiceEffect_processAndWriteToAmr(int);
 
 int VoiceEffect_processAndWriteToMp3(int);
+
+int VoiceEffect_saveFile(char*, int, int);
 
 void VoiceEffect_playCustomEffect(bool, bool, bool, bool);
 

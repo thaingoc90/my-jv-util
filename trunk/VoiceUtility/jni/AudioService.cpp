@@ -1,4 +1,4 @@
-#include "GlobalConstant.h"
+#include "Config.h"
 #include <stdio.h>
 #include <assert.h>
 #include <ctime>

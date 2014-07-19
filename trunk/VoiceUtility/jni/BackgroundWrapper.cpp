@@ -1,4 +1,4 @@
-#include "GlobalConstant.h"
+#include "Config.h"
 #include "BackgroundWrapper.h"
 #include "Log.h"
 #include "Utils.h"

@@ -100,19 +100,14 @@ jint Java_ntdn_voiceutil_service_CVoiceService_playEffect(JNIEnv* pEnv,
 }
 
 /**
- * Process data & write data to amr file.
- */
-jint Java_ntdn_voiceutil_service_CVoiceService_processAndWriteToAmr(
-		JNIEnv* pEnv, jobject pThis, jint effect) {
-	return VoiceEffect_processAndWriteToAmr(effect);
-}
-
-/**
  * Process data & write data to mp3 file.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_processAndWriteToMp3(
-		JNIEnv* pEnv, jobject pThis, jint effect) {
-	return VoiceEffect_processAndWriteToMp3(effect);
+jint Java_ntdn_voiceutil_service_CVoiceService_saveFile(JNIEnv* pEnv,
+		jobject pThis, jstring path, jint effect, jint type) {
+	const char* filePath = pEnv->GetStringUTFChars(path, 0);
+	jint status = VoiceEffect_saveFile((char*) filePath, effect, type);
+	pEnv->ReleaseStringUTFChars(path, filePath);
+	return status;
 }
 
 // ------------------Start custom functions----------------------------------------

@@ -1,6 +1,7 @@
 package ntdn.voiceutil.utils;
 
 public class Constants {
+	public static final int TIME_RECORD = 600000; // ms
 	
 	public static final int EFFECT_ORIGINAL = 0;
 	public static final int EFFECT_BIRD = 1;
@@ -19,4 +20,14 @@ public class Constants {
 	public static final int STATUS_OK = 0;
 	public static final int STATUS_FAIL = 1;
 	public static final int STATUS_NOT_SUPPORT = 2;
+	
+	public static final String APP_FOLDER = "VUtils";
+	
+	public static final int FILE_TYPE_WAV = 0;
+	public static final int FILE_TYPE_MP3 = 1;
+	public static final int FILE_TYPE_AMR = 2;
+	
+	public static final String WAV_EXT = ".wav";
+	public static final String MP3_EXT = ".mp3";
+	public static final String AMR_EXT = ".amr";
 }

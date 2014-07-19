@@ -30,7 +30,6 @@ public class VoiceEffectActivity extends Activity {
 	private static final String message = "Recording ....";
 	private CountDownTimer cdt;
 
-	public static final int TIME_RECORD = 300000; // ms
 	public static CVoiceService voiceServices;
 	private boolean initFail = false;
 
@@ -134,7 +133,7 @@ public class VoiceEffectActivity extends Activity {
 			mDrawThread = mdrawer.getThread();
 			checkInterface();
 			startCountTimer();
-			mHandler.postDelayed(stopThreads, TIME_RECORD);
+			mHandler.postDelayed(stopThreads, Constants.TIME_RECORD);
 			getWindow()
 					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
@@ -175,10 +174,10 @@ public class VoiceEffectActivity extends Activity {
 			recordBtn.setVisibility(View.INVISIBLE);
 			mdrawer.setVisibility(View.VISIBLE);
 		} else {
-			messageRecord.setVisibility(View.INVISIBLE);
-			stopBtn.setVisibility(View.INVISIBLE);
+			messageRecord.setVisibility(View.GONE);
+			stopBtn.setVisibility(View.GONE);
 			recordBtn.setVisibility(View.VISIBLE);
-			mdrawer.setVisibility(View.INVISIBLE);
+			mdrawer.setVisibility(View.GONE);
 		}
 	}
 
@@ -186,17 +185,19 @@ public class VoiceEffectActivity extends Activity {
 	 * Count time of record.
 	 */
 	private void startCountTimer() {
-		cdt = new CountDownTimer(TIME_RECORD, 1000) {
+		cdt = new CountDownTimer(Constants.TIME_RECORD, 1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
-				messageRecord.setText(message
-						+ ((TIME_RECORD - millisUntilFinished) / 1000 + 1)
-						+ "s");
+				messageRecord
+						.setText(message
+								+ ((Constants.TIME_RECORD - millisUntilFinished) / 1000 + 1)
+								+ "s");
 			}
 
 			@Override
 			public void onFinish() {
-				messageRecord.setText(message + TIME_RECORD / 1000 + "s");
+				messageRecord.setText(message + Constants.TIME_RECORD / 1000
+						+ "s");
 			}
 		};
 		cdt.start();
@@ -211,6 +212,5 @@ public class VoiceEffectActivity extends Activity {
 		mDrawThread = mdrawer.getThread();
 		mDrawThread.setBuffer(paramArrayOfShort);
 	}
-
 
 }

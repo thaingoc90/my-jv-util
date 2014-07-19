@@ -23,7 +23,7 @@
     <string name="btn_effect_bath">Bathroom</string>
     <string name="btn_effect_techtronic">Techtronic</string>
     <string name="btn_effect_dub">Dub</string>
-    <string name="btn_action_send">Send</string>
+    <string name="btn_action_save">Save</string>
     <string name="title_activity_voice_utility">VoiceUtilityActivity</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
