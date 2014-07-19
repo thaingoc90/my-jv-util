@@ -67,18 +67,14 @@ JNIEXPORT void JNICALL Java_ntdn_voiceutil_service_CVoiceService_setChannel(
  * Signature: (I)V
  */JNIEXPORT jint JNICALL Java_ntdn_voiceutil_service_CVoiceService_playEffect(
 		JNIEnv *, jobject, jint);
+
 /*
  * Class:     ntdn_voiceutil_service_CVoiceService
- * Method:    processAndWriteToAmr
+ * Method:    saveFile
  * Signature: (I)V
- */JNIEXPORT jint JNICALL Java_ntdn_voiceutil_service_CVoiceService_processAndWriteToAmr(
-		JNIEnv *, jobject, jint);
-/*
- * Class:     ntdn_voiceutil_service_CVoiceService
- * Method:    processAndWriteToMp3
- * Signature: (I)V
- */JNIEXPORT jint JNICALL Java_ntdn_voiceutil_service_CVoiceService_processAndWriteToMp3(
-		JNIEnv *, jobject, jint);
+ */
+jint Java_ntdn_voiceutil_service_CVoiceService_saveFile(JNIEnv* pEnv,
+		jobject pThis, jstring, jint, jint);
 
 /*
  * Class:     ntdn_voiceutil_service_CVoiceService

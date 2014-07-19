@@ -153,7 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="@string/btn_action_send"
+            android:text="@string/btn_action_save"
             android:textSize="15sp"
             android:width="150dp" />
 

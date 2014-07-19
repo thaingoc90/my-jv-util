@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "WavFile.h"
 #include "Utils.h"
+#include "Constant.h"
 
 #include "Mp3Utils.h"
 #ifdef _USE_LAME_MP3_
@@ -93,7 +94,8 @@ int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
 
 	{
 		//SAVE ENVIROMENT
-		jclass tempClass = pEnv->FindClass("ntdn/voiceutil/service/CVoiceService");
+		jclass tempClass = pEnv->FindClass(
+				"ntdn/voiceutil/service/CVoiceService");
 		if (tempClass == NULL) {
 			Log::info("ERROR - cant get class");
 		}
@@ -514,6 +516,46 @@ int VoiceEffect_processAndWriteToMp3(int effect) {
 	return STATUS_NOT_SUPPORT;
 }
 #endif
+
+int VoiceEffect_saveFile(char* path, int effect, int type) {
+	short* buffer;
+	int numShort = 0, status = STATUS_OK;
+
+	AudioService_clearPlayer();
+	VoiceEffect_selectAndInitEffect(effect);
+	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
+	if (inWavFile == NULL) {
+		return STATUS_FAIL;
+	}
+	switch (type) {
+	case FILE_TYPE_WAV: {
+		WavOutFile* outFile = new WavOutFile(path, inWavFile->getSampleRate(),
+				inWavFile->getNumBits(), inWavFile->getNumChannels());
+		while (inWavFile != NULL && inWavFile->eof() == 0) {
+			numShort = inWavFile->read(sampleBuffer, BUFF_SIZE);
+			buffer = duplicateShortPtr(sampleBuffer, numShort);
+			numShort = VoiceEffect_filterEffect(&buffer, numShort);
+			outFile->write(buffer, numShort);
+			delete[] buffer;
+		}
+		if (outFile != NULL) {
+			delete outFile;
+			outFile = NULL;
+		}
+		break;
+	}
+	case FILE_TYPE_MP3:
+	case FILE_TYPE_AMR:
+	default:
+		status = STATUS_NOT_SUPPORT;
+		break;
+	}
+	if (inWavFile != NULL) {
+		delete inWavFile;
+		inWavFile = NULL;
+	}
+	return status;
+}
 
 // ------------------Start custom functions----------------------------------------
 /**

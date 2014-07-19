@@ -4,6 +4,7 @@ import ntdn.voiceutil.service.CVoiceService;
 import ntdn.voiceutil.utils.Constants;
 import ntdn.voiceutil.utils.Utils;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,210 +31,162 @@ public class EffectActivity extends Activity {
 		soundServices.initEffectLib(mgr);
 		effectType = Constants.EFFECT_ORIGINAL;
 
+		View.OnClickListener btnListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String logStr = "EFFECT_ORIGINAL";
+				switch (v.getId()) {
+				case R.id.btn_effect_cat:
+					effectType = Constants.EFFECT_CAT;
+					logStr = "EFFECT_CAT";
+					break;
+				case R.id.btn_effect_bird:
+					effectType = Constants.EFFECT_BIRD;
+					logStr = "EFFECT_BIRD";
+					break;
+				case R.id.btn_effect_cow:
+					effectType = Constants.EFFECT_COW;
+					logStr = "EFFECT_COW";
+					break;
+				case R.id.btn_effect_dub:
+					effectType = Constants.EFFECT_DUB;
+					logStr = "EFFECT_DUB";
+					break;
+				case R.id.btn_effect_dub_vader:
+					effectType = Constants.EFFECT_DUB_VADER;
+					logStr = "EFFECT_DUB_VADER";
+					break;
+				case R.id.btn_effect_fast:
+					effectType = Constants.EFFECT_FAST;
+					logStr = "EFFECT_FAST";
+					break;
+				case R.id.btn_effect_mic:
+					effectType = Constants.EFFECT_MIC;
+					logStr = "EFFECT_MIC";
+					break;
+				case R.id.btn_effect_robot:
+					effectType = Constants.EFFECT_ROBOT;
+					logStr = "EFFECT_ROBOT";
+					break;
+				case R.id.btn_effect_romance:
+					effectType = Constants.EFFECT_ROMANCE;
+					logStr = "EFFECT_ROMANCE";
+					break;
+				case R.id.btn_effect_stage:
+					effectType = Constants.EFFECT_STAGE;
+					logStr = "EFFECT_STAGE";
+					break;
+				case R.id.btn_effect_techtronic:
+					effectType = Constants.EFFECT_TECHTRONIC;
+					logStr = "EFFECT_TECHTRONIC";
+					break;
+				default:
+					effectType = Constants.EFFECT_ORIGINAL;
+					break;
+				}
+
+				Log.i(LOG_TAG, logStr);
+				new Thread(new Runnable() {
+					public void run() {
+						soundServices.playEffect(effectType);
+					}
+				}).start();
+
+				// Another way
+				// soundServices.prepareSoundTouchEffect(0, 6, 15);
+				// soundServices.playCustomEffect(true, false, false,
+				// false);
+			}
+		};
+
 		/* SEND */
 		sendBtn = (Button) findViewById(R.id.btn_action_send);
 		sendBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.i(LOG_TAG, "SEND ACTION");
-				// int status = soundServices.processAndWriteToAmr(effectType);
-				int status = soundServices.processAndWriteToMp3(effectType);
+				Log.i(LOG_TAG, "SAVE ACTION");
+				final ProgressDialog waitingDialog = ProgressDialog.show(
+						EffectActivity.this, "Please wait ...",
+						"Saving Image ...", true, true);
 
-				if (status == Constants.STATUS_OK) {
-					Utils.showMsg(EffectActivity.this, "Send succeffully");
-				} else if (status == Constants.STATUS_NOT_SUPPORT) {
-					Utils.showMsg(EffectActivity.this,
-							"Not support this sample rate");
-				} else {
-					Utils.showMsg(EffectActivity.this, "Failed");
-				}
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						String filePath = Utils
+								.getFileName(Constants.FILE_TYPE_WAV);
+						if (Utils.strIsEmpty(filePath)) {
+							waitingDialog.dismiss();
+							Utils.showMsgSync(EffectActivity.this,
+									"Cannot get app's folder");
+							return;
+						}
+
+						int status = soundServices.saveFile(filePath,
+								effectType, Constants.FILE_TYPE_WAV);
+
+						waitingDialog.dismiss();
+
+						String msg = "";
+						if (status == Constants.STATUS_OK) {
+							msg = "Save successfully";
+						} else if (status == Constants.STATUS_NOT_SUPPORT) {
+							msg = "Not support";
+						} else {
+							msg = "Failed";
+						}
+						Utils.showMsgSync(EffectActivity.this, msg);
+					}
+				}).start();
 			}
 		});
 
 		/* CAT EFFECT */
 		catBtn = (Button) findViewById(R.id.btn_effect_cat);
-		catBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "CAT EFFECT");
-						effectType = Constants.EFFECT_CAT;
-						soundServices.playEffect(effectType);
-
-						// Another way
-						// soundServices.prepareSoundTouchEffect(0, 6, 15);
-						// soundServices.playCustomEffect(true, false, false,
-						// false);
-					}
-				}).start();
-			}
-		});
+		catBtn.setOnClickListener(btnListener);
 
 		/* COW EFFECT */
 		cowBtn = (Button) findViewById(R.id.btn_effect_cow);
-		cowBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "COW EFFECT");
-						effectType = Constants.EFFECT_COW;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		cowBtn.setOnClickListener(btnListener);
 
 		/* BIRD EFFECT */
 		birdBtn = (Button) findViewById(R.id.btn_effect_bird);
-		birdBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "BIRD EFFECT");
-						effectType = Constants.EFFECT_BIRD;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		birdBtn.setOnClickListener(btnListener);
 
 		/* FAST EFFECT */
 		fastBtn = (Button) findViewById(R.id.btn_effect_fast);
-		fastBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "FAST EFFECT");
-						effectType = Constants.EFFECT_FAST;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		fastBtn.setOnClickListener(btnListener);
 
 		/* ROBOT EFFECT */
 		robotBtn = (Button) findViewById(R.id.btn_effect_robot);
-		robotBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "ROBOT EFFECT");
-						effectType = Constants.EFFECT_ROBOT;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		robotBtn.setOnClickListener(btnListener);
 
 		/* STAGE EFFECT */
 		stageBtn = (Button) findViewById(R.id.btn_effect_stage);
-		stageBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "STAGE EFFECT");
-						effectType = Constants.EFFECT_STAGE;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		stageBtn.setOnClickListener(btnListener);
 
 		/* DUB VADER EFFECT */
 		dubVaderBtn = (Button) findViewById(R.id.btn_effect_dub_vader);
-		dubVaderBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "DUB VADER EFFECT");
-						effectType = Constants.EFFECT_DUB_VADER;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		dubVaderBtn.setOnClickListener(btnListener);
 
 		/* ROMANCE EFFECT */
 		romanceBtn = (Button) findViewById(R.id.btn_effect_romance);
-		romanceBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "ROMANCE EFFECT");
-						effectType = Constants.EFFECT_ROMANCE;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		romanceBtn.setOnClickListener(btnListener);
 
 		/* MICROPHONE EFFECT */
 		micBtn = (Button) findViewById(R.id.btn_effect_mic);
-		micBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "MICROPHONE EFFECT");
-						effectType = Constants.EFFECT_MIC;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		micBtn.setOnClickListener(btnListener);
 
 		/* DUB EFFECT */
 		dubBtn = (Button) findViewById(R.id.btn_effect_dub);
-		dubBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "DUB EFFECT");
-						effectType = Constants.EFFECT_DUB;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		dubBtn.setOnClickListener(btnListener);
 
 		/* TECHTRONIC EFFECT */
 		techtronicBtn = (Button) findViewById(R.id.btn_effect_techtronic);
-		techtronicBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "TECHTRONIC EFFECT");
-						effectType = Constants.EFFECT_TECHTRONIC;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		techtronicBtn.setOnClickListener(btnListener);
 
 		/* ORIGINAL EFFECT */
 		originalBtn = (Button) findViewById(R.id.btn_effect_original);
-		originalBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run() {
-						Log.i(LOG_TAG, "ORIGINAL EFFECT");
-						effectType = Constants.EFFECT_ORIGINAL;
-						soundServices.playEffect(effectType);
-					}
-				}).start();
-			}
-		});
+		originalBtn.setOnClickListener(btnListener);
 
 	}
 

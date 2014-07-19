@@ -32,10 +32,8 @@ public class CVoiceService {
 	public native int destroyEffectLib();
 
 	public native int playEffect(int effect);
-
-	public native int processAndWriteToAmr(int effect);
-
-	public native int processAndWriteToMp3(int effect);
+	
+	public native int saveFile(String path, int effect, int type);
 
 	// FUNCTION USE FOR CUSTOM EFFECT IF NECESSARY
 

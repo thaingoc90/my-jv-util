@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "GlobalConstant.h"
+#include "Config.h"
 
 #ifdef _ANDROID_FLAG_
 #include <android/log.h>
