@@ -37,8 +37,6 @@ bool hasBackGroundFlag = false;
 bool hasReverbFlag = false;
 
 static char* pathWavFileTemp;
-static char* pathAmrFileTemp;
-static char* pathMp3FileTemp;
 
 void setFlagEffectsInFilter(bool, bool, bool, bool);
 
@@ -56,26 +54,11 @@ int JNI_OnLoad(JavaVM* aVm, void* aReserved) {
 /**
  *Init AudioLib
  */
-int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
+int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* tempFile) {
 
-	int rootSize = strlen(rootStorage);
-	if (ROOT_FOLDER == NULL) {
-		delete[] ROOT_FOLDER;
-		ROOT_FOLDER = NULL;
-	}
-	ROOT_FOLDER = new char[rootSize];
-	strcpy(ROOT_FOLDER, rootStorage);
-
-	int size = rootSize + strlen("/voice.wav") + 1;
-	pathWavFileTemp = new char[size];
-	pathMp3FileTemp = new char[size];
-	pathAmrFileTemp = new char[size];
-	strcpy(pathWavFileTemp, rootStorage);
-	strcat(pathWavFileTemp, "/voice.wav");
-	strcpy(pathMp3FileTemp, rootStorage);
-	strcat(pathMp3FileTemp, "/voice.mp3");
-	strcpy(pathAmrFileTemp, rootStorage);
-	strcat(pathAmrFileTemp, "/voice.amr");
+	int size = strlen(tempFile);
+	pathWavFileTemp = new char[size + 1];
+	strcpy(pathWavFileTemp, tempFile);
 
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
@@ -94,8 +77,7 @@ int VoiceEffect_init(JNIEnv* pEnv, jobject pThis, char* rootStorage) {
 
 	{
 		//SAVE ENVIROMENT
-		jclass tempClass = pEnv->FindClass(
-				"ntdn/voiceutil/service/CVoiceService");
+		jclass tempClass = pEnv->FindClass(J_SERVICE_FILENAME);
 		if (tempClass == NULL) {
 			Log::info("ERROR - cant get class");
 		}
@@ -122,14 +104,6 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 	AudioService_destroy();
 
 	delete[] pathWavFileTemp;
-	delete[] pathMp3FileTemp;
-	delete[] pathAmrFileTemp;
-
-	if (ROOT_FOLDER == NULL) {
-		delete[] ROOT_FOLDER;
-		ROOT_FOLDER = NULL;
-	}
-
 	return STATUS_OK;
 }
 
@@ -138,17 +112,10 @@ int VoiceEffect_destroy(JNIEnv* pEnv, jobject pThis) {
 /**
  *Init AudioLib
  */
-int VoiceEffect_init(char* rootStorage) {
-	int size = strlen(rootStorage) + strlen("/voice.wav") + 1;
+int VoiceEffect_init(char* tempFile) {
+	int size = strlen(tempFile);
 	pathWavFileTemp = new char[size];
-	pathMp3FileTemp = new char[size];
-	pathAmrFileTemp = new char[size];
-	strcpy(pathWavFileTemp, rootStorage);
-	strcat(pathWavFileTemp, "/voice.wav");
-	strcpy(pathMp3FileTemp, rootStorage);
-	strcat(pathMp3FileTemp, "/voice.mp3");
-	strcpy(pathAmrFileTemp, rootStorage);
-	strcat(pathAmrFileTemp, "/voice.amr");
+	strcpy(pathWavFileTemp, tempFile);
 
 	int res = AudioService_init();
 	if (res != STATUS_OK) {
@@ -177,8 +144,6 @@ int VoiceEffect_destroy() {
 	AudioService_destroy();
 
 	delete[] pathWavFileTemp;
-	delete[] pathMp3FileTemp;
-	delete[] pathAmrFileTemp;
 	return STATUS_OK;
 }
 
@@ -328,20 +293,17 @@ void VoiceEffect_selectAndInitEffect(int effect) {
 		break;
 	}
 	case EFFECT_ROMANCE: {
-		const char* path = "bg_romance.wav";
-		BackgroundEffect_initProcess(path, 0.7, true, true);
+		BackgroundEffect_initProcess(BG_ROMANCE_FILE, 0.7, true, true);
 		setIfBackground = true;
 		break;
 	}
 	case EFFECT_TECHTRONIC: {
-		const char* path = "bg_techtronic.wav";
-		BackgroundEffect_initProcess(path, 0.7, true, true);
+		BackgroundEffect_initProcess(BG_TECHTRONIC_FILE, 0.7, true, true);
 		setIfBackground = true;
 		break;
 	}
 	case EFFECT_DUB: {
-		const char* path = "bg_dub.wav";
-		BackgroundEffect_initProcess(path, 0.7, true, true);
+		BackgroundEffect_initProcess(BG_DUB_FILE, 0.7, true, true);
 		setIfBackground = true;
 		break;
 	}
@@ -373,7 +335,7 @@ int VoiceEffect_processAndWriteToAmr(int effect) {
 	}
 
 	VoiceEffect_selectAndInitEffect(effect);
-	FILE* outAmrFile = fopen(pathAmrFileTemp, "wb");
+	FILE* outAmrFile = fopen(pathAmrFileTemp, "wb"); // Note: pathAmrFileTemp was deleted
 	void* amrObj = Encoder_Interface_init(0);
 	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
 	if (inWavFile == NULL || outAmrFile == NULL) {
@@ -442,7 +404,7 @@ int VoiceEffect_processAndWriteToAmr(int effect) {
 #ifdef _USE_LAME_MP3_
 int VoiceEffect_processAndWriteToMp3(int effect) {
 	VoiceEffect_selectAndInitEffect(effect);
-	FILE* outMp3File = fopen(pathMp3FileTemp, "wb");
+	FILE* outMp3File = fopen(pathMp3FileTemp, "wb"); // Note: pathMp3FileTemp was deleted
 	WavInFile* inWavFile = new WavInFile(pathWavFileTemp);
 	if (inWavFile == NULL || outMp3File == NULL) {
 		return STATUS_FAIL;

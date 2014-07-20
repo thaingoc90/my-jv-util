@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -44,10 +43,15 @@ public class VoiceEffectActivity extends Activity {
 		setContentView(R.layout.activity_voice_effect);
 
 		voiceServices = new CVoiceService(this);
-		String rootStorage = Environment.getExternalStorageDirectory()
-				.getPath();
-		Log.i(LOG_TAG, rootStorage);
-		int res = voiceServices.init(rootStorage);
+		String fileTemp = Utils.getFileTemp();
+		if (Utils.strIsEmpty(fileTemp)) {
+			Utils.showMsg(this, "Can not get your storage");
+			initFail = true;
+			return;
+		}
+		
+		Log.i(LOG_TAG, fileTemp);
+		int res = voiceServices.init(fileTemp);
 		if (res == Constants.STATUS_FAIL) {
 			Utils.showMsg(this,
 					"Init fail, maybe your device doesn't support this plugin");

@@ -11,7 +11,7 @@ public class CVoiceService {
 		mActivity = activity;
 	}
 	
-	public native int init(String rootStorage);
+	public native int init(String tempFile);
 
 	public native int destroy();
 

@@ -22,6 +22,7 @@ public class Constants {
 	public static final int STATUS_NOT_SUPPORT = 2;
 	
 	public static final String APP_FOLDER = "VUtils";
+	public static final String RECORD_FILE_TEMP = "voicetmp";
 	
 	public static final int FILE_TYPE_WAV = 0;
 	public static final int FILE_TYPE_MP3 = 1;
