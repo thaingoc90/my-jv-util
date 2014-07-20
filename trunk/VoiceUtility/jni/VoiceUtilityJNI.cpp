@@ -6,14 +6,14 @@
  *Init AudioLib
  */
 jint Java_ntdn_voiceutil_service_CVoiceService_init(JNIEnv* pEnv, jobject pThis,
-		jstring rootStorage) {
-	const char* rootStoragePath = pEnv->GetStringUTFChars(rootStorage, 0);
+		jstring tempFile) {
+	const char* tempFilePath = pEnv->GetStringUTFChars(tempFile, 0);
 #ifdef _ANDROID_FLAG_
-	int res = VoiceEffect_init(pEnv, pThis, (char*) rootStoragePath);
+	int res = VoiceEffect_init(pEnv, pThis, (char*) tempFilePath);
 #else
 	int res = VoiceEffect_init((char*) rootStoragePath);
 #endif
-	pEnv->ReleaseStringUTFChars(rootStorage, rootStoragePath);
+	pEnv->ReleaseStringUTFChars(tempFile, tempFilePath);
 	return res;
 }
 

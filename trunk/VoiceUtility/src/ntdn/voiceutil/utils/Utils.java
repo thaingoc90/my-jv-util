@@ -31,6 +31,10 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * Get folder of app
+	 * @return
+	 */
 	public static String getAppFolder() {
 		String folder = "";
 		String rootStorage = Environment.getExternalStorageDirectory()
@@ -46,6 +50,12 @@ public class Utils {
 		return folder;
 	}
 
+	/**
+	 * Create fileName when saving 
+	 * 
+	 * @param fileType
+	 * @return
+	 */
 	public static String getFileName(int fileType) {
 		String fileName = getAppFolder();
 		if (strIsEmpty(fileName)) {
@@ -69,6 +79,19 @@ public class Utils {
 			return "";
 		}
 
+		return fileName;
+	}
+
+	/**
+	 * Get temp file when recording
+	 * @return
+	 */
+	public static final String getFileTemp() {
+		String fileName = getAppFolder();
+		if (strIsEmpty(fileName)) {
+			return "";
+		}
+		fileName += "/" + Constants.RECORD_FILE_TEMP + Constants.WAV_EXT;
 		return fileName;
 	}
 

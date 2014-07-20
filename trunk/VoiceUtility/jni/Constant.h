@@ -21,4 +21,10 @@ const int FILE_TYPE_WAV = 0;
 const int FILE_TYPE_MP3 = 1;
 const int FILE_TYPE_AMR = 2;
 
+const char* J_SERVICE_FILENAME = "ntdn/voiceutil/service/CVoiceService";
+const char* BG_ROMANCE_FILE = "bg_romance.wav";
+const char* BG_TECHTRONIC_FILE = "bg_techtronic.wav";
+const char* BG_DUB_FILE = "bg_dub.wav";
+
+
 #endif
