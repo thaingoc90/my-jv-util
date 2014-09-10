@@ -1,14 +1,15 @@
 package ntdn.voiceutil.activity;
 
 import ntdn.voiceutil.manager.CSoundManager;
+import ntdn.voiceutil.utils.AppSetting;
 import ntdn.voiceutil.utils.Constants;
+import ntdn.voiceutil.utils.Log;
 import ntdn.voiceutil.utils.Utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -49,7 +50,7 @@ public class VoiceEffectActivity extends Activity {
 			initFail = true;
 			return;
 		}
-		
+
 		Log.i(LOG_TAG, fileTemp);
 		int res = voiceServices.init(fileTemp);
 		if (res == Constants.STATUS_FAIL) {
@@ -137,7 +138,7 @@ public class VoiceEffectActivity extends Activity {
 			mDrawThread = mdrawer.getThread();
 			checkInterface();
 			startCountTimer();
-			mHandler.postDelayed(stopThreads, Constants.TIME_RECORD);
+			mHandler.postDelayed(stopThreads, AppSetting.TIME_RECORD);
 			getWindow()
 					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
@@ -189,19 +190,17 @@ public class VoiceEffectActivity extends Activity {
 	 * Count time of record.
 	 */
 	private void startCountTimer() {
-		cdt = new CountDownTimer(Constants.TIME_RECORD, 1000) {
+		final int timeRecord = AppSetting.TIME_RECORD;
+		cdt = new CountDownTimer(timeRecord, 1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
-				messageRecord
-						.setText(message
-								+ ((Constants.TIME_RECORD - millisUntilFinished) / 1000 + 1)
-								+ "s");
+				int timeText = (int) ((timeRecord - millisUntilFinished) / 1000 + 1);
+				messageRecord.setText(message + timeText + "s");
 			}
 
 			@Override
 			public void onFinish() {
-				messageRecord.setText(message + Constants.TIME_RECORD / 1000
-						+ "s");
+				messageRecord.setText(message + timeRecord / 1000 + "s");
 			}
 		};
 		cdt.start();

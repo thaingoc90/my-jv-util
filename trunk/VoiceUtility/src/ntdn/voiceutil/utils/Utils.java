@@ -33,13 +33,14 @@ public class Utils {
 
 	/**
 	 * Get folder of app
+	 * 
 	 * @return
 	 */
 	public static String getAppFolder() {
 		String folder = "";
 		String rootStorage = Environment.getExternalStorageDirectory()
 				.getPath();
-		folder = rootStorage + "/" + Constants.APP_FOLDER;
+		folder = rootStorage + File.pathSeparator + Constants.APP_FOLDER;
 		File dir = new File(folder);
 		if (!dir.exists()) {
 			boolean status = dir.mkdir();
@@ -51,7 +52,7 @@ public class Utils {
 	}
 
 	/**
-	 * Create fileName when saving 
+	 * Create fileName when saving
 	 * 
 	 * @param fileType
 	 * @return
@@ -64,7 +65,7 @@ public class Utils {
 		Date cur = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 		String timeStr = sdf.format(cur);
-		fileName += "/" + timeStr;
+		fileName += File.pathSeparator + timeStr;
 		switch (fileType) {
 		case Constants.FILE_TYPE_WAV:
 			fileName += Constants.WAV_EXT;
@@ -84,6 +85,7 @@ public class Utils {
 
 	/**
 	 * Get temp file when recording
+	 * 
 	 * @return
 	 */
 	public static final String getFileTemp() {
@@ -91,8 +93,22 @@ public class Utils {
 		if (strIsEmpty(fileName)) {
 			return "";
 		}
-		fileName += "/" + Constants.RECORD_FILE_TEMP + Constants.WAV_EXT;
+		fileName += File.pathSeparator + Constants.RECORD_FILE_TEMP
+				+ Constants.WAV_EXT;
 		return fileName;
+	}
+
+	public static final String getLogFolder() {
+		String logFolder = getAppFolder() + File.pathSeparator
+				+ Constants.APP_LOG_FOLDER;
+		File dir = new File(logFolder);
+		if (!dir.exists()) {
+			boolean status = dir.mkdir();
+			if (!status) {
+				logFolder = "";
+			}
+		}
+		return logFolder;
 	}
 
 	static class ToastRunnable implements Runnable {
