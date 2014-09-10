@@ -1,6 +1,6 @@
 package ntdn.voiceutil.activity;
 
-import ntdn.voiceutil.service.CVoiceService;
+import ntdn.voiceutil.manager.CSoundManager;
 import ntdn.voiceutil.utils.Constants;
 import ntdn.voiceutil.utils.Utils;
 import android.app.Activity;
@@ -29,7 +29,7 @@ public class VoiceEffectActivity extends Activity {
 	private static final String message = "Recording ....";
 	private CountDownTimer cdt;
 
-	public static CVoiceService voiceServices;
+	public static CSoundManager voiceServices;
 	private boolean initFail = false;
 
 	// FOR SOUND WAVE
@@ -42,7 +42,7 @@ public class VoiceEffectActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_voice_effect);
 
-		voiceServices = new CVoiceService(this);
+		voiceServices = new CSoundManager(this);
 		String fileTemp = Utils.getFileTemp();
 		if (Utils.strIsEmpty(fileTemp)) {
 			Utils.showMsg(this, "Can not get your storage");

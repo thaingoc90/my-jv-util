@@ -1,4 +1,4 @@
-package ntdn.voiceutil.service;
+package ntdn.voiceutil.manager;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -11,7 +11,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-public class JRecordService {
+public class JRecordManager {
 
 	private AudioRecord mRecorder;
 	private int sampleRate;
@@ -25,7 +25,7 @@ public class JRecordService {
 	private int channelAlias, bpsAlias;
 	private long fileSize = 0;
 
-	public JRecordService(int sampleRate, int channel, int sampleSize,
+	public JRecordManager(int sampleRate, int channel, int sampleSize,
 			String fileName) {
 		this.sampleRate = sampleRate;
 		this.channel = channel;
