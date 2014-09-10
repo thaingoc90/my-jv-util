@@ -1,17 +1,17 @@
-package ntdn.voiceutil.service;
+package ntdn.voiceutil.manager;
 
 import java.io.File;
 
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 
-public class JPlayerService {
+public class JPlayerManager {
 
 	private boolean isPlaying = false;
 	private String fileName;
 	private MediaPlayer mPlayer = null;
 
-	public JPlayerService(String fileName) {
+	public JPlayerManager(String fileName) {
 		this.fileName = fileName;
 		isPlaying = false;
 	}

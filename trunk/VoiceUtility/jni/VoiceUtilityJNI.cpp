@@ -5,7 +5,7 @@
 /**
  *Init AudioLib
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_init(JNIEnv* pEnv, jobject pThis,
+jint Java_ntdn_voiceutil_manager_CSoundManager_init(JNIEnv* pEnv, jobject pThis,
 		jstring tempFile) {
 	const char* tempFilePath = pEnv->GetStringUTFChars(tempFile, 0);
 #ifdef _ANDROID_FLAG_
@@ -20,7 +20,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_init(JNIEnv* pEnv, jobject pThis,
 /**
  * Destroy AudioLib
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_destroy(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_destroy(JNIEnv* pEnv,
 		jobject pThis) {
 #ifdef _ANDROID_FLAG_
 	return VoiceEffect_destroy(pEnv, pThis);
@@ -29,12 +29,12 @@ jint Java_ntdn_voiceutil_service_CVoiceService_destroy(JNIEnv* pEnv,
 #endif
 }
 
-void Java_ntdn_voiceutil_service_CVoiceService_setSampleRate(JNIEnv* pEnv,
+void Java_ntdn_voiceutil_manager_CSoundManager_setSampleRate(JNIEnv* pEnv,
 		jobject pThis, jint sampleRate) {
 	VoiceEffect_setSampleRate(sampleRate);
 }
 
-void Java_ntdn_voiceutil_service_CVoiceService_setChannel(JNIEnv* pEnv,
+void Java_ntdn_voiceutil_manager_CSoundManager_setChannel(JNIEnv* pEnv,
 		jobject pThis, jint channel) {
 	VoiceEffect_setChannel(channel);
 }
@@ -42,7 +42,7 @@ void Java_ntdn_voiceutil_service_CVoiceService_setChannel(JNIEnv* pEnv,
 /**
  * Start record.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_startRecord(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_startRecord(JNIEnv* pEnv,
 		jobject pThis) {
 	return VoiceEffect_startRecord();
 }
@@ -50,7 +50,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_startRecord(JNIEnv* pEnv,
 /**
  * Stop record.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_stopRecord(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_stopRecord(JNIEnv* pEnv,
 		jobject pThis) {
 	return VoiceEffect_stopRecord();
 }
@@ -58,7 +58,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_stopRecord(JNIEnv* pEnv,
 /**
  * Start player. Open tempFile (sdcard/voice.wav) to ready to play.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_startPlayer(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_startPlayer(JNIEnv* pEnv,
 		jobject pThis) {
 	return VoiceEffect_startPlayer();
 }
@@ -66,7 +66,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_startPlayer(JNIEnv* pEnv,
 /**
  * Stop player.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_stopPlayer(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_stopPlayer(JNIEnv* pEnv,
 		jobject pThis) {
 	return VoiceEffect_stopPlayer();
 }
@@ -74,7 +74,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_stopPlayer(JNIEnv* pEnv,
 /**
  * Init lib of effects
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_initEffectLib(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_initEffectLib(JNIEnv* pEnv,
 		jobject pThis, jobject assetManager) {
 #ifdef _ANDROID_FLAG_
 	return VoiceEffect_initEffectLib(pEnv, pThis, assetManager);
@@ -86,7 +86,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_initEffectLib(JNIEnv* pEnv,
 /**
  * Destroy lib of effects.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_destroyEffectLib(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_destroyEffectLib(JNIEnv* pEnv,
 		jobject pThis) {
 	return VoiceEffect_destroyEffectLib();
 }
@@ -94,7 +94,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_destroyEffectLib(JNIEnv* pEnv,
 /**
  * Play a effect which is defined.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_playEffect(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_playEffect(JNIEnv* pEnv,
 		jobject pThis, jint effect) {
 	return VoiceEffect_playEffect(effect);
 }
@@ -102,7 +102,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_playEffect(JNIEnv* pEnv,
 /**
  * Process data & write data to mp3 file.
  */
-jint Java_ntdn_voiceutil_service_CVoiceService_saveFile(JNIEnv* pEnv,
+jint Java_ntdn_voiceutil_manager_CSoundManager_saveFile(JNIEnv* pEnv,
 		jobject pThis, jstring path, jint effect, jint type) {
 	const char* filePath = pEnv->GetStringUTFChars(path, 0);
 	jint status = VoiceEffect_saveFile((char*) filePath, effect, type);
@@ -114,7 +114,7 @@ jint Java_ntdn_voiceutil_service_CVoiceService_saveFile(JNIEnv* pEnv,
 /**
  * Play custom effect. Note: use this func after inited an any effect.
  */
-void Java_ntdn_voiceutil_service_CVoiceService_playCustomEffect(JNIEnv* pEnv,
+void Java_ntdn_voiceutil_manager_CSoundManager_playCustomEffect(JNIEnv* pEnv,
 		jobject pThis, jboolean setIfSoundTouch, jboolean setIfEcho,
 		jboolean setIfBackground, jboolean setIfReverb) {
 
@@ -125,7 +125,7 @@ void Java_ntdn_voiceutil_service_CVoiceService_playCustomEffect(JNIEnv* pEnv,
 /**
  * Prepare for soundTouch Lib
  */
-void Java_ntdn_voiceutil_service_CVoiceService_prepareSoundTouchEffect(
+void Java_ntdn_voiceutil_manager_CSoundManager_prepareSoundTouchEffect(
 		JNIEnv* pEnv, jobject pThis, jdouble tempo, jdouble pitch,
 		jdouble rate) {
 	VoiceEffect_prepareSoundTouchEffect(tempo, pitch, rate);
@@ -134,7 +134,7 @@ void Java_ntdn_voiceutil_service_CVoiceService_prepareSoundTouchEffect(
 /**
  * Prepare for Echo Lib
  */
-void Java_ntdn_voiceutil_service_CVoiceService_prepareEchoEffect(JNIEnv* pEnv,
+void Java_ntdn_voiceutil_manager_CSoundManager_prepareEchoEffect(JNIEnv* pEnv,
 		jobject pThis, jdouble mDelay, jdouble mDecay) {
 	VoiceEffect_prepareEchoEffect(mDelay, mDecay);
 }
@@ -142,7 +142,7 @@ void Java_ntdn_voiceutil_service_CVoiceService_prepareEchoEffect(JNIEnv* pEnv,
 /**
  * Prepare for Background Lib
  */
-void Java_ntdn_voiceutil_service_CVoiceService_prepareBackgroundEffect(
+void Java_ntdn_voiceutil_manager_CSoundManager_prepareBackgroundEffect(
 		JNIEnv* pEnv, jobject pThis, jstring bgPath, jdouble gain,
 		jboolean inAssetFolder, jboolean isWavFile) {
 	const char* bgFilePath = pEnv->GetStringUTFChars(bgPath, 0);
@@ -154,7 +154,7 @@ void Java_ntdn_voiceutil_service_CVoiceService_prepareBackgroundEffect(
 /**
  * Prepare for Reverb Lib
  */
-void Java_ntdn_voiceutil_service_CVoiceService_prepareReverbEffect(JNIEnv* pEnv,
+void Java_ntdn_voiceutil_manager_CSoundManager_prepareReverbEffect(JNIEnv* pEnv,
 		jobject pThis, jdouble mRoomSize, jdouble mDelay, jdouble mReverberance,
 		jdouble mHfDamping, jdouble mToneLow, jdouble mToneHigh,
 		jdouble mWetGain, jdouble mDryGain) {

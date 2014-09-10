@@ -1,6 +1,6 @@
 package ntdn.voiceutil.activity;
 
-import ntdn.voiceutil.service.CVoiceService;
+import ntdn.voiceutil.manager.CSoundManager;
 import ntdn.voiceutil.utils.Constants;
 import ntdn.voiceutil.utils.Utils;
 import android.app.Activity;
@@ -20,7 +20,7 @@ public class EffectActivity extends Activity {
 	private AssetManager mgr;
 	private static final String LOG_TAG = "EffectActivity";
 	private int effectType = Constants.EFFECT_ORIGINAL;
-	public static CVoiceService soundServices = VoiceEffectActivity.voiceServices;
+	public static CSoundManager soundServices = VoiceEffectActivity.voiceServices;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -1,13 +1,13 @@
-package ntdn.voiceutil.service;
+package ntdn.voiceutil.manager;
 
 import ntdn.voiceutil.activity.VoiceEffectActivity;
 import android.content.res.AssetManager;
 
-public class CVoiceService {
+public class CSoundManager {
 
 	private VoiceEffectActivity mActivity;
 
-	public CVoiceService(VoiceEffectActivity activity) {
+	public CSoundManager(VoiceEffectActivity activity) {
 		mActivity = activity;
 	}
 	
