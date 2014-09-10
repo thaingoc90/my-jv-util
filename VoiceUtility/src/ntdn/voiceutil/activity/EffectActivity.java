@@ -2,12 +2,12 @@ package ntdn.voiceutil.activity;
 
 import ntdn.voiceutil.manager.CSoundManager;
 import ntdn.voiceutil.utils.Constants;
+import ntdn.voiceutil.utils.Log;
 import ntdn.voiceutil.utils.Utils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
