@@ -40,7 +40,7 @@ public class Utils {
 		String folder = "";
 		String rootStorage = Environment.getExternalStorageDirectory()
 				.getPath();
-		folder = rootStorage + File.pathSeparator + Constants.APP_FOLDER;
+		folder = rootStorage + File.separator + Constants.APP_FOLDER;
 		File dir = new File(folder);
 		if (!dir.exists()) {
 			boolean status = dir.mkdir();
@@ -65,7 +65,7 @@ public class Utils {
 		Date cur = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 		String timeStr = sdf.format(cur);
-		fileName += File.pathSeparator + timeStr;
+		fileName += File.separator + timeStr;
 		switch (fileType) {
 		case Constants.FILE_TYPE_WAV:
 			fileName += Constants.WAV_EXT;
@@ -93,13 +93,13 @@ public class Utils {
 		if (strIsEmpty(fileName)) {
 			return "";
 		}
-		fileName += File.pathSeparator + Constants.RECORD_FILE_TEMP
+		fileName += File.separator + Constants.RECORD_FILE_TEMP
 				+ Constants.WAV_EXT;
 		return fileName;
 	}
 
 	public static final String getLogFolder() {
-		String logFolder = getAppFolder() + File.pathSeparator
+		String logFolder = getAppFolder() + File.separator
 				+ Constants.APP_LOG_FOLDER;
 		File dir = new File(logFolder);
 		if (!dir.exists()) {
